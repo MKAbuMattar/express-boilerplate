@@ -72,7 +72,7 @@
     "vitest": "1.6.0"
   },
   "engines": {
-    "node": ">=20.x"
+    "node": ">=18.x"
   },
   "packageManager": "pnpm@8.15.8"
 }
