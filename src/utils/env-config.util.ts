@@ -6,8 +6,8 @@ dotenv.config();
 function getEnv() {
   return cleanEnv(process.env, {
     NODE_ENV: str({
-      devDefault: testOnly('development'),
-      choices: ['development', 'staging', 'production'],
+      devDefault: testOnly('test'),
+      choices: ['test', 'development', 'staging', 'production'],
     }),
     HOST: host({devDefault: testOnly('localhost')}),
     PORT: port({devDefault: testOnly(8080)}),
