@@ -1,0 +1,26 @@
+services:
+  backend:
+    platform: linux/amd64 # This is required for M1 Macs
+    restart: always
+    container_name: express-boilerplate
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - target: 8080
+        published: 8080
+        protocol: tcp
+        mode: host
+    networks:
+      - backend
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - HOST=${HOST}
+      - CORS_WHITELIST=${CORS_WHITELIST}
+
+networks:
+  backend:
+    driver: bridge
