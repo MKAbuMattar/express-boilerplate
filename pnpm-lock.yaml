@@ -26,9 +26,6 @@ dependencies:
   express:
     specifier: 4.19.2
     version: 4.19.2
-  express-rate-limit:
-    specifier: 7.3.1
-    version: 7.3.1(express@4.19.2)
   helmet:
     specifier: 7.1.0
     version: 7.1.0
@@ -1714,15 +1711,6 @@ packages:
       signal-exit: 4.1.0
       strip-final-newline: 3.0.0
     dev: true
-
-  /express-rate-limit@7.3.1(express@4.19.2):
-    resolution: {integrity: sha512-BbaryvkY4wEgDqLgD18/NSy2lDO2jTuT9Y8c1Mpx0X63Yz0sYd5zN6KPe7UvpuSVvV33T6RaE1o1IVZQjHMYgw==}
-    engines: {node: '>= 16'}
-    peerDependencies:
-      express: 4 || 5 || ^5.0.0-beta.1
-    dependencies:
-      express: 4.19.2
-    dev: false
 
   /express@4.19.2:
     resolution: {integrity: sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==}
