@@ -9,7 +9,7 @@ import {ServiceResponse} from '@/models/service-response.model';
 import {app} from '@/server';
 
 describe('User API Endpoints', () => {
-  describe('GET /users', () => {
+  describe('GET /api/users', () => {
     it('should return a list of users', async () => {
       // Act
       const response = await request(app).get('/users');
@@ -26,7 +26,7 @@ describe('User API Endpoints', () => {
     });
   });
 
-  describe('GET /users/:id', () => {
+  describe('GET /api/users/:id', () => {
     it('should return a user for a valid ID', async () => {
       // Arrange
       const testId = 1;

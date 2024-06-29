@@ -13,7 +13,21 @@ export const openAPIRouter: Router = (() => {
     res.send(openAPIDocument);
   });
 
-  router.use('/', swaggerUi.serve, swaggerUi.setup(openAPIDocument));
+  router.use(
+    '/',
+    swaggerUi.serve,
+    swaggerUi.setup(openAPIDocument, {
+      customSiteTitle: 'API Documentation',
+      customCss: `
+        .swagger-ui .topbar .topbar-wrapper {
+          display: none; 
+        }
+      `,
+      swaggerOptions: {
+        filter: true,
+      },
+    }),
+  );
 
   return router;
 })();

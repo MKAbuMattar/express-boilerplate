@@ -20,6 +20,7 @@ export const healthCheckRouter: Router = (() => {
     method: 'get',
     path: '/health-check',
     tags: ['Health Check'],
+    summary: 'Health Check API',
     responses: createApiResponse(z.null(), 'Success'),
   });
 
