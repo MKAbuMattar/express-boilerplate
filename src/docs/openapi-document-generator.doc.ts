@@ -7,7 +7,7 @@ import {
 import {healthCheckRegistry} from '@/api/health-check/health-check.router';
 import {userRegistry} from '@/api/user/user.router';
 
-export function generateOpenAPIDocument() {
+export const generateOpenAPIDocument = () => {
   const registry = new OpenAPIRegistry([healthCheckRegistry, userRegistry]);
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
@@ -19,7 +19,7 @@ export function generateOpenAPIDocument() {
     },
     externalDocs: {
       description: 'View the raw OpenAPI Specification in JSON format',
-      url: 'docs/swagger.json',
+      url: '/docs/swagger.json',
     },
   });
-}
+};

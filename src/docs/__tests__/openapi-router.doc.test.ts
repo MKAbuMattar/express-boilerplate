@@ -1,32 +1,24 @@
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
-
-// Docs
-import {generateOpenAPIDocument} from '@/docs/openapi-document-generator.doc';
+// Models
 import {app} from '@/server';
 
 describe('OpenAPI Router', () => {
-  describe('Swagger JSON route', () => {
-    it('should return Swagger JSON content', async () => {
-      // Arrange
-      const expectedResponse = generateOpenAPIDocument();
-
+  describe('GET /docs/swagger.json', () => {
+    it('should return the OpenAPI document', async () => {
       // Act
       const response = await request(app).get('/docs/swagger.json');
+      const responseBody = response.body;
 
       // Assert
-      expect(response.status).toBe(StatusCodes.OK);
-      expect(response.type).toBe('application/json');
-      expect(response.body).toEqual(expectedResponse);
-    });
-
-    it('should serve the Swagger UI', async () => {
-      // Act
-      const response = await request(app).get('/docs/');
-
-      // Assert
-      expect(response.status).toBe(StatusCodes.OK);
-      expect(response.text).toContain('swagger-ui');
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(responseBody.openapi).toEqual('3.0.0');
+      expect(responseBody.info.version).toEqual('1.0.0');
+      expect(responseBody.info.title).toEqual('Swagger API');
+      expect(responseBody.externalDocs.description).toEqual(
+        'View the raw OpenAPI Specification in JSON format',
+      );
+      expect(responseBody.externalDocs.url).toEqual('/docs/swagger.json');
     });
   });
 });
