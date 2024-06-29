@@ -14,8 +14,8 @@ describe('OpenAPI Router', () => {
       // Assert
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(responseBody.openapi).toEqual('3.0.0');
-      expect(responseBody.info.version).toEqual('1.0.0');
-      expect(responseBody.info.title).toEqual('Swagger API');
+      expect(responseBody.info.version).toEqual('0.0.0');
+      expect(responseBody.info.title).toEqual('API Documentation');
       expect(responseBody.externalDocs.description).toEqual(
         'View the raw OpenAPI Specification in JSON format',
       );
