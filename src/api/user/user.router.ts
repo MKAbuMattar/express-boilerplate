@@ -21,7 +21,7 @@ export const userRouter: Router = (() => {
 
   userRegistry.registerPath({
     method: 'get',
-    path: '/users',
+    path: '/api/users',
     tags: ['User'],
     responses: createApiResponse(z.array(UserSchema), 'Success'),
   });
@@ -33,7 +33,7 @@ export const userRouter: Router = (() => {
 
   userRegistry.registerPath({
     method: 'get',
-    path: '/users/{id}',
+    path: '/api/users/{id}',
     tags: ['User'],
     request: {params: GetUserSchema.shape.params},
     responses: createApiResponse(UserSchema, 'Success'),
