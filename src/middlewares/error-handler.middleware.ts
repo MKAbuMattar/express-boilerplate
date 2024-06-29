@@ -1,5 +1,4 @@
 import {type ErrorRequestHandler, type RequestHandler} from 'express';
-
 import {StatusCodes} from 'http-status-codes';
 
 const unexpectedRequest: RequestHandler = (_req, res) => {

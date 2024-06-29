@@ -4,10 +4,8 @@ import {z} from 'zod';
 
 import {GetUserSchema, UserSchema} from '@/api/user/user.model';
 import {userService} from '@/api/user/user.service';
-
 // Docs
 import {createApiResponse} from '@/docs/openapi-response-builders.doc';
-
 // Models
 import {
   handleServiceResponse,

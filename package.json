@@ -22,9 +22,10 @@
     "build": "rimraf dist && tsup --tsconfig tsconfig.json",
     "start": "node dist/bin/www.js | pino-pretty",
     "clean": "rimraf dist coverage",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix",
-    "format": "prettier --config prettier.config.mjs --write .",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
+    "format": "prettier --config prettier.config.mjs --check ./src",
+    "format:fix": "prettier --config prettier.config.mjs --write ./src",
     "test": "vitest run",
     "test:dev": "vitest dev",
     "test:cov": "vitest run --coverage"

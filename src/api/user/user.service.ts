@@ -3,10 +3,8 @@ import {StatusCodes} from 'http-status-codes';
 // User Controller
 import {User} from '@/api/user/user.model';
 import {userRepository} from '@/api/user/user.repository';
-
 // Models
 import {ResponseStatus, ServiceResponse} from '@/models/service-response.model';
-
 import {logger} from '@/server';
 
 export const userService = {

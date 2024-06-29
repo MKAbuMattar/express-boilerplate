@@ -1,5 +1,4 @@
 import {app, logger} from '@/server';
-
 // Utils
 import {env} from '@/utils/env-config.util';
 
