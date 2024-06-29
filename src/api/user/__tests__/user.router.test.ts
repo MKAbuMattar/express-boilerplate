@@ -4,10 +4,8 @@ import request from 'supertest';
 // User Controller
 import {User} from '@/api/user/user.model';
 import {users} from '@/api/user/user.repository';
-
 // Models
 import {ServiceResponse} from '@/models/service-response.model';
-
 import {app} from '@/server';
 
 describe('User API Endpoints', () => {

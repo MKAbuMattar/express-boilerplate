@@ -1,22 +1,18 @@
-import express, {type Express} from 'express';
-
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import express, {type Express} from 'express';
 import helmet from 'helmet';
 import {pino} from 'pino';
 
 // Controllers
 import {healthCheckRouter} from '@/api/health-check/health-check.router';
 import {userRouter} from '@/api/user/user.router';
-
 // Docs
 import {openAPIRouter} from '@/docs/openapi-router.doc';
-
 // Middlewares
 import errorHandler from '@/middlewares/error-handler.middleware';
 import requestLogger from '@/middlewares/request-logger.middleware';
-
 // Utils
 import {env} from '@/utils/env-config.util';
 

@@ -2,7 +2,6 @@ import {randomUUID} from 'node:crypto';
 import {IncomingMessage, ServerResponse} from 'node:http';
 
 import {Request, RequestHandler, Response} from 'express';
-
 import {getReasonPhrase, StatusCodes} from 'http-status-codes';
 import {LevelWithSilent} from 'pino';
 import {CustomAttributeKeys, Options, pinoHttp} from 'pino-http';
