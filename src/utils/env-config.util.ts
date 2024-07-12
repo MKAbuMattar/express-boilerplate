@@ -14,6 +14,12 @@ function getEnv() {
     CORS_WHITELIST: str({
       devDefault: testOnly('http://localhost:*'),
     }),
+    API_KEY: str({
+      devDefault: testOnly('TEST_API_KEY'),
+    }),
+    SESSION_SECRET: str({
+      devDefault: testOnly('TEST_SESSION_SECRET'),
+    }),
   });
 }
 

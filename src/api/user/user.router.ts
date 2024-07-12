@@ -19,10 +19,36 @@ userRegistry.register('User', UserSchema);
 export const userRouter: Router = (() => {
   const router = express.Router();
 
+  const apiKeyAuth = userRegistry.registerComponent(
+    'securitySchemes',
+    'ApiKeyAuth',
+    {
+      type: 'apiKey',
+      in: 'header',
+      name: 'X-API-Key',
+    },
+  );
+
+  const cookieAuth = userRegistry.registerComponent(
+    'securitySchemes',
+    'cookieAuth',
+    {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'connect.sid',
+    },
+  );
+
   userRegistry.registerPath({
     method: 'get',
     path: '/api/users',
     tags: ['User'],
+    security: [
+      {
+        [apiKeyAuth.name]: ['read:auth', 'write:auth'],
+        [cookieAuth.name]: ['read:auth', 'write:auth'],
+      },
+    ],
     responses: createApiResponse(z.array(UserSchema), 'Success'),
   });
 
@@ -35,6 +61,12 @@ export const userRouter: Router = (() => {
     method: 'get',
     path: '/api/users/{id}',
     tags: ['User'],
+    security: [
+      {
+        [apiKeyAuth.name]: ['read:auth', 'write:auth'],
+        [cookieAuth.name]: ['read:auth', 'write:auth'],
+      },
+    ],
     request: {params: GetUserSchema.shape.params},
     responses: createApiResponse(UserSchema, 'Success'),
   });

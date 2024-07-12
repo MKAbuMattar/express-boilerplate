@@ -9,17 +9,21 @@ on:
       - main
 
 env:
+  STACK_NAME: express-bdoilerplate
+  DOMAIN: localhost
   NODE_ENV: development
   PORT: 8080
   HOST: localhost
   CORS_WHITELIST: '*'
+  API_KEY: 'secret'
+  SESSION_SECRET: 'secret'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [20, 22]
 
     steps:
       - name: Checkout
@@ -28,7 +32,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8.15.8
+          version: 9.5.0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
