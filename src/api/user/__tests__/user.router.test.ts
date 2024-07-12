@@ -40,8 +40,6 @@ describe('User API Endpoints', () => {
         .get('/api/users')
         .set('X-API-KEY', env.API_KEY)
         .set('Cookie', `${sessionCookie}`);
-      console.log(JSON.stringify(response));
-      console.log(JSON.stringify(sessionCookie));
       const responseBody: ServiceResponse<User[]> = response.body;
 
       // Assert
