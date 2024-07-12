@@ -1,6 +1,6 @@
-import {app, logger} from '@/server';
 // Middlewares
 import errorHandler from '@/middlewares/error-handler.middleware';
+import {app, logger} from '@/server';
 // Utils
 import {env} from '@/utils/env-config.util';
 
