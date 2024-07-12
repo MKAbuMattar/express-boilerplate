@@ -4,7 +4,14 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 const viteConfig: UserConfig = defineConfig({
   test: {
     coverage: {
-      exclude: ['**/node_modules/**', '**/index.ts'],
+      include: ['src/**'],
+      exclude: [
+        '**/node_modules/**',
+        '**/bin/*.ts',
+        '**/schemas/*',
+        '**/types/*',
+        '**/server.ts',
+      ],
     },
     globals: true,
     restoreMocks: true,

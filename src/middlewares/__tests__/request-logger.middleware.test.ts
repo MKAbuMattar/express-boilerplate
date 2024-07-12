@@ -11,10 +11,10 @@ describe('Request Logger Middleware', () => {
 
   beforeAll(() => {
     app.use(requestLogger);
-    app.get('/success', (req, res) =>
+    app.get('/success', (_req, res) =>
       res.status(StatusCodes.OK).send('Success'),
     );
-    app.get('/redirect', (req, res) => res.redirect('/success'));
+    app.get('/redirect', (_req, res) => res.redirect('/success'));
     app.get('/error', () => {
       throw new Error('Test error');
     });

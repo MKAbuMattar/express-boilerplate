@@ -1,6 +1,10 @@
 import {app, logger} from '@/server';
+// Middlewares
+import errorHandler from '@/middlewares/error-handler.middleware';
 // Utils
 import {env} from '@/utils/env-config.util';
+
+app.use(errorHandler());
 
 const server = app.listen(env.PORT, () => {
   const {NODE_ENV, HOST, PORT} = env;
