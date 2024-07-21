@@ -20,7 +20,7 @@
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/bin/www.ts | pino-pretty",
     "build": "rimraf dist && tsup --tsconfig tsconfig.json",
-    "start": "node ./dist/bin/www.js | pino-pretty",
+    "start": "node ./dist/bin/www.mjs | pino-pretty",
     "clean": "rimraf dist coverage",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",

@@ -13,6 +13,7 @@ const tsupConfig = defineConfig({
   dts: false,
   treeshake: true,
   shims: true,
+  format: ['esm'],
   minify: isProduction ? 'terser' : false,
 });
 
