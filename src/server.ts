@@ -6,7 +6,6 @@ import helmet from 'helmet';
 import {pino} from 'pino';
 
 // API
-import {authRouter} from '@/api/auth/auth.router';
 import {healthCheckRouter} from '@/api/health-check/health-check.router';
 import {userRouter} from '@/api/user/user.router';
 // Docs
@@ -55,7 +54,6 @@ app.use(requestLogger);
 
 // Routes
 app.use('/health-check', healthCheckRouter);
-app.use('/api/auth', authApiKey(), authRouter);
 app.use('/api/users', authApiKey(), userRouter);
 
 // Docs
