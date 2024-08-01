@@ -16,7 +16,6 @@ env:
   HOST: localhost
   CORS_WHITELIST: '*'
   API_KEY: 'secret'
-  SESSION_SECRET: 'secret'
 
 jobs:
   build:
