@@ -1,13 +1,9 @@
-import {Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
 // User Controller
 import {User} from '@/api/user/user.model';
 import {users} from '@/api/user/user.repository';
-// Middlewares
-import authApiKey from '@/middlewares/auth-api-key.middleware';
-import errorHandler from '@/middlewares/error-handler.middleware';
 // Models
 import {ServiceResponse} from '@/models/service-response.model';
 import {app} from '@/server';
@@ -15,31 +11,12 @@ import {app} from '@/server';
 import {env} from '@/utils/env-config.util';
 
 describe('User API Endpoints', () => {
-  beforeAll(() => {
-    app.get('/login', authApiKey(), (req: Request, res: Response) => {
-      // Simulate login and set session cookie
-      req.session.user = {id: 'user-id', username: 'testuser'};
-      res.status(StatusCodes.OK).send('Login route');
-    });
-
-    app.use(errorHandler());
-  });
-
   describe('GET /api/users', () => {
     it('should return a list of users', async () => {
-      const agent = request.agent(app);
-
-      const loginResponse = await agent
-        .get('/login')
-        .set('X-API-KEY', env.API_KEY);
-
-      const sessionCookie = loginResponse.header['set-cookie'][0];
-
       // Act
       const response = await request(app)
         .get('/api/users')
-        .set('X-API-KEY', env.API_KEY)
-        .set('Cookie', `${sessionCookie}`);
+        .set('X-API-KEY', env.API_KEY);
       const responseBody: ServiceResponse<User[]> = response.body;
 
       // Assert
@@ -55,14 +32,6 @@ describe('User API Endpoints', () => {
 
   describe('GET /api/users/:id', () => {
     it('should return a user for a valid ID', async () => {
-      const agent = request.agent(app);
-
-      const loginResponse = await agent
-        .get('/login')
-        .set('X-API-KEY', env.API_KEY);
-
-      const sessionCookie = loginResponse.header['set-cookie'][0];
-
       // Arrange
       const testId = 1;
       const expectedUser = users.find((user) => user.id === testId) as User;
@@ -70,8 +39,7 @@ describe('User API Endpoints', () => {
       // Act
       const response = await request(app)
         .get(`/api/users/${testId}`)
-        .set('X-API-KEY', env.API_KEY)
-        .set('Cookie', `${sessionCookie}`);
+        .set('X-API-KEY', env.API_KEY);
       const responseBody: ServiceResponse<User> = response.body;
 
       // Assert
@@ -84,22 +52,13 @@ describe('User API Endpoints', () => {
     });
 
     it('should return a not found error for non-existent ID', async () => {
-      const agent = request.agent(app);
-
-      const loginResponse = await agent
-        .get('/login')
-        .set('X-API-KEY', env.API_KEY);
-
-      const sessionCookie = loginResponse.header['set-cookie'][0];
-
       // Arrange
       const testId = Number.MAX_SAFE_INTEGER;
 
       // Act
       const response = await request(app)
         .get(`/api/users/${testId}`)
-        .set('X-API-KEY', env.API_KEY)
-        .set('Cookie', `${sessionCookie}`);
+        .set('X-API-KEY', env.API_KEY);
       const responseBody: ServiceResponse = response.body;
 
       // Assert
@@ -110,20 +69,11 @@ describe('User API Endpoints', () => {
     });
 
     it('should return a bad request for invalid ID format', async () => {
-      const agent = request.agent(app);
-
-      const loginResponse = await agent
-        .get('/login')
-        .set('X-API-KEY', env.API_KEY);
-
-      const sessionCookie = loginResponse.header['set-cookie'][0];
-
       // Act
       const invalidInput = 'abc';
       const response = await request(app)
         .get(`/api/users/${invalidInput}`)
-        .set('X-API-KEY', env.API_KEY)
-        .set('Cookie', `${sessionCookie}`);
+        .set('X-API-KEY', env.API_KEY);
       const responseBody: ServiceResponse = response.body;
 
       // Assert

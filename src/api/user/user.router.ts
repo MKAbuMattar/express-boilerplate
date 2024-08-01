@@ -29,16 +29,6 @@ export const userRouter: Router = (() => {
     },
   );
 
-  const cookieAuth = userRegistry.registerComponent(
-    'securitySchemes',
-    'cookieAuth',
-    {
-      type: 'apiKey',
-      in: 'cookie',
-      name: 'connect.sid',
-    },
-  );
-
   userRegistry.registerPath({
     method: 'get',
     path: '/api/users',
@@ -46,7 +36,6 @@ export const userRouter: Router = (() => {
     security: [
       {
         [apiKeyAuth.name]: ['read:auth', 'write:auth'],
-        [cookieAuth.name]: ['read:auth', 'write:auth'],
       },
     ],
     responses: createApiResponse(z.array(UserSchema), 'Success'),
@@ -64,7 +53,6 @@ export const userRouter: Router = (() => {
     security: [
       {
         [apiKeyAuth.name]: ['read:auth', 'write:auth'],
-        [cookieAuth.name]: ['read:auth', 'write:auth'],
       },
     ],
     request: {params: GetUserSchema.shape.params},
