@@ -18,9 +18,9 @@
     "url": "https://github.com/MKAbuMattar/express-boilerplate/issues"
   },
   "scripts": {
-    "dev": "tsx watch --clear-screen=false src/bin/www.ts | pino-pretty",
+    "dev": "tsx watch --clear-screen=false src/bin/www.ts",
     "build": "rimraf dist && tsup --tsconfig tsconfig.json",
-    "start": "node ./dist/bin/www.mjs | pino-pretty",
+    "start": "node ./dist/bin/www.mjs",
     "clean": "rimraf dist coverage",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",

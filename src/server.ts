@@ -8,6 +8,8 @@ import {pino} from 'pino';
 // API
 import {healthCheckRouter} from '@/api/health-check/health-check.router';
 import {userRouter} from '@/api/user/user.router';
+// Configs
+import {loggerOptions} from './configs/logger-options.config';
 // Docs
 import {openAPIRouter} from '@/docs/openapi-router.doc';
 // Middlewares
@@ -16,7 +18,8 @@ import requestLogger from '@/middlewares/request-logger.middleware';
 // Utils
 import {env} from '@/utils/env-config.util';
 
-const logger = pino({name: 'server start'});
+const logger = pino(loggerOptions);
+
 const app: Express = express();
 
 app.set('trust proxy', true);
