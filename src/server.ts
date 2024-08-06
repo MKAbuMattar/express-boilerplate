@@ -8,8 +8,6 @@ import {pino} from 'pino';
 // API
 import {healthCheckRouter} from '@/api/health-check/health-check.router';
 import {userRouter} from '@/api/user/user.router';
-// Configs
-import {loggerOptions} from './configs/logger-options.config';
 // Docs
 import {openAPIRouter} from '@/docs/openapi-router.doc';
 // Middlewares
@@ -17,6 +15,9 @@ import authApiKey from '@/middlewares/auth-api-key.middleware';
 import requestLogger from '@/middlewares/request-logger.middleware';
 // Utils
 import {env} from '@/utils/env-config.util';
+
+// Configs
+import {loggerOptions} from './configs/logger-options.config';
 
 const logger = pino(loggerOptions);
 
