@@ -16,7 +16,11 @@ import requestLogger from '@/middlewares/request-logger.middleware';
 // Utils
 import {env} from '@/utils/env-config.util';
 
-const logger = pino({name: 'server start'});
+// Configs
+import {loggerOptions} from './configs/logger-options.config';
+
+const logger = pino(loggerOptions);
+
 const app: Express = express();
 
 app.set('trust proxy', true);
