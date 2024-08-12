@@ -9,9 +9,17 @@ export default async function (
   options = {
     dir: '',
     filename: 'app.log',
+    enabled: true,
   },
 ) {
-  const {dir, filename} = options;
+  const {dir, filename, enabled} = options;
+
+  if (!enabled) {
+    return build((source) => source, {
+      parse: 'lines',
+      close() {},
+    });
+  }
 
   if (dir == null) {
     throw new Error('Missing required option: dir');
