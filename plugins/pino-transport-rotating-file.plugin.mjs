@@ -1,18 +1,21 @@
-import build from 'pino-abstract-transport';
-import * as rfs from 'rotating-file-stream';
 import path from 'node:path';
-import {prettyFactory} from 'pino-pretty';
-import {Transform, pipeline} from 'stream';
 
-export default async function (options = {dir}) {
-  if (options.dir == null) {
+import build from 'pino-abstract-transport';
+import {prettyFactory} from 'pino-pretty';
+import {createStream} from 'rotating-file-stream';
+import {pipeline, Transform} from 'stream';
+
+export default async function (options = {dir: ''}) {
+  const {dir} = options;
+
+  if (dir == null) {
     throw new Error('Missing required option: dir');
   }
 
   const pad = (num) => (num > 9 ? '' : '0') + num;
   // The log filename generator
   const generator = (time, index) => {
-    if (!time) return path.join(options.dir, 'app.log');
+    if (!time) return path.join(dir, 'app.log');
     const date =
       time.getFullYear() +
       '-' +
@@ -20,10 +23,10 @@ export default async function (options = {dir}) {
       '-' +
       pad(time.getDate());
     const filename = `${date}.${index}.log`;
-    return path.join(options.dir, filename);
+    return path.join(dir, filename);
   };
 
-  const rotatingStream = rfs.createStream(generator, {
+  const rotatingStream = createStream(generator, {
     size: '10M', // rotate every 10 MegaBytes written
     interval: '1d', // rotate daily
     compress: 'gzip', // compress rotated files
