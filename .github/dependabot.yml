@@ -7,7 +7,7 @@ updates:
     schedule:
       interval: 'weekly'
     commit-message:
-      prefix: 'chore(deps): update'
+      prefix: 'chore(deps)'
 
   # Maintain dependencies for Node.js
   - package-ecosystem: 'npm'
@@ -15,4 +15,4 @@ updates:
     schedule:
       interval: 'weekly'
     commit-message:
-      prefix: 'chore(deps): update'
+      prefix: 'chore(deps)'
