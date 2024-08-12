@@ -1,5 +1,5 @@
-// import path from 'node:path';
-import * as path from 'path';
+import path from 'node:path';
+
 import {LoggerOptions} from 'pino';
 
 export const loggerOptions: LoggerOptions = {
@@ -16,7 +16,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'info',
-        target: `${process.cwd()}/plugins/pino-transport-rotating-file.plugin.mjs`,
+        target: `${process.cwd()}/plugins/pino-transport-rotating-file/index.plugin.mjs`,
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'all',
@@ -25,7 +25,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'error',
-        target: `${process.cwd()}/plugins/pino-transport-rotating-file.plugin.mjs`,
+        target: `${process.cwd()}/plugins/pino-transport-rotating-file/index.plugin.mjs`,
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'error',
