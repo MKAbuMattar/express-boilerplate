@@ -1,5 +1,5 @@
-import {type UserConfig, defineConfig} from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import {defineConfig, type UserConfig} from 'vitest/config';
 
 const viteConfig: UserConfig = defineConfig({
   test: {
