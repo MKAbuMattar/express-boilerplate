@@ -1,0 +1,14 @@
+# Node Modules/Build 
+coverage
+node_modules
+dist
+build
+dist-ssr
+*.local
+
+# Docker
+compose.override.yml
+compose.traefik.yml
+compose.yml
+Dockerfile
+Dockerfile.aws
