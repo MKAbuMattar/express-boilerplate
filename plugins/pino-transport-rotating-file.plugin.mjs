@@ -5,8 +5,13 @@ import {prettyFactory} from 'pino-pretty';
 import {createStream} from 'rotating-file-stream';
 import {pipeline, Transform} from 'stream';
 
-export default async function (options = {dir: ''}) {
-  const {dir} = options;
+export default async function (
+  options = {
+    dir: '',
+    filename: 'app.log',
+  },
+) {
+  const {dir, filename} = options;
 
   if (dir == null) {
     throw new Error('Missing required option: dir');
@@ -22,8 +27,8 @@ export default async function (options = {dir: ''}) {
       pad(time.getMonth() + 1) +
       '-' +
       pad(time.getDate());
-    const filename = `${date}.${index}.log`;
-    return path.join(dir, filename);
+    const _filename = `${filename}-${date}.${index}.log`;
+    return path.join(dir, _filename);
   };
 
   const rotatingStream = createStream(generator, {

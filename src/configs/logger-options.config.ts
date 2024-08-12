@@ -14,11 +14,6 @@ export const loggerOptions: LoggerOptions = {
           colorize: true,
         },
       },
-      {
-        level: 'info',
-        target: `${process.cwd()}/plugins/pino-transport-rotating-file.plugin.mjs`,
-        options: {dir: path.join(process.cwd(), 'logs')},
-      },
       // {
       //   level: 'info',
       //   target: 'pino-pretty',
@@ -29,12 +24,28 @@ export const loggerOptions: LoggerOptions = {
       //   },
       // },
       {
-        level: 'error',
-        target: 'pino-pretty',
+        level: 'info',
+        target: `${process.cwd()}/plugins/pino-transport-rotating-file.plugin.mjs`,
         options: {
-          colorize: false,
-          mkdir: true,
-          destination: path.join(process.cwd(), 'logs', 'error.log'),
+          dir: path.join(process.cwd(), 'logs'),
+          filename: 'all',
+        },
+      },
+      // {
+      //   level: 'error',
+      //   target: 'pino-pretty',
+      //   options: {
+      //     colorize: false,
+      //     mkdir: true,
+      //     destination: path.join(process.cwd(), 'logs', 'error.log'),
+      //   },
+      // },
+      {
+        level: 'error',
+        target: `${process.cwd()}/plugins/pino-transport-rotating-file.plugin.mjs`,
+        options: {
+          dir: path.join(process.cwd(), 'logs'),
+          filename: 'error',
         },
       },
     ],

@@ -44,6 +44,9 @@ importers:
       pino-pretty:
         specifier: 11.2.2
         version: 11.2.2
+      rotating-file-stream:
+        specifier: 3.2.3
+        version: 3.2.3
       swagger-ui-express:
         specifier: 5.0.1
         version: 5.0.1(express@4.19.2)
@@ -1826,6 +1829,10 @@ packages:
     resolution: {integrity: sha512-5r7EYSQIowHsK4eTZ0Y81qpZuJz+MUuYeqmmYmRMl1nwhdmbiYqt5jwzf6u7wyOzJgYqtCRMtVRKOtHANBz7rA==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
+
+  rotating-file-stream@3.2.3:
+    resolution: {integrity: sha512-cfmm3tqdnbuYw2FBmRTPBDaohYEbMJ3211T35o6eZdr4d7v69+ZeK1Av84Br7FLj2dlzyeZSbN6qTuXXE6dawQ==}
+    engines: {node: '>=14.0'}
 
   run-parallel@1.2.0:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
@@ -3857,6 +3864,8 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.19.0
       '@rollup/rollup-win32-x64-msvc': 4.19.0
       fsevents: 2.3.3
+
+  rotating-file-stream@3.2.3: {}
 
   run-parallel@1.2.0:
     dependencies:
