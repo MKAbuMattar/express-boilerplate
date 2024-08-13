@@ -7,9 +7,9 @@ import {z} from 'zod';
 import {createApiResponse} from '@/docs/openapi-response-builders.doc';
 // Models
 import {ResponseStatus, ServiceResponse} from '@/models/service-response.model';
+import {logger} from '@/server';
 // Utils
 import {handleServiceResponse} from '@/utils/http-handlers.util';
-import {logger} from '@/server';
 
 export const HealthCheckRegistry = new OpenAPIRegistry();
 export const HealthCheckRouter: Router = express.Router();
