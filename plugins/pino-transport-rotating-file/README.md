@@ -13,14 +13,6 @@ This module provides a custom logging transport for the `pino` logger that uses 
 - **Compression Method**: Configurable compression method for rotated log files.
 - **Immutability**: Option to apply immutability to rotated log files.
 
-## Installation
-
-To use this plugin, ensure that you have `pino`, `pino-abstract-transport`, `pino-pretty`, and `rotating-file-stream` installed in your project:
-
-```bash
-pnpm install pino pino-abstract-transport pino-pretty rotating-file-stream
-```
-
 ## Usage
 
 To use the plugin, import it and provide the required configuration options:
@@ -28,8 +20,6 @@ To use the plugin, import it and provide the required configuration options:
 ```typescript
 import path from 'node:path';
 import {pino, LoggerOptions} from 'pino';
-
-import pinoTransportRotatingFile from './path/to/pino-transport-rotating-file.plugin.mjs';
 
 const loggerOptions: LoggerOptions = {
   name: 'server start',
@@ -45,7 +35,7 @@ const loggerOptions: LoggerOptions = {
       },
       {
         level: 'info',
-        target: pinoTransportRotatingFile,
+        target: '@mkabumattar/pino-transport-rotating-file',
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'all',
@@ -58,7 +48,7 @@ const loggerOptions: LoggerOptions = {
       },
       {
         level: 'error',
-        target: pinoTransportRotatingFile,
+        target: '@mkabumattar/pino-transport-rotating-file',
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'error',
@@ -118,6 +108,7 @@ The log files are rotated based on the following parameters:
 
 - Ensure that the directory specified in `dir` exists and is writable by the application.
 - The `enabled` option can be used to turn off logging without removing the transport configuration.
+- The `compress` option accepts various methods, but make sure the chosen method is supported by `rotating-file-stream`.
 
 ## License
 
