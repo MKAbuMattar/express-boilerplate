@@ -1,6 +1,7 @@
 {
   "name": "@mkabumattar/express-boilerplate",
   "description": "A boilerplate for Express.js with TypeScript",
+  "type": "commonjs",
   "version": "0.0.0",
   "license": "MIT",
   "author": {
