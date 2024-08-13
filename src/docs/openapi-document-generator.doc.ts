@@ -1,6 +1,6 @@
 import {
-  OpenApiGeneratorV3,
   OpenAPIRegistry,
+  OpenApiGeneratorV3,
 } from '@asteasolutions/zod-to-openapi';
 
 // Controllers

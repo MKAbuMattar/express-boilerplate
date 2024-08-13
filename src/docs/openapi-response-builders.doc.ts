@@ -1,5 +1,5 @@
 import {StatusCodes} from 'http-status-codes';
-import {z} from 'zod';
+import type {z} from 'zod';
 
 // Models
 import {ServiceResponseSchema} from '@/models/service-response.model';

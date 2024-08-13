@@ -23,10 +23,7 @@
     },
     "./package.json": "./package.json"
   },
-  "files": [
-    "./index.mjs",
-    "./index.d.ts"
-  ],
+  "files": ["./index.mjs", "./index.d.ts"],
   "support": {
     "backing": {
       "npm-funding": true

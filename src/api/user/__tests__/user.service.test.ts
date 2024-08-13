@@ -1,7 +1,7 @@
 import {StatusCodes} from 'http-status-codes';
-import {Mock} from 'vitest';
+import type {Mock} from 'vitest';
 
-import {User} from '@/api/user/user.model';
+import type {User} from '@/api/user/user.model';
 import {userRepository} from '@/api/user/user.repository';
 import {userService} from '@/api/user/user.service';
 
