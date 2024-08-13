@@ -6,8 +6,8 @@ import helmet from 'helmet';
 import {pino} from 'pino';
 
 // API
-import {healthCheckRouter} from '@/api/health-check/health-check.router';
-import {userRouter} from '@/api/user/user.router';
+import {HealthCheckRouter} from '@/api/health-check/health-check.router';
+import {UserRouter} from '@/api/user/user.router';
 // Docs
 import {openAPIRouter} from '@/docs/openapi-router.doc';
 // Middlewares
@@ -57,8 +57,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(requestLogger);
 
 // Routes
-app.use('/health-check', healthCheckRouter);
-app.use('/api/users', authApiKey(), userRouter);
+app.use('/health-check', HealthCheckRouter);
+app.use('/api/users', authApiKey(), UserRouter);
 
 // Docs
 app.use('/docs', openAPIRouter);
