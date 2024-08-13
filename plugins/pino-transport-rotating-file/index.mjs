@@ -63,7 +63,7 @@ import {createStream} from 'rotating-file-stream';
 async function pinoTransportRotatingFile(
   options = {
     dir: '',
-    filename: 'app.log',
+    filename: 'app',
     enabled: true,
     size: '10M',
     interval: '1d',
@@ -72,9 +72,9 @@ async function pinoTransportRotatingFile(
   },
 ) {
   const {
-    dir,
-    filename,
-    enabled,
+    dir = '',
+    filename = 'app',
+    enabled = true,
     size = '10M',
     interval = '1d',
     compress = 'gzip',

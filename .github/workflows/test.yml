@@ -1,4 +1,4 @@
-name: Build Express Bdoilerplate
+name: Test Express Bdoilerplate
 
 on:
   push:
@@ -18,7 +18,7 @@ env:
   API_KEY: 'secret'
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,8 +42,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Lint code
-        run: pnpm lint
-
-      - name: Build
-        run: pnpm build
+      - name: Test
+        run: pnpm test
