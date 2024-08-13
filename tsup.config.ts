@@ -6,7 +6,7 @@ dotenv.config();
 const isProduction = process.env.NODE_ENV === 'production';
 
 const tsupConfig = defineConfig({
-  entry: ['./src/**/*.ts'],
+  entry: ['./src/**/*.ts', '!./src/**/__tests__/**', '!./src/**/*.test.*'],
   splitting: true,
   sourcemap: true,
   clean: true,
