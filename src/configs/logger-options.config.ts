@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import {LoggerOptions} from 'pino';
+import type {LoggerOptions} from 'pino';
 
 export const loggerOptions: LoggerOptions = {
   name: 'server start',
@@ -16,7 +16,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'info',
-        target: `@mkabumattar/pino-transport-rotating-file`,
+        target: '@mkabumattar/pino-transport-rotating-file',
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'all',
@@ -25,7 +25,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'error',
-        target: `@mkabumattar/pino-transport-rotating-file`,
+        target: '@mkabumattar/pino-transport-rotating-file',
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'error',

@@ -1,4 +1,4 @@
-import express, {Request, Response} from 'express';
+import express, {type Request, type Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 

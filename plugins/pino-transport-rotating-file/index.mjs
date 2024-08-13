@@ -1,5 +1,5 @@
 import path from 'node:path';
-import {pipeline, Transform} from 'node:stream';
+import {Transform, pipeline} from 'node:stream';
 
 import build from 'pino-abstract-transport';
 import {prettyFactory} from 'pino-pretty';

@@ -4,9 +4,7 @@
     "module": "ESNext",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
     "moduleResolution": "Node",
     "outDir": "dist",
@@ -17,15 +15,9 @@
     "noPropertyAccessFromIndexSignature": false,
     "skipLibCheck": true,
     "ignoreDeprecations": "5.0",
-    "types": [
-      "vitest/globals"
-    ]
+    "types": ["vitest/globals"]
   },
   "extends": [],
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "src/**/*.ts"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts"]
 }

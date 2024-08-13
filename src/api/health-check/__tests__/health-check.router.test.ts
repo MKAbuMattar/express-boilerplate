@@ -2,7 +2,7 @@ import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
 // Models
-import {ServiceResponse} from '@/models/service-response.model';
+import type {ServiceResponse} from '@/models/service-response.model';
 import {app} from '@/server';
 
 describe('Health Check API endpoints', () => {

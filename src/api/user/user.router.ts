@@ -1,5 +1,5 @@
 import {OpenAPIRegistry} from '@asteasolutions/zod-to-openapi';
-import express, {Request, Response, Router} from 'express';
+import express, {type Request, type Response, type Router} from 'express';
 import {z} from 'zod';
 
 import {GetUserSchema, UserSchema} from '@/api/user/user.model';
@@ -63,7 +63,7 @@ export const userRouter: Router = (() => {
     '/:id',
     validateRequest(GetUserSchema),
     async (req: Request, res: Response) => {
-      const id = parseInt(req.params.id as string, 10);
+      const id = Number.parseInt(req.params.id as string, 10);
       const serviceResponse = await userService.findById(id);
       handleServiceResponse(serviceResponse, res);
     },

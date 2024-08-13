@@ -22,10 +22,10 @@
     "build": "rimraf dist && tsup --tsconfig tsconfig.json",
     "start": "node ./dist/bin/www.mjs",
     "clean": "rimraf dist coverage",
-    "lint": "eslint ./src",
-    "lint:fix": "eslint --fix ./src",
-    "fmt": "prettier --config prettier.config.mjs --check ./src",
-    "fmt:fix": "prettier --config prettier.config.mjs --write ./src",
+    "lint": "biome check ./src",
+    "lint:fix": "biome check ./src --fix",
+    "fmt": "biome format ./src",
+    "fmt:fix": "biome format --write ./src",
     "test": "vitest run",
     "test:dev": "vitest dev",
     "test:cov": "vitest run --coverage"
@@ -48,8 +48,7 @@
     "zod": "3.23.8"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.1.0",
-    "@eslint/js": "9.9.0",
+    "@biomejs/biome": "1.8.3",
     "@types/compression": "1.7.5",
     "@types/cookie-parser": "1.4.7",
     "@types/cors": "2.8.17",
@@ -57,15 +56,9 @@
     "@types/node": "22.2.0",
     "@types/supertest": "6.0.2",
     "@types/swagger-ui-express": "4.1.6",
-    "@typescript-eslint/eslint-plugin": "8.1.0",
-    "@typescript-eslint/parser": "8.1.0",
     "@vitest/coverage-v8": "2.0.5",
-    "eslint": "9.9.0",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-prettier": "5.2.1",
-    "eslint-plugin-simple-import-sort": "12.1.1",
     "globals": "15.9.0",
-    "prettier": "3.3.3",
+    "lint-staged": "15.2.9",
     "rimraf": "6.0.1",
     "supertest": "7.0.0",
     "terser": "5.31.5",
@@ -74,6 +67,11 @@
     "typescript": "5.5.4",
     "vite-tsconfig-paths": "5.0.1",
     "vitest": "2.0.5"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,json,jsonc}": [
+      "biome check --apply --no-errors-on-unmatched"
+    ]
   },
   "engines": {
     "node": ">=20.x"

@@ -1,10 +1,10 @@
 import {randomUUID} from 'node:crypto';
-import {IncomingMessage, ServerResponse} from 'node:http';
+import type {IncomingMessage, ServerResponse} from 'node:http';
 
-import {Request, RequestHandler, Response} from 'express';
-import {getReasonPhrase, StatusCodes} from 'http-status-codes';
-import {LevelWithSilent} from 'pino';
-import {CustomAttributeKeys, Options, pinoHttp} from 'pino-http';
+import type {Request, RequestHandler, Response} from 'express';
+import {StatusCodes, getReasonPhrase} from 'http-status-codes';
+import type {LevelWithSilent} from 'pino';
+import {type CustomAttributeKeys, type Options, pinoHttp} from 'pino-http';
 
 // Utils
 import {env} from '@/utils/env-config.util';
@@ -61,7 +61,7 @@ const responseBodyMiddleware: RequestHandler = (_req, res, next) => {
   const isNotProduction = !env.isProduction;
   if (isNotProduction) {
     const originalSend = res.send;
-    res.send = function (content) {
+    res.send = (content) => {
       res.locals.responseBody = content;
       res.send = originalSend;
       return originalSend.call(res, content);
