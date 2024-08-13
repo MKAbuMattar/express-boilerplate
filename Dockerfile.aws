@@ -27,4 +27,18 @@ COPY --from=build /app/dist /app/dist
 
 # Expose port and start the application
 EXPOSE 8080
+
+# Set ARGs and ENVs
+ARG NODE_ENV=""
+ARG PORT=""
+ARG HOST=""
+ARG CORS_WHITELIST=""
+ARG API_KEY=""
+
+ENV NODE_ENV=${NODE_ENV}
+ENV PORT=${PORT}
+ENV HOST=${HOST}
+ENV CORS_WHITELIST=${CORS_WHITELIST}
+ENV API_KEY=${API_KEY}
+
 CMD [ "pnpm", "start" ]
