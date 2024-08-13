@@ -11,29 +11,24 @@ import {logger} from '@/server';
 // Utils
 import {handleServiceResponse} from '@/utils/http-handlers.util';
 
-export const healthCheckRegistry = new OpenAPIRegistry();
+export const HealthCheckRegistry = new OpenAPIRegistry();
+export const HealthCheckRouter: Router = express.Router();
 
-export const healthCheckRouter: Router = (() => {
-  const router = express.Router();
+HealthCheckRegistry.registerPath({
+  method: 'get',
+  path: '/health-check',
+  tags: ['Health Check'],
+  summary: 'Health Check API',
+  responses: createApiResponse(z.null(), 'Success'),
+});
 
-  healthCheckRegistry.registerPath({
-    method: 'get',
-    path: '/health-check',
-    tags: ['Health Check'],
-    summary: 'Health Check API',
-    responses: createApiResponse(z.null(), 'Success'),
-  });
-
-  router.get('/', (_req: Request, res: Response) => {
-    logger.info('$GET /health-check - Service is healthy');
-    const serviceResponse = new ServiceResponse(
-      ResponseStatus.Success,
-      StatusCodes.OK,
-      'Service is healthy',
-      null,
-    );
-    handleServiceResponse(serviceResponse, res);
-  });
-
-  return router;
-})();
+HealthCheckRouter.get('/', (_req: Request, res: Response) => {
+  logger.info('$GET /health-check - Service is healthy');
+  const serviceResponse = new ServiceResponse(
+    ResponseStatus.Success,
+    StatusCodes.OK,
+    'Service is healthy',
+    null,
+  );
+  handleServiceResponse(serviceResponse, res);
+});

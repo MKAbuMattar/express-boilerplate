@@ -1,6 +1,7 @@
 import {extendZodWithOpenApi} from '@asteasolutions/zod-to-openapi';
 import {z} from 'zod';
 
+// Validations
 import {commonValidations} from '@/validations/common.validation';
 
 extendZodWithOpenApi(z);
