@@ -16,7 +16,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'info',
-        target: `${process.cwd()}/plugins/pino-transport-rotating-file/index.plugin.mjs`,
+        target: `@mkabumattar/pino-transport-rotating-file`,
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'all',
@@ -25,7 +25,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'error',
-        target: `${process.cwd()}/plugins/pino-transport-rotating-file/index.plugin.mjs`,
+        target: `@mkabumattar/pino-transport-rotating-file`,
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'error',
