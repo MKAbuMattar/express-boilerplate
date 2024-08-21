@@ -5,7 +5,7 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 
 # Enable corepack and install pnpm
-RUN corepack enable && corepack prepare pnpm@9.7.0 --activate
+RUN corepack enable && corepack prepare pnpm@9.7.1 --activate
 
 # Copy application code
 COPY . /app
