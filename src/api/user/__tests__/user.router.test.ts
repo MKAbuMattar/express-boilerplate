@@ -1,7 +1,7 @@
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
-// User Controller
+// User API
 import type {User} from '@/api/user/user.model';
 import {users} from '@/api/user/user.repository';
 // Models

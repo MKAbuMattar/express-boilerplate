@@ -4,13 +4,13 @@ import {
 } from '@asteasolutions/zod-to-openapi';
 
 // Controllers
-import {HealthCheckRegistry} from '@/api/health-check/health-check.router';
-import {UserRegistry} from '@/api/user/user.router';
+import {healthCheckRegistry} from '@/api/health-check/health-check.router';
+import {userRegistry} from '@/api/user/user.router';
 
 export const generateOpenAPIDocument = () => {
   const openAPIRegistryConfig: OpenAPIRegistry[] = [
-    HealthCheckRegistry,
-    UserRegistry,
+    healthCheckRegistry,
+    userRegistry,
   ];
 
   const registry = new OpenAPIRegistry(openAPIRegistryConfig);
