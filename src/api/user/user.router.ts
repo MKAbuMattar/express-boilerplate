@@ -1,21 +1,21 @@
 import {OpenAPIRegistry} from '@asteasolutions/zod-to-openapi';
-import express, {type Request, type Response, type Router} from 'express';
+import express, {type Router} from 'express';
 import {z} from 'zod';
 
-// User Controller
+// User API
 import {getUser, getUsers} from '@/api/user/user.controller';
 import {GetUserSchema, UserSchema} from '@/api/user/user.model';
 // Docs
 import {createApiResponse} from '@/docs/openapi-response-builders.doc';
-// Models
+// Utils
 import {validateRequest} from '@/utils/http-handlers.util';
 
-export const UserRegistry = new OpenAPIRegistry();
-export const UserRouter: Router = express.Router();
+export const userRegistry = new OpenAPIRegistry();
+export const userRouter: Router = express.Router();
 
-UserRegistry.register('User', UserSchema);
+userRegistry.register('User', UserSchema);
 
-const apiKeyAuth = UserRegistry.registerComponent(
+const apiKeyAuth = userRegistry.registerComponent(
   'securitySchemes',
   'ApiKeyAuth',
   {
@@ -25,7 +25,7 @@ const apiKeyAuth = UserRegistry.registerComponent(
   },
 );
 
-UserRegistry.registerPath({
+userRegistry.registerPath({
   method: 'get',
   path: '/api/users',
   tags: ['User'],
@@ -37,9 +37,9 @@ UserRegistry.registerPath({
   responses: createApiResponse(z.array(UserSchema), 'Success'),
 });
 
-UserRouter.get('/', getUsers);
+userRouter.get('/', getUsers);
 
-UserRegistry.registerPath({
+userRegistry.registerPath({
   method: 'get',
   path: '/api/users/{id}',
   tags: ['User'],
@@ -52,4 +52,4 @@ UserRegistry.registerPath({
   responses: createApiResponse(UserSchema, 'Success'),
 });
 
-UserRouter.get('/:id', validateRequest(GetUserSchema), getUser);
+userRouter.get('/:id', validateRequest(GetUserSchema), getUser);

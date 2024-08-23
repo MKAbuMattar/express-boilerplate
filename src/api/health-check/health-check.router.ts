@@ -5,16 +5,17 @@ import {z} from 'zod';
 
 // Docs
 import {createApiResponse} from '@/docs/openapi-response-builders.doc';
+// libs
+import {logger} from '@/libs/logger.lib';
 // Models
 import {ResponseStatus, ServiceResponse} from '@/models/service-response.model';
-import {logger} from '@/server';
 // Utils
 import {handleServiceResponse} from '@/utils/http-handlers.util';
 
-export const HealthCheckRegistry = new OpenAPIRegistry();
-export const HealthCheckRouter: Router = express.Router();
+export const healthCheckRegistry = new OpenAPIRegistry();
+export const healthCheckRouter: Router = express.Router();
 
-HealthCheckRegistry.registerPath({
+healthCheckRegistry.registerPath({
   method: 'get',
   path: '/health-check',
   tags: ['Health Check'],
@@ -22,7 +23,7 @@ HealthCheckRegistry.registerPath({
   responses: createApiResponse(z.null(), 'Success'),
 });
 
-HealthCheckRouter.get('/', (_req: Request, res: Response) => {
+healthCheckRouter.get('/', (_req: Request, res: Response) => {
   logger.info('$GET /health-check - Service is healthy');
   const serviceResponse = new ServiceResponse(
     ResponseStatus.Success,
