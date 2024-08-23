@@ -1,6 +1,6 @@
 {
   "name": "@mkabumattar/pino-transport-rotating-file",
-  "description": "A boilerplate for Express.js with TypeScript",
+  "description": "Plugin for pino to transport logs to rotating files",
   "version": "0.0.0",
   "license": "MIT",
   "author": {
