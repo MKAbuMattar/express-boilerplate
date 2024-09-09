@@ -9,7 +9,7 @@
     "url": "https://mkabumattar.github.io/"
   },
   "dependencies": {
-    "pino": "9.3.2",
+    "pino": "9.4.0",
     "pino-pretty": "11.2.2",
     "rotating-file-stream": "3.2.3"
   },
