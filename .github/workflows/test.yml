@@ -14,8 +14,8 @@ env:
   NODE_ENV: development
   PORT: 8080
   HOST: localhost
-  CORS_WHITELIST: '*'
-  API_KEY: 'secret'
+  CORS_WHITELIST: "*"
+  API_KEY: "secret"
 
 jobs:
   test:
@@ -31,13 +31,13 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.7.1
+          version: 9.10.0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install

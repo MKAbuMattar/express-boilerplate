@@ -38,7 +38,7 @@
     "cors": "2.8.5",
     "dotenv": "16.4.5",
     "envalid": "8.0.0",
-    "express": "4.19.2",
+    "express": "4.21.0",
     "helmet": "7.1.0",
     "http-status-codes": "2.3.0",
     "pino": "9.4.0",
@@ -48,25 +48,25 @@
     "zod": "3.23.8"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.3",
+    "@biomejs/biome": "1.9.0",
     "@types/compression": "1.7.5",
     "@types/cookie-parser": "1.4.7",
     "@types/cors": "2.8.17",
     "@types/express": "4.17.21",
     "@types/lint-staged": "13.3.0",
-    "@types/node": "22.5.4",
+    "@types/node": "22.5.5",
     "@types/supertest": "6.0.2",
     "@types/swagger-ui-express": "4.1.6",
-    "@vitest/coverage-v8": "2.0.5",
+    "@vitest/coverage-v8": "2.1.1",
     "lint-staged": "15.2.10",
     "rimraf": "6.0.1",
     "supertest": "7.0.0",
-    "terser": "5.31.6",
+    "terser": "5.32.0",
     "tsup": "8.2.4",
-    "tsx": "4.19.0",
-    "typescript": "5.5.4",
+    "tsx": "4.19.1",
+    "typescript": "5.6.2",
     "vite-tsconfig-paths": "5.0.1",
-    "vitest": "2.0.5"
+    "vitest": "2.1.1"
   },
   "lint-staged": {
     "*.{js,ts,cjs,mjs,d.cts,d.mts,json,jsonc}": [
@@ -76,5 +76,5 @@
   "engines": {
     "node": ">=20.x"
   },
-  "packageManager": "pnpm@9.7.1"
+  "packageManager": "pnpm@9.10.0"
 }
