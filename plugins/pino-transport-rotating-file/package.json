@@ -11,7 +11,7 @@
   "dependencies": {
     "pino": "9.4.0",
     "pino-pretty": "11.2.2",
-    "rotating-file-stream": "3.2.4"
+    "rotating-file-stream": "3.2.5"
   },
   "devDependencies": {},
   "sideEffects": false,
