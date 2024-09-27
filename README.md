@@ -46,7 +46,7 @@ This repository provides a boilerplate for building applications using Express.j
 2. Install dependencies:
 
    ```sh
-   npm install
+   pnpm install
    ```
 
 3. Set up environment variables:
