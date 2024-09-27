@@ -98,6 +98,7 @@ express-boilerplate/
 │   │   ├── build.yml
 │   │   ├── code-quality.yml
 │   │   ├── label-syncer.yml
+│   │   ├── pr-title.yml
 │   │   ├── release.yml
 │   │   ├── stale.yml
 │   │   └── test.yml
