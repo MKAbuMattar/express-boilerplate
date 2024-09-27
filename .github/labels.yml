@@ -28,9 +28,6 @@
 - name: question
   color: d876e3
   description: Further information is requested
-- name: security
-  color: ee0701
-  description: Security vulnerabilities
 - name: wontfix
   color: ffffff
   description: This will not be worked on
