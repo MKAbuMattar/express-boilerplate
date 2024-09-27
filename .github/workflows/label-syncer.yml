@@ -1,0 +1,21 @@
+name: Sync labels
+
+on:
+  push:
+    paths:
+      - ".github/labels.yml"
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Sync labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - mame: Sync labels
+        uses: brpaz/action-label-syncer@0.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

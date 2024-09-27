@@ -97,9 +97,11 @@ express-boilerplate/
 │   ├── workflows/
 │   │   ├── build.yml
 │   │   ├── code-quality.yml
+│   │   ├── label-syncer.yml
 │   │   └── test.yml
 |   ├── CODE_OF_CONDUCT.md
 |   ├── dependabot.yml
+|   ├── labels.yml
 |   └── SECURITY.md
 ├── .vscode/
 ├── plugins/
