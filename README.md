@@ -98,6 +98,7 @@ express-boilerplate/
 │   │   ├── build.yml
 │   │   ├── code-quality.yml
 │   │   ├── label-syncer.yml
+│   │   ├── release.yml
 │   │   ├── stale.yml
 │   │   └── test.yml
 |   ├── CODE_OF_CONDUCT.md
@@ -163,6 +164,7 @@ express-boilerplate/
 ├── .gitignore
 ├── .npmrc
 ├── .nvmrc
+├── .releaserc.json
 ├── biome.json
 ├── compose.yml
 ├── Dockerfile
