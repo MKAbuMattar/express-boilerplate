@@ -1,4 +1,4 @@
-name: Build Express Bdoilerplate
+name: Build Express Boilerplate
 
 on:
   push:
