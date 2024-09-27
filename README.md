@@ -98,6 +98,7 @@ express-boilerplate/
 │   │   ├── build.yml
 │   │   ├── code-quality.yml
 │   │   ├── label-syncer.yml
+│   │   ├── stale.yml
 │   │   └── test.yml
 |   ├── CODE_OF_CONDUCT.md
 |   ├── dependabot.yml
