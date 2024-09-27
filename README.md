@@ -102,6 +102,7 @@ express-boilerplate/
 |   ├── CODE_OF_CONDUCT.md
 |   ├── dependabot.yml
 |   ├── labels.yml
+|   ├── PULL_REQUEST_TEMPLATE.md
 |   └── SECURITY.md
 ├── .vscode/
 ├── plugins/
