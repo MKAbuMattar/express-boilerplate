@@ -92,6 +92,16 @@ docker-compose up -d --build
 
 ```
 express-boilerplate/
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   ├── workflows/
+│   │   ├── build.yml
+│   │   ├── code-quality.yml
+│   │   └── test.yml
+|   ├── CODE_OF_CONDUCT.md
+|   ├── dependabot.yml
+|   └── SECURITY.md
+├── .vscode/
 ├── plugins/
 │   └── pino-transport-rotating-file/
 │       ├── index.d.ts
@@ -152,10 +162,11 @@ express-boilerplate/
 ├── compose.yml
 ├── Dockerfile
 ├── Dockerfile.aws
+├── LICENSE
 ├── package.json
 ├── pnpm-workspace.yaml
-├── README.md
 ├── package.json
+├── README.md
 ├── tsconfig.json
 ├── tsup.config.ts
 └── vite.config.mts
