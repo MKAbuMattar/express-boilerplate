@@ -102,12 +102,12 @@ express-boilerplate/
 │   │   ├── release.yml
 │   │   ├── stale.yml
 │   │   └── test.yml
-|   ├── CODE_OF_CONDUCT.md
-|   ├── CONTRIBUTING.md
-|   ├── dependabot.yml
-|   ├── labels.yml
-|   ├── PULL_REQUEST_TEMPLATE.md
-|   └── SECURITY.md
+│   ├── CODE_OF_CONDUCT.md
+│   ├── CONTRIBUTING.md
+│   ├── dependabot.yml
+│   ├── labels.yml
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   └── SECURITY.md
 ├── .vscode/
 ├── plugins/
 │   └── pino-transport-rotating-file/
