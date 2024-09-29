@@ -1,6 +1,6 @@
 # Express Boilerplate
 
-A boilerplate for Express.js with TypeScript.
+A boilerplate for building scalable applications with Express.js and TypeScript.
 
 ## Table of Contents
 
@@ -10,22 +10,34 @@ A boilerplate for Express.js with TypeScript.
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
+  - [Running the Server](#running-the-server)
+  - [Building for Production](#building-for-production)
+  - [Running with Docker](#running-with-docker)
 - [Project Structure](#project-structure)
+- [Git Strategy](#git-strategy)
+  - [Branches](#branches)
+  - [Workflow](#workflow)
+  - [Semantic Commit Messages and Versioning](#semantic-commit-messages-and-versioning)
+- [Testing](#testing)
+- [Linting and Formatting](#linting-and-formatting)
+- [Contributing](#contributing)
 - [License](#license)
+- [Further Reading](#further-reading)
 
 ## Introduction
 
-This repository provides a boilerplate for building applications using Express.js with TypeScript. It includes a basic setup to get started quickly and follows best practices for project structure and code quality.
+This boilerplate provides a strong foundation for building applications using Express.js and TypeScript. It follows best practices for code quality, structure, and development workflow. The repository also supports Docker and includes preconfigured Git workflows for streamlined project management.
 
 ## Features
 
-- Express.js with TypeScript
-- Docker support
-- Example routes and middleware
-- Environment-based configuration
-- Logging with Pino
-- Error handling middleware
-- Unit and integration tests
+- **Express.js** with **TypeScript**: Combines the simplicity of Express.js with the type safety and scalability of TypeScript.
+- **Docker** support: Ensures consistent environment setups across different machines, simplifying deployment and scaling.
+- Pre-configured environment-based configuration: Seamlessly manage different configurations for development, staging, and production.
+- Centralized **logging** with [Pino](https://getpino.io/): Pino is a high-performance logger designed to handle heavy workloads with minimal overhead.
+- **Error handling** middleware: Built-in centralized error handling to manage different error types efficiently.
+- Unit and integration testing with [Vitest](https://vitest.dev/): Vitest provides fast and simple testing for both unit and integration tests.
+- **Semantic Versioning** and **Conventional Commits** integration: Ensures a structured release process and maintainable commit history.
+- **GitHub Actions** for CI/CD pipelines: Automates testing, linting, and deployment workflows.
 
 ## Getting Started
 
@@ -50,6 +62,7 @@ This repository provides a boilerplate for building applications using Express.j
    ```
 
 3. Set up environment variables:
+
    ```sh
    cp .env.example .env
    ```
@@ -64,17 +77,17 @@ To start the development server, run:
 pnpm run dev
 ```
 
-The server will start on the port specified in your `.env` file.
+The server will start on the port specified in your `.env` file (default: 8080).
 
 ### Building for Production
 
-To build the project for production, run:
+To build the project for production:
 
 ```sh
 pnpm run build
 ```
 
-To start the production server, run:
+Then, to start the production server:
 
 ```sh
 pnpm start
@@ -82,7 +95,7 @@ pnpm start
 
 ### Running with Docker
 
-To build and run the project using Docker, run:
+Using Docker helps maintain a consistent development environment across machines. To build and run the project using Docker, use the following commands:
 
 ```sh
 docker-compose up -d --build
@@ -92,98 +105,140 @@ docker-compose up -d --build
 
 ```
 express-boilerplate/
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   ├── workflows/
-│   │   ├── build.yml
-│   │   ├── code-quality.yml
-│   │   ├── label-syncer.yml
-│   │   ├── pr-title.yml
-│   │   ├── release.yml
-│   │   ├── stale.yml
-│   │   └── test.yml
-│   ├── CODE_OF_CONDUCT.md
-│   ├── CONTRIBUTING.md
-│   ├── dependabot.yml
-│   ├── labels.yml
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   └── SECURITY.md
-├── .vscode/
-├── plugins/
-│   └── pino-transport-rotating-file/
-│       ├── index.d.ts
-│       ├── index.mjs
-│       ├── package.json
-│       └── README.md
-├── src/
-│   ├── api/
-│   │   ├── health-check/
-│   │   │   ├── __tests__/
-│   │   │   │   └── health-check.router.test.ts
-│   │   │   └── health-check.router.ts
-│   │   └── health-check/
-│   │       ├── __tests__/
-│   │       │   ├── user.router.test.ts
-│   │       │   └── user.service.test.ts
-│   │       ├── user.controller.ts
-│   │       ├── user.model.ts
-│   │       ├── user.repository.ts
-│   │       ├── user.router.ts
-│   │       └── user.service.ts
-│   ├── bin/
-│   │   └── www.ts
-│   ├── configs/
-│   │   └── logger-options.config.ts
-│   ├── docs/
-│   │   ├── __tests__/
-│   │   │   └── openapi-router.doc.test.ts
-│   │   ├── openapi-document-generator.doc.ts
-│   │   ├── openapi-response-builders.doc.ts
-│   │   └── openapi-router.doc.ts
-│   ├── libs/
-│   │   └── logger.lib.ts
-│   ├── middlewares/
-│   │   ├── __tests__/
-│   │   │   ├── auth-api-key.middleware.test.ts
-│   │   │   ├── error-handler.middleware.test.ts
-│   │   │   └── request-logger.middleware.test.ts
-│   │   ├── auth-api-key.middleware.ts
-│   │   ├── error-handler.middleware.ts
-│   │   └── request-logger.middleware.ts
-│   ├── models/
-│   │   └── service-response.model.ts
-│   ├── schemas/
-│   │   └── express-session.schema.ts
-│   ├── utils/
-│   │   ├── env-config.util.ts
-│   │   └── http-handlers.util.ts
-│   ├── validations/
-│   │   └── common.validation.ts
-│   └── index.ts
-├── .dockerignore
-├── .env.example
-├── .gitignore
-├── .npmrc
-├── .nvmrc
-├── .releaserc.json
-├── biome.json
-├── compose.yml
-├── Dockerfile
-├── Dockerfile.aws
-├── LICENSE
-├── package.json
-├── pnpm-workspace.yaml
-├── package.json
-├── README.md
-├── tsconfig.json
-├── tsup.config.ts
-└── vite.config.mts
+├── .github/               # GitHub configurations for CI/CD and issue templates
+├── .vscode/               # VSCode-specific settings for workspace
+├── plugins/               # Custom plugins (e.g., Pino transports)
+├── src/                   # Core application source code
+│   ├── api/               # API routes and controllers
+│   ├── bin/               # Application entry point (startup scripts)
+│   ├── configs/           # Configuration files for logger, environment, etc.
+│   ├── docs/              # API documentation and OpenAPI specs
+│   ├── libs/              # Reusable libraries
+│   ├── middlewares/       # Custom middleware logic
+│   ├── models/            # Data models and schemas
+│   ├── schemas/           # Validation schemas
+│   ├── utils/             # Utility functions for the app
+│   ├── validations/       # Business logic validations
+│   └── index.ts           # Main server file
+├── Dockerfile             # Docker configuration
+├── compose.yml            # Docker Compose for multi-service applications
+├── .env.example           # Example environment variables
+├── LICENSE                # License file
+├── package.json           # Project metadata and scripts
+├── tsconfig.json          # TypeScript configuration
+└── README.md              # Project documentation
+```
+
+## Git Strategy
+
+### Branches
+
+- `main`: Reflects the production-ready state of the source code.
+- `develop`: Contains the latest delivered changes for the next release.
+
+### Workflow
+
+1. Create a new branch from `main` for each feature or bug fix.
+   - Use descriptive branch names with a prefix (e.g., `feature/`, `bugfix/`).
+2. Make changes and commit them.
+   - Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
+   - Write descriptive commit messages.
+3. Push the branch to the remote repository.
+4. Create a pull request to merge the branch into `develop`.
+5. After approval, merge the pull request into `develop`.
+6. Create a pull request to merge `develop` into `main`.
+7. After approval, merge the pull request into `main`.
+
+### Semantic Commit Messages and Versioning
+
+This project adheres to [Semantic Versioning](https://semver.org/) and uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) to manage releases. Every commit message and version change should follow this standard:
+
+- **fix**: Patches a bug in your codebase (`PATCH` release) or a hotfix.
+  ```sh
+  git commit -m "fix(api): fix health check route"
+  ```
+- **feat**: Introduces a new feature (`MINOR` release) or enhancement.
+  ```sh
+  git commit -m "feat(api): add user route"
+  ```
+- **BREAKING CHANGE**: Introduces breaking changes (`MAJOR` release) that require a manual update.
+  ```sh
+  git commit -m "feat!(api): change user route to use UUID"
+  ```
+- **chore**: Updates dependencies, refactors code, or makes other changes that don't affect the user-facing code.
+  ```sh
+  git commit -m "chore: update dependencies"
+  ```
+- **docs**: Updates documentation, README, or other non-code files.
+  ```sh
+  git commit -m "docs: update README"
+  ```
+- **ci**: Updates CI/CD configurations or workflows.
+  ```sh
+  git commit -m "ci: add GitHub Actions workflow"
+  ```
+
+## Testing
+
+Testing is crucial to ensure code reliability and prevent regressions. This project uses [Vitest](https://vitest.dev/) for running unit and integration tests.
+
+- **Unit Tests**: Test individual units of code in isolation.
+- **Integration Tests**: Test the interaction between different units of code.
+
+- **Test Files**: Test files are located in the `src` directory with the `.test.ts` extension.
+  ```sh
+  pnpm test
+  ```
+- **Coverage Reports**: To generate a code coverage report:
+  ```sh
+  pnpm test:cov
+  ```
+- **Watch Mode**: To run tests in watch mode (ideal for active development):
+  ```sh
+  pnpm test:dev
+  ```
+
+> [!TIP]
+> Focus on writing tests that verify the behavior of the code, not implementation details.
+
+## Linting and Formatting
+
+The project uses [Biome](https://biomejs.dev/) for linting and formatting. This helps ensure that the code adheres to a consistent style.
+
+To run the linter:
+
+```sh
+pnpm lint
+```
+
+To format code:
+
+```sh
+pnpm fmt
+```
+
+To fix linting and formatting issues:
+
+```sh
+pnpm lint:fix
+pnpm fmt:fix
 ```
 
 ## Contributing
 
-Contributions are welcome! If you would like to contribute to this project, please follow the guidelines in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
+Contributions are welcome! Please follow the guidelines in [CONTRIBUTING.md](.github/CONTRIBUTING.md). If you don't have this file, consider creating one with instructions for how to fork the project, make changes, and submit pull requests.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+## Further Reading
+
+If you want to dive deeper into some of the technologies used in this project, here are some useful resources:
+
+- [Express.js Documentation](https://expressjs.com/)
+- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+- [Docker Documentation](https://docs.docker.com/)
+- [Pino Logger](https://getpino.io/)
+- [Vitest Testing Framework](https://vitest.dev/)
+- [Biome Linting](https://biomejs.dev/)
