@@ -2,6 +2,14 @@
 
 A boilerplate for building scalable applications with Express.js and TypeScript.
 
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.0.0-brightgreen.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/container-Docker-blue.svg)](https://www.docker.com/)
+[![CI Build](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/build.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/build.yml)
+[![CI Tests](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/test.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/test.yml)
+[![CI Lint](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/code-quality.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/code-quality.yml)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -77,7 +85,7 @@ This boilerplate provides a strong foundation for building applications using Ex
 To start the development server, run:
 
 ```sh
-pnpm run dev
+pnpm dev
 ```
 
 The server will start on the port specified in your `.env` file (default: 8080).
@@ -87,7 +95,7 @@ The server will start on the port specified in your `.env` file (default: 8080).
 To build the project for production:
 
 ```sh
-pnpm run build
+pnpm build
 ```
 
 Then, to start the production server:
@@ -231,9 +239,15 @@ pnpm fmt:fix
 
 Contributions are welcome! Please follow the guidelines in [CONTRIBUTING.md](.github/CONTRIBUTING.md). If you don't have this file, consider creating one with instructions for how to fork the project, make changes, and submit pull requests.
 
+### Additional Guidelines
+
+- Follow the coding style outlined in the `Biome` configuration files.
+- Use the PR template provided in the `.github` folder to ensure all necessary details are included when submitting a pull request.
+- Report issues using the provided issue template.
+
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details by [@MKAbuMattar](https://github.com/MKAbuMattar).
 
 ## Further Reading
 
