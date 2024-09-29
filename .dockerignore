@@ -6,6 +6,8 @@ build
 dist-ssr
 *.local
 *.log
+.env
+.env.*
 
 # Docker
 compose.override.yml

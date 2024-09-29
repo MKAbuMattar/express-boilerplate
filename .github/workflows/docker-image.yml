@@ -30,15 +30,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.PAT_TOKEN }}
 
-      # Create an environment variable to run the Docker container
-      - name: create environment variable
-        run: |
-          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env
-          echo "PORT=${{ secrets.PORT }}" >> .env
-          echo "HOST=${{ secrets.HOST }}" >> .env
-          echo "CORS_WHITELIST=${{ secrets.CORS_WHITELIST }}" >> .env
-          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
-
       # Convert repository name to lowercase
       - name: Set repository name to lowercase
         run: echo "REPO_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
