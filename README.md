@@ -5,10 +5,10 @@ A boilerplate for building scalable applications with Express.js and TypeScript.
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.0.0-brightgreen.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg)](https://www.typescriptlang.org/)
-[![Docker](https://img.shields.io/badge/container-Docker-blue.svg)](https://www.docker.com/)
 [![CI Build](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/build.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/build.yml)
 [![CI Tests](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/test.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/test.yml)
 [![CI Lint](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/code-quality.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/code-quality.yml)
+[![CI Docker](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/docker-image.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/docker-image.yml)
 
 ## Table of Contents
 
@@ -22,18 +22,23 @@ A boilerplate for building scalable applications with Express.js and TypeScript.
   - [Building for Production](#building-for-production)
   - [Running with Docker](#running-with-docker)
 - [Project Structure](#project-structure)
+- [Testing](#testing)
+- [Git Strategy](#git-strategy)
+  - [Branches](#branches)
+  - [Workflow](#workflow)
+  - [Semantic Commit Messages and Versioning](#semantic-commit-messages-and-versioning)
 - [GitHub Environments](#github-environments)
   - [Why Use GitHub Environments?](#why-use-github-environments)
   - [Setting Up GitHub Environments](#setting-up-github-environments)
   - [Using Secrets in Your Workflow](#using-secrets-in-your-workflow)
   - [Best Practices for Managing GitHub Environments](#best-practices-for-managing-github-environments)
-- [Git Strategy](#git-strategy)
-  - [Branches](#branches)
-  - [Workflow](#workflow)
-  - [Semantic Commit Messages and Versioning](#semantic-commit-messages-and-versioning)
-- [Testing](#testing)
-- [Linting and Formatting](#linting-and-formatting)
+- [Running the Server with Docker and GitHub Container Registry (ghcr.io)](#running-the-server-with-docker-and-github-container-registry-ghcrio)
+  - [Login to GitHub Container Registry](#login-to-github-container-registry)
+  - [Run the Docker Container](#run-the-docker-container)
+    - [Explanation of the Command:](#explanation-of-the-command)
+  - [Verify the Container is Running](#verify-the-container-is-running)
 - [Contributing](#contributing)
+  - [Additional Guidelines](#additional-guidelines)
 - [License](#license)
 - [Further Reading](#further-reading)
 
@@ -45,15 +50,14 @@ This boilerplate provides a strong foundation for building applications using Ex
 
 - **Express.js** with **TypeScript**: Combines the simplicity of Express.js with the type safety and scalability of TypeScript.
 - **Docker** support: Ensures consistent environment setups across different machines, simplifying deployment and scaling.
-- Pre-configured environment-based configuration: Seamlessly manage different configurations for development, staging, and production.
-- Centralized **logging** with [Pino](https://getpino.io/): Pino is a high-performance logger designed to handle heavy workloads with minimal overhead.
+- Centralized **logging** with [Pino](https://getpino.io/): A high-performance logger designed to handle heavy workloads with minimal overhead.
 - **Error handling** middleware: Built-in centralized error handling to manage different error types efficiently.
-- Unit and integration testing with [Vitest](https://vitest.dev/): Vitest provides fast and simple testing for both unit and integration tests.
+- Unit and integration testing with [Vitest](https://vitest.dev/): Fast and simple testing for both unit and integration tests.
 - **API documentation** with OpenAPI Swagger: Automatically generate API documentation from your codebase.
 - **Validation** with [Zod](https://zod.dev/): A TypeScript-first schema declaration and validation library.
 - **Linting** and **Formatting** with [Biome](https://biomejs.dev/): Ensures code consistency and quality across the project.
-- **Semantic Versioning** and **Conventional Commits** integration: Ensures a structured release process and maintainable commit history.
 - **GitHub Actions** for CI/CD pipelines: Automates testing, linting, and deployment workflows.
+- **Semantic Versioning** and **Conventional Commits**: Ensures a structured release process and maintainable commit history.
 
 ## Getting Started
 
@@ -145,6 +149,78 @@ express-boilerplate/
 └── README.md              # Project documentation
 ```
 
+## Testing
+
+Testing is crucial to ensure code reliability and prevent regressions. This project uses [Vitest](https://vitest.dev/) for running unit and integration tests.
+
+- **Unit Tests**: Test individual units of code in isolation.
+- **Integration Tests**: Test the interaction between different units of code.
+
+- **Test Files**: Test files are located in the `src` directory with the `.test.ts` extension.
+  ```sh
+  pnpm test
+  ```
+- **Coverage Reports**: To generate a code coverage report:
+  ```sh
+  pnpm test:cov
+  ```
+- **Watch Mode**: To run tests in watch mode (ideal for active development):
+  ```sh
+  pnpm test:dev
+  ```
+
+> [!TIP]
+> Focus on writing tests that verify the behavior of the code, not implementation details.
+
+## Git Strategy
+
+### Branches
+
+- `main`: Reflects the production-ready state of the source code.
+- `develop`: Contains the latest delivered changes for the next release.
+
+### Workflow
+
+1. Create a new branch from `main` for each feature or bug fix.
+   - Use descriptive branch names with a prefix (e.g., `feat/`, `fix/`).
+2. Make changes and commit them.
+   - Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
+   - Write descriptive commit messages.
+3. Push the branch to the remote repository.
+4. Create a pull request to merge the branch into `develop`.
+5. After approval, merge the pull request into `develop`.
+6. Create a pull request to merge `develop` into `main`.
+7. After approval, merge the pull request into `main`.
+
+### Semantic Commit Messages and Versioning
+
+This project adheres to [Semantic Versioning](https://semver.org/) and uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) to manage releases. Every commit message and version change should follow this standard:
+
+- **fix**: Patches a bug in your codebase (`PATCH` release) or a hotfix.
+  ```sh
+  git commit -m "fix(api): fix health check route"
+  ```
+- **feat**: Introduces a new feature (`MINOR` release) or enhancement.
+  ```sh
+  git commit -m "feat(api): add user route"
+  ```
+- **BREAKING CHANGE**: Introduces breaking changes (`MAJOR` release) that require a manual update.
+  ```sh
+  git commit -m "feat!(api): change user route to use UUID"
+  ```
+- **chore**: Updates dependencies, refactors code, or makes other changes that don't affect the user-facing code.
+  ```sh
+  git commit -m "chore: update dependencies"
+  ```
+- **docs**: Updates documentation, README, or other non-code files.
+  ```sh
+  git commit -m "docs: update README"
+  ```
+- **ci**: Updates CI/CD configurations or workflows.
+  ```sh
+  git commit -m "ci: add GitHub Actions workflow"
+  ```
+
 ## GitHub Environments
 
 GitHub environments empower you to manage deployment settings and configure workflows in GitHub Actions more effectively. This feature enhances the security, control, and visibility of your CI/CD pipeline. Below, you'll find a step-by-step guide to setting up environments and securely managing secrets, such as `PAT_TOKEN`, for Docker image builds.
@@ -230,100 +306,67 @@ jobs:
 
 By following these guidelines, you can establish a robust and secure CI/CD process that enhances your development workflow while maintaining best practices for managing sensitive information.
 
-## Git Strategy
+## Running the Server with Docker and GitHub Container Registry (ghcr.io)
 
-### Branches
+### Login to GitHub Container Registry
 
-- `main`: Reflects the production-ready state of the source code.
-- `develop`: Contains the latest delivered changes for the next release.
-
-### Workflow
-
-1. Create a new branch from `main` for each feature or bug fix.
-   - Use descriptive branch names with a prefix (e.g., `feature/`, `bugfix/`).
-2. Make changes and commit them.
-   - Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
-   - Write descriptive commit messages.
-3. Push the branch to the remote repository.
-4. Create a pull request to merge the branch into `develop`.
-5. After approval, merge the pull request into `develop`.
-6. Create a pull request to merge `develop` into `main`.
-7. After approval, merge the pull request into `main`.
-
-### Semantic Commit Messages and Versioning
-
-This project adheres to [Semantic Versioning](https://semver.org/) and uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) to manage releases. Every commit message and version change should follow this standard:
-
-- **fix**: Patches a bug in your codebase (`PATCH` release) or a hotfix.
-  ```sh
-  git commit -m "fix(api): fix health check route"
-  ```
-- **feat**: Introduces a new feature (`MINOR` release) or enhancement.
-  ```sh
-  git commit -m "feat(api): add user route"
-  ```
-- **BREAKING CHANGE**: Introduces breaking changes (`MAJOR` release) that require a manual update.
-  ```sh
-  git commit -m "feat!(api): change user route to use UUID"
-  ```
-- **chore**: Updates dependencies, refactors code, or makes other changes that don't affect the user-facing code.
-  ```sh
-  git commit -m "chore: update dependencies"
-  ```
-- **docs**: Updates documentation, README, or other non-code files.
-  ```sh
-  git commit -m "docs: update README"
-  ```
-- **ci**: Updates CI/CD configurations or workflows.
-  ```sh
-  git commit -m "ci: add GitHub Actions workflow"
-  ```
-
-## Testing
-
-Testing is crucial to ensure code reliability and prevent regressions. This project uses [Vitest](https://vitest.dev/) for running unit and integration tests.
-
-- **Unit Tests**: Test individual units of code in isolation.
-- **Integration Tests**: Test the interaction between different units of code.
-
-- **Test Files**: Test files are located in the `src` directory with the `.test.ts` extension.
-  ```sh
-  pnpm test
-  ```
-- **Coverage Reports**: To generate a code coverage report:
-  ```sh
-  pnpm test:cov
-  ```
-- **Watch Mode**: To run tests in watch mode (ideal for active development):
-  ```sh
-  pnpm test:dev
-  ```
-
-> [!TIP]
-> Focus on writing tests that verify the behavior of the code, not implementation details.
-
-## Linting and Formatting
-
-The project uses [Biome](https://biomejs.dev/) for linting and formatting. This helps ensure that the code adheres to a consistent style.
-
-To run the linter:
+Before running the Docker container, ensure you're logged into the GitHub Container Registry (GHCR). Replace `TOKEN` and `USERNAME` with your GitHub Personal Access Token (PAT) and GitHub username, respectively:
 
 ```sh
-pnpm lint
+echo <YOUR_PAT_TOKEN> | docker login ghcr.io -u <USERNAME> --password-stdin
 ```
 
-To format code:
+- **`<YOUR_PAT_TOKEN>`**: Your GitHub Personal Access Token with access to the container registry.
+- **`<USERNAME>`**: Your GitHub username.
+
+You can create a GitHub PAT [here](https://github.com/settings/tokens), ensuring it has the `read:packages` scope.
+
+> [!NOTE]
+> This step is required to pull the Docker image from the GitHub Container Registry for private repositories.
+
+### Run the Docker Container
+
+Once logged in, run the Docker container using the following command. Be sure to replace the environment variables and image information with your specific values:
 
 ```sh
-pnpm fmt
+docker run -d -p 8080:8080 \
+    -e NODE_ENV="development" \
+    -e PORT="8080" \
+    -e HOST="localhost" \
+    -e CORS_WHITELIST="*" \
+    -e API_KEY="uk6XUcp7Hj6f4O+w6b<O" \
+    ghcr.io/<USERNAME>/<REPOSITORY_NAME>:<DIGEST>
 ```
 
-To fix linting and formatting issues:
+#### Explanation of the Command:
+
+- **`-p 8080:8080`**: Maps the container's internal port `8080` to port `8080` on your machine.
+- **`-e NODE_ENV="development"`**: Sets the `NODE_ENV` environment variable to `development`. Other options might be `production` or `staging` depending on your setup.
+- **`-e PORT="8080"`**: Specifies the port on which the app should run inside the container.
+- **`-e HOST="localhost"`**: Defines the host, typically `localhost` for local development.
+- **`-e CORS_WHITELIST="*"`**: Allows all domains by using a wildcard for CORS. Adjust this according to your security needs.
+- **`-e API_KEY="uk6XUcp7Hj6f4O+w6b<O"`**: An API key required by your application. Replace with your actual key.
+- **`ghcr.io/<USERNAME>/<REPOSITORY_NAME>:<DIGEST>`**: Replace `<USERNAME>`, `<REPOSITORY_NAME>`, and `<DIGEST>` with your GitHub username, the repository name, and the specific image digest or tag (e.g., `latest`).
 
 ```sh
-pnpm lint:fix
-pnpm fmt:fix
+docker run -d -p 8080:8080 \
+    -e NODE_ENV="production" \
+    -e PORT="8080" \
+    -e HOST="0.0.0.0" \
+    -e CORS_WHITELIST="https://example.com" \
+    -e API_KEY="superSecretAPIKey123" \
+    ghcr.io/MKAbuMattar/express-boilerplate:latest
 ```
+
+### Verify the Container is Running
+
+To check if your container is running, you can use the following command:
+
+```sh
+docker ps
+```
+
+This will display a list of all active containers. You should see your container listed with the port mappings (`8080:8080` in this case).
 
 ## Contributing
 
@@ -341,11 +384,10 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Further Reading
 
-If you want to dive deeper into some of the technologies used in this project, here are some useful resources:
-
 - [Express.js Documentation](https://expressjs.com/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 - [Docker Documentation](https://docs.docker.com/)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Pino Logger](https://getpino.io/)
 - [Vitest Testing Framework](https://vitest.dev/)
 - [Biome Linting](https://biomejs.dev/)
