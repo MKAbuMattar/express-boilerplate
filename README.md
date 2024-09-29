@@ -23,8 +23,10 @@ A boilerplate for building scalable applications with Express.js and TypeScript.
   - [Running with Docker](#running-with-docker)
 - [Project Structure](#project-structure)
 - [GitHub Environments](#github-environments)
-  - [Adding the `PAT_TOKEN` Secret](#adding-the-pat_token-secret)
-  - [Using the Secret in Your Workflow](#using-the-secret-in-your-workflow)
+  - [Why Use GitHub Environments?](#why-use-github-environments)
+  - [Setting Up GitHub Environments](#setting-up-github-environments)
+  - [Using Secrets in Your Workflow](#using-secrets-in-your-workflow)
+  - [Best Practices for Managing GitHub Environments](#best-practices-for-managing-github-environments)
 - [Git Strategy](#git-strategy)
   - [Branches](#branches)
   - [Workflow](#workflow)
@@ -227,6 +229,8 @@ jobs:
 - **Monitor Usage**: Regularly review and audit your environment settings and secrets to ensure compliance with best practices and security policies.
 
 By following these guidelines, you can establish a robust and secure CI/CD process that enhances your development workflow while maintaining best practices for managing sensitive information.
+
+## Git Strategy
 
 ### Branches
 
