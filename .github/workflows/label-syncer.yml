@@ -4,12 +4,16 @@ on:
   push:
     branches:
       - main
-    paths:
-      - .github/labels.yml
 
 permissions:
-  pull-requests: read
+  contents: write
+  issues: write
+  pull-requests: write
   statuses: write
+  actions: write
+  checks: write
+  deployments: write
+  discussions: write
 
 jobs:
   build:
