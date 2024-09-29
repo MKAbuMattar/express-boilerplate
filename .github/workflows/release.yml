@@ -1,19 +1,19 @@
 name: Release
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
-    paths:
-      - .github/workflows/release.yml
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # Skip running release workflow on forks
-    if: github.repository_owner == 'MKAbuMattar'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
