@@ -36,6 +36,9 @@ This boilerplate provides a strong foundation for building applications using Ex
 - Centralized **logging** with [Pino](https://getpino.io/): Pino is a high-performance logger designed to handle heavy workloads with minimal overhead.
 - **Error handling** middleware: Built-in centralized error handling to manage different error types efficiently.
 - Unit and integration testing with [Vitest](https://vitest.dev/): Vitest provides fast and simple testing for both unit and integration tests.
+- **API documentation** with OpenAPI Swagger: Automatically generate API documentation from your codebase.
+- **Validation** with [Zod](https://zod.dev/): A TypeScript-first schema declaration and validation library.
+- **Linting** and **Formatting** with [Biome](https://biomejs.dev/): Ensures code consistency and quality across the project.
 - **Semantic Versioning** and **Conventional Commits** integration: Ensures a structured release process and maintainable commit history.
 - **GitHub Actions** for CI/CD pipelines: Automates testing, linting, and deployment workflows.
 
