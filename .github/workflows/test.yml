@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+permissions:
+  pull-requests: read
+  statuses: write
+
 env:
   STACK_NAME: express-bdoilerplate
   DOMAIN: localhost
