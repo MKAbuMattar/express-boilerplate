@@ -22,6 +22,9 @@ A boilerplate for building scalable applications with Express.js and TypeScript.
   - [Building for Production](#building-for-production)
   - [Running with Docker](#running-with-docker)
 - [Project Structure](#project-structure)
+- [GitHub Environments](#github-environments)
+  - [Adding the `PAT_TOKEN` Secret](#adding-the-pat_token-secret)
+  - [Using the Secret in Your Workflow](#using-the-secret-in-your-workflow)
 - [Git Strategy](#git-strategy)
   - [Branches](#branches)
   - [Workflow](#workflow)
@@ -140,7 +143,90 @@ express-boilerplate/
 └── README.md              # Project documentation
 ```
 
-## Git Strategy
+## GitHub Environments
+
+GitHub environments empower you to manage deployment settings and configure workflows in GitHub Actions more effectively. This feature enhances the security, control, and visibility of your CI/CD pipeline. Below, you'll find a step-by-step guide to setting up environments and securely managing secrets, such as `PAT_TOKEN`, for Docker image builds.
+
+### Why Use GitHub Environments?
+
+Using GitHub Environments offers several advantages:
+
+- **Security**: Secrets stored in environments are encrypted, ensuring that sensitive information is only accessible to workflows running within those environments.
+- **Controlled Deployments**: You can enforce rules for approval before deployments, ensuring that changes are reviewed before going live.
+- **Environment-Specific Settings**: Manage different configurations tailored for development, staging, and production, reducing the risk of errors during deployment.
+
+### Setting Up GitHub Environments
+
+Follow these steps to set up GitHub Environments for your project:
+
+1. **Navigate to Your Repository**:
+
+   - Open your web browser and go to your GitHub repository.
+
+2. **Access Environment Settings**:
+
+   - Click on the **Settings** tab at the top of the repository page.
+   - In the left sidebar, find and select **Environments** under the **Security** section.
+
+3. **Create a New Environment**:
+
+   - Click the **New environment** button.
+   - Provide a meaningful name for your environment (e.g., `development`, `staging`, `production`) to indicate its purpose.
+   - (Optional) Configure specific rules, such as requiring manual approval for deployment, to enhance control over the process.
+
+4. **Add Secrets to Your Environment**:
+   - After creating your environment, click on its name to access its settings.
+   - In the **Secrets** section, click on **Add secret**.
+   - Enter `PAT_TOKEN` as the secret name and paste your Personal Access Token into the value field.
+   - Click **Add secret** to save the secret securely.
+
+### Using Secrets in Your Workflow
+
+To utilize the `PAT_TOKEN` secret in your GitHub Actions workflow for building Docker images, reference the secret using the syntax shown in the example workflow below. You can find this configuration in your [docker-image.yml](.github/workflows/docker-image.yml) file:
+
+```yaml
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: development # Specify the environment
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Log in to the GitHub Container Registry only on main branch pushes
+      - name: Login to GitHub Container Registry
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT_TOKEN }}
+
+      # Add additional steps here (e.g., building and pushing the Docker image)
+```
+
+### Best Practices for Managing GitHub Environments
+
+- **Limit Access**: Only grant access to environments to those who require it. Utilize branch protection rules to ensure that only specific users can deploy to production.
+- **Review Approvals**: For sensitive environments, set up an approval process to require reviews before deployments occur. This adds a layer of safety to your deployment strategy.
+- **Monitor Usage**: Regularly review and audit your environment settings and secrets to ensure compliance with best practices and security policies.
+
+By following these guidelines, you can establish a robust and secure CI/CD process that enhances your development workflow while maintaining best practices for managing sensitive information.
 
 ### Branches
 
