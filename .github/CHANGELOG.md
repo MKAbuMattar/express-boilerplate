@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.1.0...v1.2.0) (2024-10-11)
+
+
+### Features
+
+* Add code comments for code review and task tracking ([02fdcb3](https://github.com/MKAbuMattar/express-boilerplate/commit/02fdcb338357ebc722952d336ca7c3964bb4335b))
+
+
+### Bug Fixes
+
+* Update VSCode settings.json ([6016f65](https://github.com/MKAbuMattar/express-boilerplate/commit/6016f65d0a63148dd3eafbe327fd55bf7e397d33))
+
 ## [1.1.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.0.0...v1.1.0) (2024-10-11)
 
 
