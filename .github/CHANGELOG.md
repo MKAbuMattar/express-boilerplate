@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.0.0...v1.1.0) (2024-10-11)
+
+
+### Features
+
+* Add Docker Image CI Cleanup workflow ([dfab664](https://github.com/MKAbuMattar/express-boilerplate/commit/dfab664495e735c14b7345daef96af64d6b9b355))
+
 ## 1.0.0 (2024-09-29)
 
 
