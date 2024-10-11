@@ -1,5 +1,7 @@
 {
   "editor.formatOnSave": true,
+  "editor.wordWrapColumn": 80,
+  "explorer.compactFolders": false,
   "editor.defaultFormatter": "biomejs.biome",
   "editor.codeActionsOnSave": {
     "quickfix.biome": "explicit",
