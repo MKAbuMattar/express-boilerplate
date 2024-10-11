@@ -56,3 +56,13 @@ app.use('/api/users', authApiKey(), userRouter);
 
 // Docs
 app.use('/docs', openAPIRouter);
+
+// Comments for code review
+// TODO: [Devloper/QA Name] [Description]
+// FIXME: [Devloper/QA Name] [Description]
+// DEBUG: [Devloper/QA Name] [Description]
+// REVIEW: [Devloper/QA Name] [Description]
+// TESTED: [Devloper/QA Name] [Description]
+// NOTE: [Devloper/QA Name] [Description]
+// INFO: [Devloper/QA Name] [Description]
+// DONE: [Devloper/QA Name] [Description]
