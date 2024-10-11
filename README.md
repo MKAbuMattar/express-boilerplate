@@ -349,13 +349,13 @@ docker run -d -p 8080:8080 \
 - **`ghcr.io/<USERNAME>/<REPOSITORY_NAME>:<DIGEST>`**: Replace `<USERNAME>`, `<REPOSITORY_NAME>`, and `<DIGEST>` with your GitHub username, the repository name, and the specific image digest or tag (e.g., `latest`).
 
 ```sh
-docker run -d -p 8080:8080 \
+docker run -d --network host \
     -e NODE_ENV="production" \
     -e PORT="8080" \
     -e HOST="0.0.0.0" \
     -e CORS_WHITELIST="https://example.com" \
     -e API_KEY="superSecretAPIKey123" \
-    ghcr.io/MKAbuMattar/express-boilerplate:latest
+    ghcr.io/mkabumattar/express-boilerplate:latest
 ```
 
 ### Verify the Container is Running
