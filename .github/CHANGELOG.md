@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.2.0...v1.2.1) (2024-10-11)
+
+
+### Bug Fixes
+
+* Update user controller to use async/await syntax ([8070171](https://github.com/MKAbuMattar/express-boilerplate/commit/80701715279654f7e6c50f3c2fe8ee4b64273062))
+
 ## [1.2.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.1.0...v1.2.0) (2024-10-11)
 
 
