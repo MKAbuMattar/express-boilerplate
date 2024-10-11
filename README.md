@@ -2,13 +2,23 @@
 
 A boilerplate for building scalable applications with Express.js and TypeScript.
 
-[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.0.0-brightgreen.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg)](https://www.typescriptlang.org/)
-[![CI Build](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/build.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/build.yml)
-[![CI Tests](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/test.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/test.yml)
-[![CI Lint](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/code-quality.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/code-quality.yml)
-[![CI Docker](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/docker-image.yml/badge.svg)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/docker-image.yml)
+<div class="badges" align="center">
+
+[![GitHub](https://img.shields.io/badge/github-%23181717.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/MKAbuMattar/express-boilerplate)
+[![GitHub Releases](https://img.shields.io/github/v/release/MKAbuMattar/express-boilerplate?include_prereleases&sort=date&style=for-the-badge)](https://github.com/MKAbuMattar/express-boilerplate/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/MKAbuMattar/express-boilerplate.svg?style=for-the-badge)](https://github.com/MKAbuMattar/express-boilerplate/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/MKAbuMattar/express-boilerplate.svg?style=for-the-badge)](https://github.com/MKAbuMattar/express-boilerplate/forks)
+[![GitHub Issues](https://img.shields.io/github/issues/MKAbuMattar/express-boilerplate.svg?style=for-the-badge)](https://github.com/MKAbuMattar/express-boilerplate/issues)
+[![GitHub License](https://img.shields.io/github/license/MKAbuMattar/express-boilerplate.svg?style=for-the-badge)](LICENSE)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.0.0-brightgreen.svg?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![CI Build](https://img.shields.io/github/actions/workflow/status/MKAbuMattar/express-boilerplate/build.yml?branch=main&style=for-the-badge&label=CI%20Build)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/build.yml)
+[![CI Tests](https://img.shields.io/github/actions/workflow/status/MKAbuMattar/express-boilerplate/test.yml?branch=main&style=for-the-badge&label=CI%20Tests)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/test.yml)
+[![CI Lint](https://img.shields.io/github/actions/workflow/status/MKAbuMattar/express-boilerplate/code-quality.yml?branch=main&style=for-the-badge&label=CI%20Lint)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/code-quality.yml)
+[![CI Docker](https://img.shields.io/github/actions/workflow/status/MKAbuMattar/express-boilerplate/docker-image.yml?branch=main&style=for-the-badge&label=CI%20Docker)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/docker-image.yml)
+[![CI Docker Cleanup](https://img.shields.io/github/actions/workflow/status/MKAbuMattar/express-boilerplate/docker-image-cleanup.yml?branch=main&style=for-the-badge&label=CI%20Docker%20Cleanup)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/docker-image-cleanup.yml)
+
+</div>
 
 ## Table of Contents
 
