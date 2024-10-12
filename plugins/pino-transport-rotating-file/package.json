@@ -17,13 +17,13 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "require": "./index.mjs",
+      "require": "./index.cjs",
       "import": "./index.mjs",
       "types": "./index.d.ts"
     },
     "./package.json": "./package.json"
   },
-  "files": ["./index.mjs", "./index.d.ts"],
+  "files": ["./index.cjs", "./index.mjs", "./index.d.ts"],
   "support": {
     "backing": {
       "npm-funding": true
