@@ -26,6 +26,7 @@ jobs:
       - uses: snok/container-retention-policy@v3.0.0
         with:
           account: mkabumattar
+          image-names: express-boilerplate
           token: ${{ secrets.PAT_DEL_TOKEN }}
           image-tags: "*"
           tag-selection: both
