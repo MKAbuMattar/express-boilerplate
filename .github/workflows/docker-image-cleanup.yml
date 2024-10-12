@@ -1,29 +1,38 @@
 name: Docker Image CI Cleanup
 
 on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
   schedule:
-    - cron: "0 0 * * *" # Run every day at midnight
+    - cron: "0 0 * * *" # Daily at midnight
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
 
 jobs:
-  cleanup-docker-image:
+  cleanup:
     runs-on: ubuntu-latest
     environment: development
-    name: Cleanup Docker Image
 
     steps:
-      - name: Get the username lowercase
-        run: echo "USERNAME=$(echo '${{ github.actor }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - name: Checkout the repository
+        uses: actions/checkout@v4
 
       - name: Get the repository name lowercase
         run: echo "REPO_NAME=$(echo '${{ github.repository }}' | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - name:
-        uses: snok/container-retention-policy@v3.0.0
+      - uses: snok/container-retention-policy@v3.0.0
         with:
-          account: ${{ env.USERNAME }} # GitHub username
-          token: ${{ secrets.PAT }} # Personal Access Token
-          image-names: ${{ env.REPO_NAME }} # Name of the image to cleanup
-          image-tags: "*" # Tag of the image to cleanup
-          tag-selection: "both" # Select both tagged and untagged package versions
-          cut-off: 1w # package versions should be older than `1w` (1 week) to be deleted
-          keep-n-most-recent: 5 # keep up to `n` tagged package versions for each of the packages
+          account: user
+          token: ${{ secrets.PAT_DEL_TOKEN }}
+          image-names: "${{ env.REPO_NAME }}"
+          image-tags: "*"
+          cut-off: 1w
+          keep-n-most-recent: 5
+          dry-run: false
