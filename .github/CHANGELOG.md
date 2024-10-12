@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.2.1...v1.3.0) (2024-10-12)
+
+
+### Features
+
+* Add CodeQL analysis workflow ([c11b344](https://github.com/MKAbuMattar/express-boilerplate/commit/c11b34492cf2389e2f6e8e2e78489f99e008f0b2))
+
 ## [1.2.1](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.2.0...v1.2.1) (2024-10-11)
 
 
