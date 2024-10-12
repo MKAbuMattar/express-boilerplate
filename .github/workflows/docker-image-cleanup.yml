@@ -27,7 +27,7 @@ jobs:
         with:
           account: mkabumattar
           image-names: express-boilerplate
-          token: ${{ secrets.PAT_DEL_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           image-tags: "*"
           tag-selection: both
           cut-off: 1w
