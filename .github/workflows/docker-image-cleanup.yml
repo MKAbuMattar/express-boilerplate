@@ -16,24 +16,43 @@ permissions:
   pull-requests: write
 
 jobs:
-  cleanup-docker-image:
+  cleanup:
     runs-on: ubuntu-latest
     environment: development
-    name: Cleanup Docker Image
 
     steps:
-      - name: Get the username lowercase
-        run: echo "USERNAME=$(echo '${{ github.actor }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+      - uses: actions/checkout@v4
 
-      - name: Get the repository name lowercase
-        run: echo "REPO_NAME=$(echo '${{ github.repository }}' | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-
-      - name:
-        uses: snok/container-retention-policy@v3.0.0
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          account: ${{ env.USERNAME }} # GitHub username
-          token: ${{ secrets.PAT_DEL_TOKEN }} # Personal Access Token (PAT) with `delete:packages` scope
-          image-names: ${{ env.REPO_NAME }} # Name of the image to cleanup
-          image-tags: "*" # Tag of the image to cleanup
-          cut-off: 1w # package versions should be older than `1w` (1 week) to be deleted
-          keep-n-most-recent: 4 # keep up to `n` tagged package versions for each of the packages
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT_DEL_TOKEN }}
+
+      - name: Get all Docker image tags
+        id: list_images
+        run: |
+          IMAGES=$(gh api -H "Accept: application/vnd.github.v3+json" \
+            /user/packages/container/${{ github.repository }}/versions \
+            | jq -r '.[] | "\(.metadata.container.tags[0]) \(.updated_at)"' | sort -r -k2)
+          echo "$IMAGES" | awk '{print $1}' > all_images.txt
+          echo "ALL_IMAGES=$(cat all_images.txt)" >> $GITHUB_ENV
+
+      - name: Filter out images to delete
+        id: filter_images
+        run: |
+          IMAGES_TO_KEEP=$(cat all_images.txt | head -n 4)  # Keep the 4 most recent
+          IMAGES_TO_DELETE=$(cat all_images.txt | tail -n +5)  # Delete older images
+          echo "IMAGES_TO_DELETE=$IMAGES_TO_DELETE" >> $GITHUB_ENV
+
+      - name: Delete old images
+        if: env.IMAGES_TO_DELETE != ''
+        run: |
+          for IMAGE in ${{ env.IMAGES_TO_DELETE }}; do
+            gh api -X DELETE \
+              -H "Accept: application/vnd.github.v3+json" \
+              /user/packages/container/${{ github.repository }}/versions/${IMAGE}
+            echo "Deleted $IMAGE"
+          done
