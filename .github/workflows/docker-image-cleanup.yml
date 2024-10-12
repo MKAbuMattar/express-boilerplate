@@ -32,4 +32,4 @@ jobs:
           image-tags: "*" # Tag of the image to cleanup
           tag-selection: "both" # Select both tagged and untagged package versions
           cut-off: 1w # package versions should be older than `1w` (1 week) to be deleted
-          keep-n-most-recent: 5 # keep up to `n` tagged package versions for each of the packages
+          keep-n-most-recent: 4 # keep up to `n` tagged package versions for each of the packages
