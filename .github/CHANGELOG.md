@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.3.1...v1.4.0) (2024-10-12)
+
+
+### Features
+
+* Update pino-transport-rotating-file package.json and index.cjs ([c316ee2](https://github.com/MKAbuMattar/express-boilerplate/commit/c316ee2c6fd7fb1f2f215d3a412701ab90ba9cb2))
+
 ## [1.3.1](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.3.0...v1.3.1) (2024-10-12)
 
 
