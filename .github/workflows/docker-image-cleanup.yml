@@ -27,7 +27,7 @@ jobs:
         uses: snok/container-retention-policy@v3.0.0
         with:
           account: ${{ env.USERNAME }} # GitHub username
-          token: ${{ secrets.PAT_TOKEN }} # Personal Access Token
+          token: ${{ secrets.PAT_DEL_TOKEN }} # Personal Access Token (PAT) with `delete:packages` scope
           image-names: ${{ env.REPO_NAME }} # Name of the image to cleanup
           image-tags: "*" # Tag of the image to cleanup
           tag-selection: "both" # Select both tagged and untagged package versions
