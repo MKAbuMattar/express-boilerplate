@@ -26,7 +26,7 @@ jobs:
       - uses: snok/container-retention-policy@v3.0.0
         with:
           account: user
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_DEL_TOKEN }}
           image-names: "express-boilerplate"
           image-tags: "*main* *release*"
           cut-off: 1w
