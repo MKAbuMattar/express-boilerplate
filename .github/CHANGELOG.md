@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.4.0...v1.5.0) (2024-10-12)
+
+
+### Features
+
+* Remove pino-transport-rotating-file package and update logger options ([f57a4e6](https://github.com/MKAbuMattar/express-boilerplate/commit/f57a4e68927754bc4cb8b6b59bff45ed03f814ff))
+* Update pino-transport-rotating-file package version to 1.0.0 ([8eca68e](https://github.com/MKAbuMattar/express-boilerplate/commit/8eca68eddece5e5002cc852ca7da33557828a4c1))
+
 ## [1.4.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.3.1...v1.4.0) (2024-10-12)
 
 
