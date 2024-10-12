@@ -23,35 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - uses: snok/container-retention-policy@v3.0.0
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.PAT_DEL_TOKEN }}
-
-      - name: Get all Docker image tags
-        id: list_images
-        run: |
-          IMAGES=$(gh api -H "Accept: application/vnd.github.v3+json" \
-            /user/packages/container/${{ github.repository }}/versions \
-            | jq -r '.[] | "\(.metadata.container.tags[0]) \(.updated_at)"' | sort -r -k2)
-          echo "$IMAGES" | awk '{print $1}' > all_images.txt
-          echo "ALL_IMAGES=$(cat all_images.txt)" >> $GITHUB_ENV
-
-      - name: Filter out images to delete
-        id: filter_images
-        run: |
-          IMAGES_TO_KEEP=$(cat all_images.txt | head -n 4)  # Keep the 4 most recent
-          IMAGES_TO_DELETE=$(cat all_images.txt | tail -n +5)  # Delete older images
-          echo "IMAGES_TO_DELETE=$IMAGES_TO_DELETE" >> $GITHUB_ENV
-
-      - name: Delete old images
-        if: env.IMAGES_TO_DELETE != ''
-        run: |
-          for IMAGE in ${{ env.IMAGES_TO_DELETE }}; do
-            gh api -X DELETE \
-              -H "Accept: application/vnd.github.v3+json" \
-              /user/packages/container/${{ github.repository }}/versions/${IMAGE}
-            echo "Deleted $IMAGE"
-          done
+          account: mkabumattar
+          image-names: express-boilerplate
+          token: ${{ secrets.PAT_DEL_TOKEN }}
+          tag-selection: both
+          keep-n-most-recent: 5
