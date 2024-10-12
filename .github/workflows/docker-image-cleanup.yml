@@ -30,6 +30,5 @@ jobs:
           token: ${{ secrets.PAT_DEL_TOKEN }} # Personal Access Token (PAT) with `delete:packages` scope
           image-names: ${{ env.REPO_NAME }} # Name of the image to cleanup
           image-tags: "*" # Tag of the image to cleanup
-          tag-selection: "both" # Select both tagged and untagged package versions
           cut-off: 1w # package versions should be older than `1w` (1 week) to be deleted
           keep-n-most-recent: 4 # keep up to `n` tagged package versions for each of the packages
