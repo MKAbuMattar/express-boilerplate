@@ -16,7 +16,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'info',
-        target: '@mkabumattar/pino-transport-rotating-file',
+        target: 'pino-transport-rotating',
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'all',
@@ -25,7 +25,7 @@ export const loggerOptions: LoggerOptions = {
       },
       {
         level: 'error',
-        target: '@mkabumattar/pino-transport-rotating-file',
+        target: 'pino-transport-rotating',
         options: {
           dir: path.join(process.cwd(), 'logs'),
           filename: 'error',

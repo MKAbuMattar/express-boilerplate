@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "7.2.0",
-    "@mkabumattar/pino-transport-rotating-file": "workspace:*",
     "compression": "1.7.4",
     "cookie-parser": "1.4.6",
     "cors": "2.8.5",
@@ -44,6 +43,7 @@
     "pino": "9.4.0",
     "pino-http": "10.3.0",
     "pino-pretty": "11.2.2",
+    "pino-transport-rotating": "0.0.0-beta.1",
     "swagger-ui-express": "5.0.1",
     "zod": "3.23.8"
   },
