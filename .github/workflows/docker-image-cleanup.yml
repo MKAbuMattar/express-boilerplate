@@ -29,6 +29,4 @@ jobs:
           image-names: express-boilerplate
           token: ${{ secrets.GITHUB_TOKEN }}
           image-tags: "*"
-          tag-selection: both
           cut-off: 1w
-          keep-n-most-recent: 5
