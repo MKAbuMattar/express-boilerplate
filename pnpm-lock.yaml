@@ -45,8 +45,8 @@ importers:
         specifier: 11.2.2
         version: 11.2.2
       pino-transport-rotating:
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.0.1
+        version: 1.0.1
       swagger-ui-express:
         specifier: 5.0.1
         version: 5.0.1(express@4.21.0)
@@ -1514,8 +1514,8 @@ packages:
   pino-std-serializers@7.0.0:
     resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
-  pino-transport-rotating@1.0.0:
-    resolution: {integrity: sha512-87b7R7BZU8dXSLOhl6QQVCw0G0L5jhaxiX2avWTNpj4xr1hYLokugx5OU+PXUEXGkaUZe8eUrIAu0um0V+ti+Q==}
+  pino-transport-rotating@1.0.1:
+    resolution: {integrity: sha512-T3bE2tb6ARK8S0MvIijUVTyjiOcyic341VhUa/f9FBk4AUnQZig65Gebo+ejgtAxHSLNdG3SBruwJa3/opaCUQ==}
 
   pino@9.4.0:
     resolution: {integrity: sha512-nbkQb5+9YPhQRz/BeQmrWpEknAaqjpAqRK8NwJpmrX/JHu7JuZC5G1CeAwJDJfGes4h+YihC6in3Q2nGb+Y09w==}
@@ -3267,7 +3267,7 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino-transport-rotating@1.0.0:
+  pino-transport-rotating@1.0.1:
     dependencies:
       pino: 9.4.0
       pino-pretty: 11.2.2
