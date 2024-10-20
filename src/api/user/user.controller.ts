@@ -1,8 +1,6 @@
 import type {Request, RequestHandler, Response} from 'express';
 
-// User API
 import {findAll, findById} from '@/api/user/user.service';
-// utils
 import {handleServiceResponse} from '@/utils/http-handlers.util';
 
 export const getUsers: RequestHandler = async (

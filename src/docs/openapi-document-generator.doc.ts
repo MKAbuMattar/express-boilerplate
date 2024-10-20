@@ -3,7 +3,6 @@ import {
   OpenApiGeneratorV3,
 } from '@asteasolutions/zod-to-openapi';
 
-// Controllers
 import {healthCheckRegistry} from '@/api/health-check/health-check.router';
 import {userRegistry} from '@/api/user/user.router';
 

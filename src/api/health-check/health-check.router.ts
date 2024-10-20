@@ -1,19 +1,15 @@
 import {OpenAPIRegistry} from '@asteasolutions/zod-to-openapi';
-import express, {type Request, type Response, type Router} from 'express';
+import {type Request, type Response, Router} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import {z} from 'zod';
 
-// Docs
 import {createApiResponse} from '@/docs/openapi-response-builders.doc';
-// libs
 import {logger} from '@/libs/logger.lib';
-// Models
 import {ResponseStatus, ServiceResponse} from '@/models/service-response.model';
-// Utils
 import {handleServiceResponse} from '@/utils/http-handlers.util';
 
 export const healthCheckRegistry = new OpenAPIRegistry();
-export const healthCheckRouter: Router = express.Router();
+export const healthCheckRouter: Router = Router();
 
 healthCheckRegistry.registerPath({
   method: 'get',

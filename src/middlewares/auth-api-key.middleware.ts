@@ -1,7 +1,6 @@
 import type {NextFunction, Request, RequestHandler, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 
-// Utils
 import {env} from '@/utils/env-config.util';
 
 const authenticateApiKey: RequestHandler = (

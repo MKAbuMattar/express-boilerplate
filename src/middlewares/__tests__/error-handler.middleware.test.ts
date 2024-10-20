@@ -2,7 +2,6 @@ import express, {type Express} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
-// Middlewares
 import errorHandler from '@/middlewares/error-handler.middleware';
 
 describe('Error Handler Middleware', () => {

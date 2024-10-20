@@ -2,11 +2,9 @@ import express, {type Request, type Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
-// Middlewares
 import authApiKey from '@/middlewares/auth-api-key.middleware';
 import errorHandler from '@/middlewares/error-handler.middleware';
 import requestLogger from '@/middlewares/request-logger.middleware';
-// Utils
 import {env} from '@/utils/env-config.util';
 
 describe('Auth API Key Middleware', () => {

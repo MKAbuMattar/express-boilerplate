@@ -2,7 +2,6 @@ import express from 'express';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
-// Middlewares
 import errorHandler from '@/middlewares/error-handler.middleware';
 import requestLogger from '@/middlewares/request-logger.middleware';
 

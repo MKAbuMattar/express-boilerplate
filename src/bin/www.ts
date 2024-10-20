@@ -1,9 +1,6 @@
-// libs
 import {logger} from '@/libs/logger.lib';
-// Middlewares
 import errorHandler from '@/middlewares/error-handler.middleware';
 import {app} from '@/server';
-// Utils
 import {env} from '@/utils/env-config.util';
 
 app.use(errorHandler());

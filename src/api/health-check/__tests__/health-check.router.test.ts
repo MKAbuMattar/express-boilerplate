@@ -1,7 +1,6 @@
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
-// Models
 import type {ServiceResponse} from '@/models/service-response.model';
 import {app} from '@/server';
 

@@ -1,11 +1,8 @@
 import {StatusCodes} from 'http-status-codes';
 
-// User API
 import type {User} from '@/api/user/user.model';
 import {findAllAsync, findByIdAsync} from '@/api/user/user.repository';
-// libs
 import {logger} from '@/libs/logger.lib';
-// Models
 import {ResponseStatus, ServiceResponse} from '@/models/service-response.model';
 
 export const findAll = async (): Promise<ServiceResponse<User[] | null>> => {
