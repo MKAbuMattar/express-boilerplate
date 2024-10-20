@@ -53,12 +53,6 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 
-      - name: Upload Artifact for CodeQL Analysis
-        uses: actions/upload-artifact@v4
-        with:
-          name: codeql-results
-          path: ${{ runner.workspace }}/.github/artifacts/codeql
-
   code-quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
@@ -75,12 +69,6 @@ jobs:
 
       - name: Run Biome
         run: biome ci .
-
-      - name: Upload Artifact for Code Quality
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-quality-results
-          path: ${{ runner.workspace }}/.github/artifacts/code-quality
 
   test:
     name: Run Unit Tests
@@ -110,12 +98,6 @@ jobs:
 
       - name: Test
         run: pnpm test
-
-      - name: Upload Artifact for Test
-        uses: actions/upload-artifact@v4
-        with:
-          name: test
-          path: ${{ runner.workspace }}/.github/artifacts/test
 
   build:
     name: Build Project
@@ -148,12 +130,6 @@ jobs:
 
       - name: Build
         run: pnpm build
-
-      - name: Upload Artifact for Build
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: ${{ runner.workspace }}/.github/artifacts/build
 
   docker-image:
     name: Docker Image CI
@@ -188,9 +164,3 @@ jobs:
         run: |
           docker push ghcr.io/${{ env.REPO_NAME }}:${{ github.sha }}
           docker push ghcr.io/${{ env.REPO_NAME }}:latest
-
-      - name: Upload Artifact for Docker Image
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: ${{ runner.workspace }}/.github/artifacts/docker-image
