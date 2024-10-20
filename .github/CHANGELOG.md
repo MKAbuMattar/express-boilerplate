@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.6.1...v1.7.0) (2024-10-20)
+
+
+### Features
+
+* Update language matrix in CI pipeline and codeql analysis workflows ([b146795](https://github.com/MKAbuMattar/express-boilerplate/commit/b146795fd3ad581672c8f8e678e70a7a6c45f88b))
+
 ## [1.6.1](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.6.0...v1.6.1) (2024-10-20)
 
 
