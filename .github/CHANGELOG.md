@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.1](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.6.0...v1.6.1) (2024-10-20)
+
+
+### Bug Fixes
+
+* Update CI Pipeline badge in README.md ([55afae1](https://github.com/MKAbuMattar/express-boilerplate/commit/55afae133e524554a3aee366de141cae98ffe340))
+* Update CI Pipeline badge in README.md ([ba451a6](https://github.com/MKAbuMattar/express-boilerplate/commit/ba451a67c5e916e5c21df30fa08ee5b391313363))
+
 ## [1.6.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.5.0...v1.6.0) (2024-10-20)
 
 
