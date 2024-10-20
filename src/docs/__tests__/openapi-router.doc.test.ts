@@ -1,7 +1,6 @@
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
-// Models
 import {app} from '@/server';
 
 describe('OpenAPI Router', () => {

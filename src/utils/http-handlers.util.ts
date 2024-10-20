@@ -2,7 +2,6 @@ import type {NextFunction, Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import type {ZodError, ZodSchema} from 'zod';
 
-// Models
 import {ResponseStatus, ServiceResponse} from '@/models/service-response.model';
 
 export const handleServiceResponse = (

@@ -1,7 +1,6 @@
 import {StatusCodes} from 'http-status-codes';
 import type {z} from 'zod';
 
-// Models
 import {ServiceResponseSchema} from '@/models/service-response.model';
 
 export function createApiResponse(

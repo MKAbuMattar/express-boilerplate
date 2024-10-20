@@ -1,7 +1,6 @@
 import {StatusCodes} from 'http-status-codes';
 import type {Mock} from 'vitest';
 
-// User API
 import type {User} from '@/api/user/user.model';
 import {findAllAsync, findByIdAsync} from '@/api/user/user.repository';
 import {findAll, findById} from '@/api/user/user.service';
