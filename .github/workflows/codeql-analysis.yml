@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         language:
-          - TypeScript
+          - javascript-typescript
 
     steps:
       - name: Checkout
