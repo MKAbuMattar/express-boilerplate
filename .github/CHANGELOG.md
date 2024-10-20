@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.6.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.5.0...v1.6.0) (2024-10-20)
+
+
+### Features
+
+* Remove unused GitHub workflows ([71b76fc](https://github.com/MKAbuMattar/express-boilerplate/commit/71b76fc7d0d34c981b23dc2ff9473648f5e1cfb1))
+
+
+### Bug Fixes
+
+* Remove unused GitHub workflows and artifacts upload ([bc05e3c](https://github.com/MKAbuMattar/express-boilerplate/commit/bc05e3c25672ad80a05014cc7eb89f75e5961291))
+
 ## [1.5.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.4.0...v1.5.0) (2024-10-12)
 
 
