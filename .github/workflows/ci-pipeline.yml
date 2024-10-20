@@ -18,7 +18,7 @@ permissions:
   issues: write
 
 env:
-  STACK_NAME: express-bdoilerplate
+  STACK_NAME: express-boilerplate
   DOMAIN: localhost
   NODE_ENV: development
   PORT: 8080
@@ -153,11 +153,11 @@ jobs:
         run: echo "REPO_NAME=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Build the Docker image
-        run: |
-          docker build . --file Dockerfile --tag ghcr.io/${{ env.REPO_NAME }}:${{ github.sha }}
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            docker tag ghcr.io/${{ env.REPO_NAME }}:${{ github.sha }} ghcr.io/${{ env.REPO_NAME }}:latest
-          fi
+        run: docker build . --file Dockerfile --tag ghcr.io/${{ env.REPO_NAME }}:${{ github.sha }}
+
+      - name: Tag the Docker image
+        if: github.ref == 'refs/heads/main'
+        run: docker tag ghcr.io/${{ env.REPO_NAME }}:${{ github.sha }} ghcr.io/${{ env.REPO_NAME }}:latest
 
       - name: Push the Docker image
         if: github.ref == 'refs/heads/main'
