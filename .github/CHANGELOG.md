@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.7.0...v1.8.0) (2024-10-21)
+
+
+### Features
+
+* Update docker base image from slim to alpine ([e653311](https://github.com/MKAbuMattar/express-boilerplate/commit/e653311c9a14e5bbacbc09997fbde70ced689576))
+
 ## [1.7.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.6.1...v1.7.0) (2024-10-20)
 
 
