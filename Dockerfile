@@ -1,4 +1,4 @@
-FROM node:iron-slim AS base
+FROM node:iron-alpine AS base
 
 # Environment variables
 ENV PNPM_HOME="/pnpm"
