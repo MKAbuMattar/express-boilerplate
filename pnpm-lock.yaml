@@ -73,8 +73,8 @@ importers:
         specifier: 13.3.0
         version: 13.3.0
       '@types/node':
-        specifier: 22.7.7
-        version: 22.7.7
+        specifier: 22.7.8
+        version: 22.7.8
       '@types/supertest':
         specifier: 6.0.2
         version: 6.0.2
@@ -83,7 +83,7 @@ importers:
         version: 4.1.6
       '@vitest/coverage-v8':
         specifier: 2.1.3
-        version: 2.1.3(vitest@2.1.3(@types/node@22.7.7)(terser@5.36.0))
+        version: 2.1.3(vitest@2.1.3(@types/node@22.7.8)(terser@5.36.0))
       lint-staged:
         specifier: 15.2.10
         version: 15.2.10
@@ -107,10 +107,10 @@ importers:
         version: 5.6.3
       vite-tsconfig-paths:
         specifier: 5.0.1
-        version: 5.0.1(typescript@5.6.3)(vite@5.4.2(@types/node@22.7.7)(terser@5.36.0))
+        version: 5.0.1(typescript@5.6.3)(vite@5.4.2(@types/node@22.7.8)(terser@5.36.0))
       vitest:
         specifier: 2.1.3
-        version: 2.1.3(@types/node@22.7.7)(terser@5.36.0)
+        version: 2.1.3(@types/node@22.7.8)(terser@5.36.0)
 
 packages:
 
@@ -630,8 +630,8 @@ packages:
   '@types/mime@1.3.5':
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
 
-  '@types/node@22.7.7':
-    resolution: {integrity: sha512-SRxCrrg9CL/y54aiMCG3edPKdprgMVGDXjA3gB8UmmBW5TcXzRUYAh8EWzTnSJFAd1rgImPELza+A3bJ+qxz8Q==}
+  '@types/node@22.7.8':
+    resolution: {integrity: sha512-a922jJy31vqR5sk+kAdIENJjHblqcZ4RmERviFsER4WJcEONqxKcjNOlk0q7OUfrF5sddT+vng070cdfMlrPLg==}
 
   '@types/qs@6.9.15':
     resolution: {integrity: sha512-uXHQKES6DQKKCLh441Xv/dwxOq1TVS3JPUMlEqoEglvlhR6Mxnlew/Xq/LRVHpLyk7iK3zODe1qYHIMltO7XGg==}
@@ -2305,7 +2305,7 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
 
   '@types/compression@1.7.5':
     dependencies:
@@ -2313,7 +2313,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
 
   '@types/cookie-parser@1.4.7':
     dependencies:
@@ -2323,13 +2323,13 @@ snapshots:
 
   '@types/cors@2.8.17':
     dependencies:
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
 
   '@types/estree@1.0.5': {}
 
   '@types/express-serve-static-core@5.0.0':
     dependencies:
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
       '@types/qs': 6.9.15
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
@@ -2349,7 +2349,7 @@ snapshots:
 
   '@types/mime@1.3.5': {}
 
-  '@types/node@22.7.7':
+  '@types/node@22.7.8':
     dependencies:
       undici-types: 6.19.8
 
@@ -2360,19 +2360,19 @@ snapshots:
   '@types/send@0.17.4':
     dependencies:
       '@types/mime': 1.3.5
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
 
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
       '@types/send': 0.17.4
 
   '@types/superagent@8.1.8':
     dependencies:
       '@types/cookiejar': 2.1.5
       '@types/methods': 1.1.4
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
       form-data: 4.0.0
 
   '@types/supertest@6.0.2':
@@ -2385,7 +2385,7 @@ snapshots:
       '@types/express': 5.0.0
       '@types/serve-static': 1.15.7
 
-  '@vitest/coverage-v8@2.1.3(vitest@2.1.3(@types/node@22.7.7)(terser@5.36.0))':
+  '@vitest/coverage-v8@2.1.3(vitest@2.1.3(@types/node@22.7.8)(terser@5.36.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -2399,7 +2399,7 @@ snapshots:
       std-env: 3.7.0
       test-exclude: 7.0.1
       tinyrainbow: 1.2.0
-      vitest: 2.1.3(@types/node@22.7.7)(terser@5.36.0)
+      vitest: 2.1.3(@types/node@22.7.8)(terser@5.36.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -2410,13 +2410,13 @@ snapshots:
       chai: 5.1.1
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.3(@vitest/spy@2.1.3)(vite@5.4.2(@types/node@22.7.7)(terser@5.36.0))':
+  '@vitest/mocker@2.1.3(@vitest/spy@2.1.3)(vite@5.4.2(@types/node@22.7.8)(terser@5.36.0))':
     dependencies:
       '@vitest/spy': 2.1.3
       estree-walker: 3.0.3
       magic-string: 0.30.11
     optionalDependencies:
-      vite: 5.4.2(@types/node@22.7.7)(terser@5.36.0)
+      vite: 5.4.2(@types/node@22.7.8)(terser@5.36.0)
 
   '@vitest/pretty-format@2.1.3':
     dependencies:
@@ -3717,12 +3717,12 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-node@2.1.3(@types/node@22.7.7)(terser@5.36.0):
+  vite-node@2.1.3(@types/node@22.7.8)(terser@5.36.0):
     dependencies:
       cac: 6.7.14
       debug: 4.3.6
       pathe: 1.1.2
-      vite: 5.4.2(@types/node@22.7.7)(terser@5.36.0)
+      vite: 5.4.2(@types/node@22.7.8)(terser@5.36.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -3734,31 +3734,31 @@ snapshots:
       - supports-color
       - terser
 
-  vite-tsconfig-paths@5.0.1(typescript@5.6.3)(vite@5.4.2(@types/node@22.7.7)(terser@5.36.0)):
+  vite-tsconfig-paths@5.0.1(typescript@5.6.3)(vite@5.4.2(@types/node@22.7.8)(terser@5.36.0)):
     dependencies:
       debug: 4.3.6
       globrex: 0.1.2
       tsconfck: 3.1.1(typescript@5.6.3)
     optionalDependencies:
-      vite: 5.4.2(@types/node@22.7.7)(terser@5.36.0)
+      vite: 5.4.2(@types/node@22.7.8)(terser@5.36.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@5.4.2(@types/node@22.7.7)(terser@5.36.0):
+  vite@5.4.2(@types/node@22.7.8)(terser@5.36.0):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.4.41
       rollup: 4.21.0
     optionalDependencies:
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
       fsevents: 2.3.3
       terser: 5.36.0
 
-  vitest@2.1.3(@types/node@22.7.7)(terser@5.36.0):
+  vitest@2.1.3(@types/node@22.7.8)(terser@5.36.0):
     dependencies:
       '@vitest/expect': 2.1.3
-      '@vitest/mocker': 2.1.3(@vitest/spy@2.1.3)(vite@5.4.2(@types/node@22.7.7)(terser@5.36.0))
+      '@vitest/mocker': 2.1.3(@vitest/spy@2.1.3)(vite@5.4.2(@types/node@22.7.8)(terser@5.36.0))
       '@vitest/pretty-format': 2.1.3
       '@vitest/runner': 2.1.3
       '@vitest/snapshot': 2.1.3
@@ -3773,11 +3773,11 @@ snapshots:
       tinyexec: 0.3.0
       tinypool: 1.0.1
       tinyrainbow: 1.2.0
-      vite: 5.4.2(@types/node@22.7.7)(terser@5.36.0)
-      vite-node: 2.1.3(@types/node@22.7.7)(terser@5.36.0)
+      vite: 5.4.2(@types/node@22.7.8)(terser@5.36.0)
+      vite-node: 2.1.3(@types/node@22.7.8)(terser@5.36.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.7.7
+      '@types/node': 22.7.8
     transitivePeerDependencies:
       - less
       - lightningcss
