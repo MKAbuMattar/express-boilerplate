@@ -32,5 +32,5 @@
   color: 00c7b7
   description: renovate[bot] PRs and issues
 - name: wontfix
-    color: ffffff
-    description: This will not be worked on
+  color: ffffff
+  description: This will not be worked on
