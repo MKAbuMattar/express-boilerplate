@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.8.0...v1.9.0) (2024-10-27)
+
+
+### Features
+
+* Add express-prom-bundle dependency ([47777b3](https://github.com/MKAbuMattar/express-boilerplate/commit/47777b3bf0a7b1a2e6eb8692b75455ebe11ab82b))
+
 ## [1.8.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.7.0...v1.8.0) (2024-10-21)
 
 
