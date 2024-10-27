@@ -2,6 +2,7 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, {type Express} from 'express';
+import promBundle from 'express-prom-bundle';
 import helmet from 'helmet';
 
 import {healthCheckRouter} from '@/api/health-check/health-check.router';
@@ -12,6 +13,21 @@ import requestLogger from '@/middlewares/request-logger.middleware';
 import {env} from '@/utils/env-config.util';
 
 export const app: Express = express();
+
+const metricsMiddleware = promBundle({
+  includeMethod: true,
+  includePath: true,
+  includeStatusCode: true,
+  includeUp: true,
+  customLabels: {
+    project_name: 'hello_world',
+    project_type: 'test_metrics_labels',
+  },
+  metricType: 'histogram',
+  promClient: {
+    collectDefaultMetrics: {},
+  },
+});
 
 app.set('trust proxy', true);
 app.use(compression());
@@ -44,6 +60,7 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(metricsMiddleware);
 app.use(requestLogger);
 
 // Routes
