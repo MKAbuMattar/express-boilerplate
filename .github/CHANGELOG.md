@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.1](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.9.0...v1.9.1) (2024-10-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency compression to v1.7.5 ([7f79d6c](https://github.com/MKAbuMattar/express-boilerplate/commit/7f79d6cf537e9614d8510d87f034e7f976e3044a))
+
 ## [1.9.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.8.0...v1.9.0) (2024-10-27)
 
 
