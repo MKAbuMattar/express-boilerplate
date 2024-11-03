@@ -1,4 +1,4 @@
-FROM node:jod-alpine@sha256:f265794478aa0b1a23d85a492c8311ed795bc527c3fe7e43453b3c872dcd71a3 AS base
+FROM public.ecr.aws/docker/library/node:jod-alpine@sha256:f265794478aa0b1a23d85a492c8311ed795bc527c3fe7e43453b3c872dcd71a3 AS base
 
 # Environment variables
 ENV PNPM_HOME="/pnpm"
