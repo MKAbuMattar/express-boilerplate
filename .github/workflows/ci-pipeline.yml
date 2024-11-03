@@ -8,14 +8,7 @@ on:
     branches:
       - main
 
-permissions:
-  actions: read
-  checks: write
-  contents: read
-  security-events: write
-  pull-requests: read
-  statuses: write
-  issues: write
+permissions: write-all
 
 env:
   STACK_NAME: express-boilerplate

@@ -4,11 +4,7 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
-permissions:
-  actions: read
-  checks: write
-  contents: read
-  security-events: write
+permissions: write-all
 
 jobs:
   analyze:
