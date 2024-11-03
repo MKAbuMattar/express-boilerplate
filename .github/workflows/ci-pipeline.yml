@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         language:
-          - javascript
+          - javascript-typescript
 
     steps:
       - name: Harden Runner
