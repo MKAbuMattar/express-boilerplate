@@ -1,4 +1,4 @@
-FROM node:iron-alpine AS base
+FROM node:jod-alpine AS base
 
 # Environment variables
 ENV PNPM_HOME="/pnpm"
