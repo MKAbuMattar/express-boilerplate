@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:iron-alpine AS base
+FROM public.ecr.aws/docker/library/node:jod-alpine AS base
 
 # Environment variables
 ENV PNPM_HOME="/pnpm"
