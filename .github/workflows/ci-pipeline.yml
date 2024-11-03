@@ -8,7 +8,7 @@ on:
     branches:
       - main
 
-permissions: read-all
+permissions: write-all
 
 env:
   STACK_NAME: express-boilerplate
