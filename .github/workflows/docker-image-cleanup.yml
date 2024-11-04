@@ -10,7 +10,7 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
-permissions: read-all
+permissions: write-all
 
 jobs:
   cleanup:
