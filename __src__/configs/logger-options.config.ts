@@ -1,4 +1,5 @@
 import path from 'node:path';
+
 import type {LoggerOptions} from 'pino';
 
 export const loggerOptions: LoggerOptions = {

@@ -1,0 +1,22 @@
+{
+  "entryFile": "src/bin/www.ts",
+  "noImplicitAdditionalProperties": "silently-remove-extras",
+  "controllerPathGlobs": ["src/**/*.controller.ts"],
+  "spec": {
+    "basePath": "/api/",
+    "outputDirectory": "src/api/__routes__/",
+    "specVersion": 2
+  },
+  "routes": {
+    "basePath": "/api/",
+    "routesDir": "src/api/__routes__/",
+    "middleware": "express",
+    "esm": true
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}

@@ -1,11 +1,13 @@
 import {randomUUID} from 'node:crypto';
 import type {IncomingMessage, ServerResponse} from 'node:http';
-import {env} from '@/utils/env-config.util';
+
 import type {Request, RequestHandler, Response} from 'express';
 import {StatusCodes, getReasonPhrase} from 'http-status-codes';
 import type {LevelWithSilent} from 'pino';
 import {type CustomAttributeKeys, type Options, pinoHttp} from 'pino-http';
-import pretty from 'pino-pretty';
+
+// Utils
+import {env} from '@/utils/env-config.util';
 
 enum LogLevel {
   Fatal = 'fatal',
@@ -36,20 +38,9 @@ const requestLogger = (options?: Options): RequestHandler[] => {
     customErrorMessage: (_req, res) =>
       `request errored with status code: ${res.statusCode}`,
     customAttributeKeys,
-    stream: prettyStream(),
     ...options,
   };
-
   return [responseBodyMiddleware, pinoHttp(pinoOptions)];
-};
-
-const prettyStream = () => {
-  return pretty({
-    colorize: true,
-    levelFirst: true,
-    translateTime: true,
-    singleLine: true,
-  });
 };
 
 const customAttributeKeys: CustomAttributeKeys = {

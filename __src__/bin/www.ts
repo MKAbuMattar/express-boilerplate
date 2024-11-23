@@ -1,7 +1,9 @@
-#!/usr/bin/env node
 import {logger} from '@/libs/logger.lib';
+import errorHandler from '@/middlewares/error-handler.middleware';
 import {app} from '@/server';
 import {env} from '@/utils/env-config.util';
+
+app.use(errorHandler());
 
 const server = app.listen(env.PORT, () => {
   const {NODE_ENV, HOST, PORT} = env;

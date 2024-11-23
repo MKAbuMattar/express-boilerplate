@@ -3,18 +3,13 @@ import {defineConfig} from 'tsup';
 
 dotenv.config();
 
-const isProduction = process.env.NODE_ENV === 'production';
-
 const tsupConfig = defineConfig({
-  entry: ['./src/**/*.ts', '!./src/**/__tests__/**', '!./src/**/*.test.*'],
-  splitting: true,
-  sourcemap: true,
+  entry: ['src', '!src/**/__tests__/**', '!src/**/*.test.*'],
+  sourcemap: false,
   clean: true,
-  dts: false,
-  treeshake: true,
-  shims: true,
+  minify: true,
   format: ['esm'],
-  minify: isProduction ? 'terser' : false,
+  skipNodeModulesBundle: true,
 });
 
 export default tsupConfig;

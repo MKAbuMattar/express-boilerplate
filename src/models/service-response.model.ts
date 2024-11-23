@@ -1,33 +1,36 @@
-import {z} from 'zod';
-
-export enum ResponseStatus {
-  Success = 0,
-  Failed = 1,
-}
+import {StatusCodes} from 'http-status-codes';
 
 export class ServiceResponse<T = null> {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: T;
+  readonly success: boolean;
+  readonly message: string;
+  readonly response: T;
+  readonly statusCode: number;
 
-  constructor(
-    status: ResponseStatus,
-    statusCode: number,
+  private constructor(
+    success: boolean,
     message: string,
-    data: T,
+    response: T,
+    statusCode: number,
   ) {
-    this.success = status === ResponseStatus.Success;
-    this.statusCode = statusCode;
+    this.success = success;
     this.message = message;
-    this.data = data;
+    this.response = response;
+    this.statusCode = statusCode;
+  }
+
+  static success<T>(
+    message: string,
+    response: T,
+    statusCode: number = StatusCodes.OK,
+  ) {
+    return new ServiceResponse(true, message, response, statusCode);
+  }
+
+  static failure<T>(
+    message: string,
+    response: T,
+    statusCode: number = StatusCodes.BAD_REQUEST,
+  ) {
+    return new ServiceResponse(false, message, response, statusCode);
   }
 }
-
-export const ServiceResponseSchema = <T extends z.ZodTypeAny>(dataSchema: T) =>
-  z.object({
-    success: z.boolean(),
-    statusCode: z.number(),
-    message: z.string(),
-    data: dataSchema.optional(),
-  });
