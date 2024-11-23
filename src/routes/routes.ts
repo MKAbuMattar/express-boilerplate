@@ -10,9 +10,9 @@ import type {
   Router,
 } from 'express';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import {HealthCheckController} from './../health-check/health-check.controller.js';
+import {HealthCheckController} from './../api/health-check/health-check.controller.js';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import {UserController} from './../user/user.controller.js';
+import {UserController} from './../api/user/user.controller.js';
 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
