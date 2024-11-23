@@ -1,13 +1,11 @@
 import {randomUUID} from 'node:crypto';
 import type {IncomingMessage, ServerResponse} from 'node:http';
-
+import path from 'node:path';
+import {env} from '@/utils/env-config.util';
 import type {Request, RequestHandler, Response} from 'express';
 import {StatusCodes, getReasonPhrase} from 'http-status-codes';
 import type {LevelWithSilent} from 'pino';
 import {type CustomAttributeKeys, type Options, pinoHttp} from 'pino-http';
-
-// Utils
-import {env} from '@/utils/env-config.util';
 
 enum LogLevel {
   Fatal = 'fatal',
@@ -28,7 +26,7 @@ type PinoCustomProps = {
 
 const requestLogger = (options?: Options): RequestHandler[] => {
   const pinoOptions: Options = {
-    enabled: env.isProduction,
+    enabled: true,
     customProps: customProps as unknown as Options['customProps'],
     redact: [],
     genReqId,
@@ -38,9 +36,53 @@ const requestLogger = (options?: Options): RequestHandler[] => {
     customErrorMessage: (_req, res) =>
       `request errored with status code: ${res.statusCode}`,
     customAttributeKeys,
+    stream: createLoggerStream(),
     ...options,
   };
+
   return [responseBodyMiddleware, pinoHttp(pinoOptions)];
+};
+
+const createLoggerStream = () => {
+  const transports = [
+    {
+      level: 'info',
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        singleLine: true,
+        translateTime: true,
+      },
+    },
+    {
+      level: 'info',
+      target: 'pino-transport-rotating',
+      options: {
+        dir: path.join(process.cwd(), 'logs'),
+        filename: 'all',
+        enabled: true,
+      },
+    },
+    {
+      level: 'error',
+      target: 'pino-transport-rotating',
+      options: {
+        dir: path.join(process.cwd(), 'logs'),
+        filename: 'error',
+        enabled: true,
+      },
+    },
+  ];
+
+  const logger = pinoHttp({
+    transport: {targets: transports},
+  }).logger;
+
+  return {
+    write: (msg: string) => {
+      logger.info(msg);
+    },
+  };
 };
 
 const customAttributeKeys: CustomAttributeKeys = {

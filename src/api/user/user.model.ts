@@ -1,22 +1,13 @@
-import {extendZodWithOpenApi} from '@asteasolutions/zod-to-openapi';
-import {z} from 'zod';
+import type {ServiceResponse} from '@/models/service-response.model';
 
-import {commonValidations} from '@/validations/common.validation';
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-extendZodWithOpenApi(z);
-
-export const UserSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  email: z.string().email(),
-  age: z.number(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-export type User = z.infer<typeof UserSchema>;
-
-// Input Validation for 'GET users/:id' endpoint
-export const GetUserSchema = z.object({
-  params: z.object({id: commonValidations.id}),
-});
+export interface IUserResponse extends ServiceResponse<User | null> {}
+export interface IUsersResponse extends ServiceResponse<User[] | null> {}

@@ -19,10 +19,12 @@ export const users: User[] = [
   },
 ];
 
-export const findAllAsync = async (): Promise<User[]> => {
-  return users;
-};
+export class UserRepository {
+  async findAllAsync(): Promise<User[]> {
+    return users;
+  }
 
-export const findByIdAsync = async (id: number): Promise<User | null> => {
-  return users.find((user) => user.id === id) || null;
-};
+  async findByIdAsync(id: number): Promise<User | null> {
+    return users.find((user) => user.id === id) || null;
+  }
+}

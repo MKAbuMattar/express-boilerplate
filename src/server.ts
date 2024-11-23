@@ -1,45 +1,31 @@
+import {RegisterRoutes} from '@/api/__routes__/routes';
+import {
+  errorHandlers,
+  notFoundHandler,
+} from '@/middlewares/error-handler.middleware';
+import requestLogger from '@/middlewares/request-logger.middleware';
+import buildApiSpecAndRoutes from '@/scripts/tsoa.script';
+import {env} from '@/utils/env-config.util';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import express, {type Express} from 'express';
-import promBundle from 'express-prom-bundle';
+import express, {type Express, type Request, type Response} from 'express';
 import helmet from 'helmet';
-
-import {healthCheckRouter} from '@/api/health-check/health-check.router';
-import {userRouter} from '@/api/user/user.router';
-import {openAPIRouter} from '@/docs/openapi-router.doc';
-import authApiKey from '@/middlewares/auth-api-key.middleware';
-import requestLogger from '@/middlewares/request-logger.middleware';
-import {env} from '@/utils/env-config.util';
+import swaggerUi from 'swagger-ui-express';
 
 export const app: Express = express();
-
-const metricsMiddleware = promBundle({
-  includeMethod: true,
-  includePath: true,
-  includeStatusCode: true,
-  includeUp: true,
-  customLabels: {
-    project_name: 'hello_world',
-    project_type: 'test_metrics_labels',
-  },
-  metricType: 'histogram',
-  promClient: {
-    collectDefaultMetrics: {},
-  },
-});
 
 app.set('trust proxy', true);
 app.use(compression());
 app.use(cookieParser());
-
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 app.use(
   cors({
     origin: env.CORS_WHITELIST,
     credentials: true,
   }),
 );
-
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -58,17 +44,24 @@ app.use(
   }),
 );
 
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-app.use(metricsMiddleware);
+if (env.isDevelopment) await buildApiSpecAndRoutes();
+
 app.use(requestLogger);
 
 // Routes
-app.use('/health-check', healthCheckRouter);
-app.use('/api/users', authApiKey(), userRouter);
+RegisterRoutes(app);
 
-// Docs
-app.use('/docs', openAPIRouter);
+app.use('/', swaggerUi.serve, (_req: Request, res: Response) => {
+  import('./api/__routes__/swagger.json').then((swaggerDocument) => {
+    res.send(swaggerUi.generateHTML(swaggerDocument));
+  });
+});
+
+// Not found handler
+app.use(notFoundHandler);
+
+// Error handlers
+app.use(errorHandlers);
 
 // Comments for code review
 // TODO: [Devloper/QA Name] [Description]

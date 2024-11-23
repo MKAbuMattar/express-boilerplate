@@ -1,7 +1,7 @@
 import tsconfigPaths from 'vite-tsconfig-paths';
-import {type UserConfig, defineConfig} from 'vitest/config';
+import {type ViteUserConfig, defineConfig} from 'vitest/config';
 
-const viteConfig: UserConfig = defineConfig({
+const viteConfig: ViteUserConfig = defineConfig({
   test: {
     coverage: {
       include: ['src/**'],
@@ -17,6 +17,6 @@ const viteConfig: UserConfig = defineConfig({
     restoreMocks: true,
   },
   plugins: [tsconfigPaths()],
-}) satisfies UserConfig;
+}) satisfies ViteUserConfig;
 
 export default viteConfig;
