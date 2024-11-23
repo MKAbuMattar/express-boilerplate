@@ -1,0 +1,218 @@
+{
+	"basePath": "/api",
+	"consumes": [
+		"application/json"
+	],
+	"definitions": {
+		"User": {
+			"properties": {
+				"id": {
+					"type": "number",
+					"format": "double"
+				},
+				"name": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"age": {
+					"type": "number",
+					"format": "double"
+				},
+				"createdAt": {
+					"type": "string",
+					"format": "date-time"
+				},
+				"updatedAt": {
+					"type": "string",
+					"format": "date-time"
+				}
+			},
+			"required": [
+				"id",
+				"name",
+				"email",
+				"age",
+				"createdAt",
+				"updatedAt"
+			],
+			"type": "object",
+			"additionalProperties": false
+		},
+		"IUsersResponse": {
+			"properties": {
+				"success": {
+					"type": "boolean"
+				},
+				"message": {
+					"type": "string"
+				},
+				"response": {
+					"items": {
+						"$ref": "#/definitions/User"
+					},
+					"type": "array",
+					"x-nullable": true
+				},
+				"statusCode": {
+					"type": "number",
+					"format": "double"
+				}
+			},
+			"required": [
+				"success",
+				"message",
+				"response",
+				"statusCode"
+			],
+			"type": "object",
+			"additionalProperties": false
+		},
+		"IUserResponse": {
+			"properties": {
+				"success": {
+					"type": "boolean"
+				},
+				"message": {
+					"type": "string"
+				},
+				"response": {
+					"type": "object"
+				},
+				"statusCode": {
+					"type": "number",
+					"format": "double"
+				}
+			},
+			"required": [
+				"success",
+				"message",
+				"response",
+				"statusCode"
+			],
+			"type": "object",
+			"additionalProperties": false
+		},
+		"IHealthCheckResponse": {
+			"properties": {
+				"success": {
+					"type": "boolean"
+				},
+				"message": {
+					"type": "string"
+				},
+				"response": {
+					"type": "number",
+					"enum": [
+						null
+					],
+					"x-nullable": true
+				},
+				"statusCode": {
+					"type": "number",
+					"format": "double"
+				}
+			},
+			"required": [
+				"success",
+				"message",
+				"response",
+				"statusCode"
+			],
+			"type": "object",
+			"additionalProperties": false
+		}
+	},
+	"info": {
+		"title": "@mkabumattar/express-boilerplate",
+		"version": "0.0.0",
+		"description": "A boilerplate for Express.js with TypeScript",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "Mohammad Abu Mattar",
+			"email": "mohammad.khaled@outlook.com",
+			"url": "https://mkabumattar.github.io/"
+		}
+	},
+	"paths": {
+		"/user": {
+			"get": {
+				"operationId": "GetUsers",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Users found",
+						"schema": {
+							"$ref": "#/definitions/IUsersResponse"
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/user/{user_id}": {
+			"get": {
+				"operationId": "GetUser",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "User found",
+						"schema": {
+							"$ref": "#/definitions/IUserResponse"
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "user_id",
+						"required": true,
+						"format": "double",
+						"type": "number"
+					}
+				]
+			}
+		},
+		"/health-check": {
+			"get": {
+				"operationId": "GetHealthCheck",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Service is healthy",
+						"schema": {
+							"$ref": "#/definitions/IHealthCheckResponse"
+						}
+					}
+				},
+				"tags": [
+					"Health Check"
+				],
+				"security": [],
+				"parameters": []
+			}
+		}
+	},
+	"produces": [
+		"application/json"
+	],
+	"swagger": "2.0",
+	"securityDefinitions": {}
+}

@@ -18,7 +18,7 @@
     "url": "https://github.com/MKAbuMattar/express-boilerplate/issues"
   },
   "scripts": {
-    "dev": "tsx watch --ignore 'src/api/__routes__/**' --clear-screen=false src/bin/www.ts",
+    "dev": "tsx watch --ignore 'src/routes/**' --clear-screen=false src/bin/www.ts",
     "build:api": "tsx src/scripts/tsoa.script.ts",
     "build": "rimraf dist && tsoa spec-and-routes && tsup --tsconfig tsconfig.json",
     "start": "node ./dist/bin/www.js",

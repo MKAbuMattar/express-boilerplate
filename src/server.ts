@@ -1,9 +1,9 @@
-import {RegisterRoutes} from '@/api/__routes__/routes';
 import {
   errorHandlers,
   notFoundHandler,
 } from '@/middlewares/error-handler.middleware';
 import requestLogger from '@/middlewares/request-logger.middleware';
+import {RegisterRoutes} from '@/routes/routes';
 import buildApiSpecAndRoutes from '@/scripts/tsoa.script';
 import {env} from '@/utils/env-config.util';
 import compression from 'compression';
@@ -52,7 +52,7 @@ app.use(requestLogger);
 RegisterRoutes(app);
 
 app.use('/', swaggerUi.serve, (_req: Request, res: Response) => {
-  import('./api/__routes__/swagger.json').then((swaggerDocument) => {
+  import('./routes/swagger.json').then((swaggerDocument) => {
     res.send(swaggerUi.generateHTML(swaggerDocument));
   });
 });

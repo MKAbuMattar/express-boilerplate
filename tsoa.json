@@ -4,12 +4,12 @@
   "controllerPathGlobs": ["src/**/*.controller.ts"],
   "spec": {
     "basePath": "/api/",
-    "outputDirectory": "src/api/__routes__/",
+    "outputDirectory": "src/routes/",
     "specVersion": 2
   },
   "routes": {
     "basePath": "/api/",
-    "routesDir": "src/api/__routes__/",
+    "routesDir": "src/routes/",
     "middleware": "express",
     "esm": true
   },
