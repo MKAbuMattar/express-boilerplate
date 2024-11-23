@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.10.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.9.4...v1.10.0) (2024-11-23)
+
+
+### Features
+
+* implement logger and health check API, add user repository and validation using tsoa ([6ac713d](https://github.com/MKAbuMattar/express-boilerplate/commit/6ac713d7db65a43e9d3301a36660a3f689e820d0))
+
 ## [1.9.4](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.9.3...v1.9.4) (2024-11-11)
 
 
