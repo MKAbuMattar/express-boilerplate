@@ -7,8 +7,8 @@ import {StatusCodes} from 'http-status-codes';
 export class UserService {
   #UserRepository: UserRepository;
 
-  constructor() {
-    this.#UserRepository = new UserRepository();
+  constructor(repository: UserRepository = new UserRepository()) {
+    this.#UserRepository = repository;
   }
 
   async findAll(): Promise<IUsersResponse> {

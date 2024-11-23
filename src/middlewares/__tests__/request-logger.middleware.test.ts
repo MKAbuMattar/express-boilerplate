@@ -1,23 +1,20 @@
+import requestLogger from '@/middlewares/request-logger.middleware';
 import express from 'express';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
-
-import errorHandler from '@/middlewares/error-handler.middleware';
-import requestLogger from '@/middlewares/request-logger.middleware';
 
 describe('Request Logger Middleware', () => {
   const app = express();
 
   beforeAll(() => {
     app.use(requestLogger);
-    app.get('/success', (_req, res) =>
-      res.status(StatusCodes.OK).send('Success'),
-    );
+    app.get('/success', (_req, res) => {
+      res.status(StatusCodes.OK).send('Success');
+    });
     app.get('/redirect', (_req, res) => res.redirect('/success'));
     app.get('/error', () => {
       throw new Error('Test error');
     });
-    app.use(errorHandler());
   });
 
   describe('Successful requests', () => {

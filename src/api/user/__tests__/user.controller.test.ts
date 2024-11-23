@@ -1,43 +1,37 @@
-import {StatusCodes} from 'http-status-codes';
-import request from 'supertest';
-
-import type {User} from '@/api/user/user.model';
+import type {IUserResponse, IUsersResponse, User} from '@/api/user/user.model';
 import {users} from '@/api/user/user.repository';
 import type {ServiceResponse} from '@/models/service-response.model';
 import {app} from '@/server';
-import {env} from '@/utils/env-config.util';
+import {StatusCodes} from 'http-status-codes';
+import request from 'supertest';
 
 describe('User API Endpoints', () => {
-  describe('GET /api/users', () => {
+  describe('GET /api/user', () => {
     it('should return a list of users', async () => {
       // Act
-      const response = await request(app)
-        .get('/api/users')
-        .set('X-API-KEY', env.API_KEY);
-      const responseBody: ServiceResponse<User[]> = response.body;
+      const response = await request(app).get('/api/user');
+      const responseBody: IUsersResponse = response.body;
 
       // Assert
       expect(response.statusCode).toEqual(StatusCodes.OK);
       expect(responseBody.success).toBeTruthy();
       expect(responseBody.message).toContain('Users found');
-      expect(responseBody.data.length).toEqual(users.length);
-      responseBody.data.forEach((user, index) =>
+      expect(responseBody.response?.length).toEqual(users.length);
+      responseBody.response?.forEach((user, index) =>
         compareUsers(users[index] as User, user),
       );
     });
   });
 
-  describe('GET /api/users/:id', () => {
+  describe('GET /api/user/:id', () => {
     it('should return a user for a valid ID', async () => {
       // Arrange
       const testId = 1;
       const expectedUser = users.find((user) => user.id === testId) as User;
 
       // Act
-      const response = await request(app)
-        .get(`/api/users/${testId}`)
-        .set('X-API-KEY', env.API_KEY);
-      const responseBody: ServiceResponse<User> = response.body;
+      const response = await request(app).get(`/api/user/${testId}`);
+      const responseBody: IUserResponse = response.body;
 
       // Assert
       expect(response.statusCode).toEqual(StatusCodes.OK);
@@ -45,7 +39,7 @@ describe('User API Endpoints', () => {
       expect(responseBody.message).toContain('User found');
       if (!expectedUser)
         throw new Error('Invalid test data: expectedUser is undefined');
-      compareUsers(expectedUser, responseBody.data);
+      compareUsers(expectedUser, responseBody.response as User);
     });
 
     it('should return a not found error for non-existent ID', async () => {
@@ -53,31 +47,32 @@ describe('User API Endpoints', () => {
       const testId = Number.MAX_SAFE_INTEGER;
 
       // Act
-      const response = await request(app)
-        .get(`/api/users/${testId}`)
-        .set('X-API-KEY', env.API_KEY);
+      const response = await request(app).get(`/api/user/${testId}`);
       const responseBody: ServiceResponse = response.body;
 
       // Assert
-      expect(response.statusCode).toEqual(StatusCodes.NOT_FOUND);
-      expect(responseBody.success).toBeFalsy();
+      expect(response.statusCode).toEqual(StatusCodes.OK);
+      expect(responseBody.success).toBeTruthy();
       expect(responseBody.message).toContain('User not found');
-      expect(responseBody.data).toBeNull();
+      expect(responseBody.response).toBeNull();
     });
 
     it('should return a bad request for invalid ID format', async () => {
       // Act
       const invalidInput = 'abc';
-      const response = await request(app)
-        .get(`/api/users/${invalidInput}`)
-        .set('X-API-KEY', env.API_KEY);
+      const response = await request(app).get(`/api/user/${invalidInput}`);
       const responseBody: ServiceResponse = response.body;
 
       // Assert
       expect(response.statusCode).toEqual(StatusCodes.BAD_REQUEST);
       expect(responseBody.success).toBeFalsy();
-      expect(responseBody.message).toContain('Invalid input');
-      expect(responseBody.data).toBeNull();
+      expect(responseBody.message).toEqual('Validation Failed');
+      expect(responseBody.response).toEqual({
+        user_id: {
+          message: 'invalid float number',
+          value: invalidInput,
+        },
+      });
     });
   });
 });
