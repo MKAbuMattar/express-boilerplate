@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.10.0...v2.0.0) (2024-11-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* update tsoa configuration to change output and routes directory; remove old swagger.json file
+
+### Features
+
+* update tsoa configuration to change output and routes directory; remove old swagger.json file ([39534dd](https://github.com/MKAbuMattar/express-boilerplate/commit/39534dd77fc61567d3a85789338d2a5291624cad))
+
 ## [1.10.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.9.4...v1.10.0) (2024-11-23)
 
 
