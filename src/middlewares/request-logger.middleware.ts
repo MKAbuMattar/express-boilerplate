@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import type {IncomingMessage, ServerResponse} from 'node:http';
-import path from 'node:path';
+import {loggerOptions} from '@/libs/logger.lib';
 import {env} from '@/utils/env-config.util';
 import type {Request, RequestHandler, Response} from 'express';
 import {StatusCodes, getReasonPhrase} from 'http-status-codes';
@@ -44,36 +44,10 @@ const requestLogger = (options?: Options): RequestHandler[] => {
 };
 
 const createLoggerStream = () => {
-  const transports = [
-    {
-      level: 'info',
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-        singleLine: true,
-        translateTime: true,
-      },
-    },
-    {
-      level: 'info',
-      target: 'pino-transport-rotating',
-      options: {
-        dir: path.join(process.cwd(), 'logs'),
-        filename: 'all',
-        enabled: true,
-      },
-    },
-    {
-      level: 'error',
-      target: 'pino-transport-rotating',
-      options: {
-        dir: path.join(process.cwd(), 'logs'),
-        filename: 'error',
-        enabled: true,
-      },
-    },
-  ];
-
+  const transports =
+    loggerOptions.transport && 'targets' in loggerOptions.transport
+      ? loggerOptions.transport.targets
+      : [];
   const logger = pinoHttp({
     transport: {targets: transports},
   }).logger;
