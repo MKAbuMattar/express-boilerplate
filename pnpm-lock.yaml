@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@tsoa/cli':
+        specifier: 6.5.1
+        version: 6.5.1
+      '@tsoa/runtime':
+        specifier: 6.5.1
+        version: 6.5.1
       compression:
         specifier: 1.7.5
         version: 1.7.5
@@ -54,12 +60,6 @@ importers:
       '@biomejs/biome':
         specifier: 1.9.4
         version: 1.9.4
-      '@tsoa/cli':
-        specifier: 6.5.1
-        version: 6.5.1
-      '@tsoa/runtime':
-        specifier: 6.5.1
-        version: 6.5.1
       '@types/compression':
         specifier: 1.7.5
         version: 1.7.5
