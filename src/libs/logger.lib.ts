@@ -33,6 +33,6 @@ export const loggerOptions: LoggerOptions = {
       },
     ],
   },
-};
+} satisfies LoggerOptions;
 
 export const logger = pino(loggerOptions);
