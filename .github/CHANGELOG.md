@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.0.0...v2.1.0) (2024-11-27)
+
+
+### Features
+
+* **api:** implement health check endpoints and remove deprecated health-check routes ([2443e6a](https://github.com/MKAbuMattar/express-boilerplate/commit/2443e6a17cc2d9b53411518919e05eb7804e71af))
+
+
+### Bug Fixes
+
+* **biome:** update ignore patterns to exclude generated files ([4d836ae](https://github.com/MKAbuMattar/express-boilerplate/commit/4d836ae70fd8c0c3af7682f78ac4c79b77e60438))
+* **scripts:** update dev script to ignore generated files ([5c45665](https://github.com/MKAbuMattar/express-boilerplate/commit/5c45665142c7b309ec7ebf27282ddeee4a51de35))
+
 ## [2.0.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v1.10.0...v2.0.0) (2024-11-23)
 
 
