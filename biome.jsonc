@@ -5,7 +5,7 @@
       "dist/**/*",
       "node_modules/**/*",
       "coverage/**/*",
-      "src/routes/*.ts"
+      "src/generated/*"
     ],
     "ignoreUnknown": true
   },
