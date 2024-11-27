@@ -1,12 +1,12 @@
-import type {IHealthCheckResponse} from '@/api/health-check/health-check.model';
+import type {IHealthResponse} from '@/api/health/health.model';
 import {app} from '@/server';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
 
-describe('Health Check API endpoints', () => {
+describe('Health API endpoints', () => {
   it('GET / - success', async () => {
-    const response = await request(app).get('/api/health-check');
-    const result: IHealthCheckResponse = response.body;
+    const response = await request(app).get('/api/health');
+    const result: IHealthResponse = response.body;
 
     expect(response.statusCode).toEqual(StatusCodes.OK);
     expect(result.success).toBeTruthy();

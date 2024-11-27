@@ -17,7 +17,7 @@ export const users: User[] = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-];
+] satisfies User[];
 
 export class UserRepository {
   async findAllAsync(): Promise<User[]> {

@@ -4,12 +4,14 @@
   "controllerPathGlobs": ["src/**/*.controller.ts"],
   "spec": {
     "basePath": "/api/",
-    "outputDirectory": "src/routes/",
-    "specVersion": 2
+    "outputDirectory": "src/generated/",
+    "specFileBaseName": "swagger",
+    "specVersion": 3
   },
   "routes": {
     "basePath": "/api/",
-    "routesDir": "src/routes/",
+    "routesDir": "src/generated/",
+    "routesFileName": "routes.ts",
     "middleware": "express",
     "esm": true
   },
