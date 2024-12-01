@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 import {logger} from '@/libs/logger.lib';
 import {app} from '@/server';
 import {env} from '@/utils/env-config.util';
