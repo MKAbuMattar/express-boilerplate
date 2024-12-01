@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.1.0...v2.2.0) (2024-12-01)
+
+
+### Features
+
+* remove shebang from www.ts ([2399f5c](https://github.com/MKAbuMattar/express-boilerplate/commit/2399f5cfebca04c5498851897f2ac077757e0e47))
+
 ## [2.1.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.0.0...v2.1.0) (2024-11-27)
 
 
