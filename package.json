@@ -37,7 +37,7 @@
     "compression": "1.7.5",
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",
-    "dotenv": "16.4.6",
+    "dotenv": "16.4.7",
     "envalid": "8.0.0",
     "express": "4.21.1",
     "helmet": "8.0.0",
