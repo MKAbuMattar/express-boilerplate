@@ -30,8 +30,8 @@ importers:
         specifier: 8.0.0
         version: 8.0.0
       express:
-        specifier: 4.21.1
-        version: 4.21.1
+        specifier: 4.21.2
+        version: 4.21.2
       helmet:
         specifier: 8.0.0
         version: 8.0.0
@@ -52,7 +52,7 @@ importers:
         version: 1.0.2
       swagger-ui-express:
         specifier: 5.0.1
-        version: 5.0.1(express@4.21.1)
+        version: 5.0.1(express@4.21.2)
       tsoa:
         specifier: 6.5.1
         version: 6.5.1
@@ -1274,8 +1274,8 @@ packages:
     resolution: {integrity: sha512-bFi65yM+xZgk+u/KRIpekdSYkTB5W1pEf0Lt8Q8Msh7b+eQ7LXVtIB1Bkm4fvclDEL1b2CZkMhv2mOeF8tMdkA==}
     engines: {node: '>=12.0.0'}
 
-  express@4.21.1:
-    resolution: {integrity: sha512-YSFlK1Ee0/GC8QaO91tHcDxJiE/X4FbpAyQWkxAvG6AXCuR65YzK8ua6D9hvi/TzUfZMpc+BwuM1IPw8fmQBiQ==}
+  express@4.21.2:
+    resolution: {integrity: sha512-28HqgMZAmih1Czt9ny7qr6ek2qddF4FclbMzwhCREB6OFfH+rXAnuNCwo1/wFvrtbgsQDb4kSbX9de9lFbrXnA==}
     engines: {node: '>= 0.10.0'}
 
   fast-copy@3.0.2:
@@ -1687,8 +1687,8 @@ packages:
     resolution: {integrity: sha512-ypGJsmGtdXUOeM5u93TyeIEfEhM6s+ljAhrk5vAvSx8uyY/02OvrZnA0YNGUrPXfpJMgI1ODd3nwz8Npx4O4cg==}
     engines: {node: 20 || >=22}
 
-  path-to-regexp@0.1.10:
-    resolution: {integrity: sha512-7lf7qcQidTku0Gu3YDPc8DJ1q7OOucfa/BSsIwjuh56VU7katFvuM8hULfkwB3Fns/rsVF7PwPKVw1sl5KQS9w==}
+  path-to-regexp@0.1.12:
+    resolution: {integrity: sha512-RA1GjUVMnvYFxuqovrEqZoxxW5NUZqbwKtYz/Tt7nXerk0LbLblQmrsgdeOxV5SFHf0UDggjS/bSeOZwt1pmEQ==}
 
   pathe@1.1.2:
     resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
@@ -2787,7 +2787,7 @@ snapshots:
       '@hapi/hapi': 21.3.12
       '@types/koa': 2.15.0
       '@types/multer': 1.4.12
-      express: 4.21.1
+      express: 4.21.2
       reflect-metadata: 0.2.2
       validator: 13.12.0
     transitivePeerDependencies:
@@ -3311,7 +3311,7 @@ snapshots:
 
   expect-type@1.1.0: {}
 
-  express@4.21.1:
+  express@4.21.2:
     dependencies:
       accepts: 1.3.8
       array-flatten: 1.1.1
@@ -3332,7 +3332,7 @@ snapshots:
       methods: 1.1.2
       on-finished: 2.4.1
       parseurl: 1.3.3
-      path-to-regexp: 0.1.10
+      path-to-regexp: 0.1.12
       proxy-addr: 2.0.7
       qs: 6.13.0
       range-parser: 1.2.1
@@ -3726,7 +3726,7 @@ snapshots:
       lru-cache: 11.0.2
       minipass: 7.1.2
 
-  path-to-regexp@0.1.10: {}
+  path-to-regexp@0.1.12: {}
 
   pathe@1.1.2: {}
 
@@ -4054,9 +4054,9 @@ snapshots:
     dependencies:
       '@scarf/scarf': 1.4.0
 
-  swagger-ui-express@5.0.1(express@4.21.1):
+  swagger-ui-express@5.0.1(express@4.21.2):
     dependencies:
-      express: 4.21.1
+      express: 4.21.2
       swagger-ui-dist: 5.18.2
 
   test-exclude@7.0.1:
