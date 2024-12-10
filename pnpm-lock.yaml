@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@tsoa/cli':
-        specifier: 6.5.1
-        version: 6.5.1
+        specifier: 6.6.0
+        version: 6.6.0
       '@tsoa/runtime':
-        specifier: 6.5.1
-        version: 6.5.1
+        specifier: 6.6.0
+        version: 6.6.0
       compression:
         specifier: 1.7.5
         version: 1.7.5
@@ -48,14 +48,14 @@ importers:
         specifier: 13.0.0
         version: 13.0.0
       pino-transport-rotating:
-        specifier: 1.0.2
-        version: 1.0.2
+        specifier: 1.1.0
+        version: 1.1.0
       swagger-ui-express:
         specifier: 5.0.1
         version: 5.0.1(express@4.21.2)
       tsoa:
-        specifier: 6.5.1
-        version: 6.5.1
+        specifier: 6.6.0
+        version: 6.6.0
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
@@ -831,13 +831,13 @@ packages:
   '@scarf/scarf@1.4.0':
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
 
-  '@tsoa/cli@6.5.1':
-    resolution: {integrity: sha512-nvYI/kU0kI+uxvCUIEAYHDUpiekvZIt5AUUyJGObHQXyh62c7nK4U20bbowsjOx7A5uQE8SgodU227lcyk76YQ==}
+  '@tsoa/cli@6.6.0':
+    resolution: {integrity: sha512-thSW0EiqjkF7HspcPIVIy0ZX65VqbWALHbxwl8Sk83j2kakOMq+fJvfo8FcBAWlMki+JDH7CO5iaAaSLHbeqtg==}
     engines: {node: '>=18.0.0', yarn: '>=1.9.4'}
     hasBin: true
 
-  '@tsoa/runtime@6.5.1':
-    resolution: {integrity: sha512-fllTz/LrHw+BJvKTREGyrnnfkusHdPivsHNNfwy5v1ZaKfxTFjSSADwm8mu64zw/SFrNeyx8N7Mr9z1ujeV1Rw==}
+  '@tsoa/runtime@6.6.0':
+    resolution: {integrity: sha512-+rF2gdL8CX+jQ82/IBc+MRJFNAvWPoBBl77HHJv3ESVMqbKhlhlo97JHmKyFbLcX6XOJN8zl8gfQpAEJN4SOMQ==}
     engines: {node: '>=18.0.0', yarn: '>=1.9.4'}
 
   '@types/accepts@1.3.7':
@@ -1726,8 +1726,8 @@ packages:
   pino-std-serializers@7.0.0:
     resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
-  pino-transport-rotating@1.0.2:
-    resolution: {integrity: sha512-G0cMu6XSC6f8ticZmp+rV+ETYoDJfrfK7Mo1eB25ABjW3VwbfjDZSeng51RGlhKUXe2wD6YJXG8XVmV55+uUjQ==}
+  pino-transport-rotating@1.1.0:
+    resolution: {integrity: sha512-2zLWYik71lm6XK71aaVFb2BIfoiEMqBEEjwtPcLTQICZLLYOB1yR44YmGAq0DLPJ9EGWt5X1O6WNhgiAdZEMXQ==}
 
   pino@9.5.0:
     resolution: {integrity: sha512-xSEmD4pLnV54t0NOUN16yCl7RIB1c5UUOse5HSyEXtBp+FgFQyPeDutc+Q2ZO7/22vImV7VfEjH/1zV2QuqvYw==}
@@ -2053,8 +2053,8 @@ packages:
   tslib@2.6.2:
     resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
 
-  tsoa@6.5.1:
-    resolution: {integrity: sha512-NnsrtNj2iWoQkQ4sX9sNtX60uOsBxZVOZX4WzUTJC24lrxeh0amywYVTKfdspfCyQsy6YjK53pK4A9+My1cEjw==}
+  tsoa@6.6.0:
+    resolution: {integrity: sha512-7FudRojmbEpbSQ3t1pyG5EjV3scF7/X75giQt1q+tnuGjjJppB8BOEmIdCK/G8S5Dqnmpwz5Q3vxluKozpIW9A==}
     engines: {node: '>=18.0.0', yarn: '>=1.9.4'}
     hasBin: true
 
@@ -2764,9 +2764,9 @@ snapshots:
 
   '@scarf/scarf@1.4.0': {}
 
-  '@tsoa/cli@6.5.1':
+  '@tsoa/cli@6.6.0':
     dependencies:
-      '@tsoa/runtime': 6.5.1
+      '@tsoa/runtime': 6.6.0
       '@types/multer': 1.4.12
       fs-extra: 11.2.0
       glob: 10.4.5
@@ -2781,7 +2781,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tsoa/runtime@6.5.1':
+  '@tsoa/runtime@6.6.0':
     dependencies:
       '@hapi/boom': 10.0.1
       '@hapi/hapi': 21.3.12
@@ -3769,7 +3769,7 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino-transport-rotating@1.0.2:
+  pino-transport-rotating@1.1.0:
     dependencies:
       pino: 9.5.0
       pino-pretty: 13.0.0
@@ -4114,10 +4114,10 @@ snapshots:
 
   tslib@2.6.2: {}
 
-  tsoa@6.5.1:
+  tsoa@6.6.0:
     dependencies:
-      '@tsoa/cli': 6.5.1
-      '@tsoa/runtime': 6.5.1
+      '@tsoa/cli': 6.6.0
+      '@tsoa/runtime': 6.6.0
     transitivePeerDependencies:
       - supports-color
 
