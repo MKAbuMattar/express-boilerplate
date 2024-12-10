@@ -32,8 +32,8 @@
     "test:cov": "vitest run --coverage"
   },
   "dependencies": {
-    "@tsoa/cli": "6.5.1",
-    "@tsoa/runtime": "6.5.1",
+    "@tsoa/cli": "6.6.0",
+    "@tsoa/runtime": "6.6.0",
     "compression": "1.7.5",
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",
@@ -45,9 +45,9 @@
     "pino": "9.5.0",
     "pino-http": "10.3.0",
     "pino-pretty": "13.0.0",
-    "pino-transport-rotating": "1.0.2",
+    "pino-transport-rotating": "1.1.0",
     "swagger-ui-express": "5.0.1",
-    "tsoa": "6.5.1"
+    "tsoa": "6.6.0"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
