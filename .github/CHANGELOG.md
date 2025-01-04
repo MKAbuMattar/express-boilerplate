@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.2.5...v2.3.0) (2025-01-04)
+
+
+### Features
+
+* **routes:** implement redirect to Swagger UI and organize routes ([43f0854](https://github.com/MKAbuMattar/express-boilerplate/commit/43f0854d0607c992a04cc0dc32c34c30f4fd3230))
+
 ## [2.2.5](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.2.4...v2.2.5) (2024-12-23)
 
 
