@@ -48,8 +48,8 @@ importers:
         specifier: 13.0.0
         version: 13.0.0
       pino-transport-rotating:
-        specifier: 1.1.0
-        version: 1.1.0
+        specifier: 1.1.2
+        version: 1.1.2
       swagger-ui-express:
         specifier: 5.0.1
         version: 5.0.1(express@4.21.2)
@@ -1742,12 +1742,8 @@ packages:
   pino-std-serializers@7.0.0:
     resolution: {integrity: sha512-e906FRY0+tV27iq4juKzSYPbUj2do2X2JX4EzSca1631EB2QJQUqGbDuERal7LCtOpxl6x3+nvo9NPZcmjkiFA==}
 
-  pino-transport-rotating@1.1.0:
-    resolution: {integrity: sha512-2zLWYik71lm6XK71aaVFb2BIfoiEMqBEEjwtPcLTQICZLLYOB1yR44YmGAq0DLPJ9EGWt5X1O6WNhgiAdZEMXQ==}
-
-  pino@9.5.0:
-    resolution: {integrity: sha512-xSEmD4pLnV54t0NOUN16yCl7RIB1c5UUOse5HSyEXtBp+FgFQyPeDutc+Q2ZO7/22vImV7VfEjH/1zV2QuqvYw==}
-    hasBin: true
+  pino-transport-rotating@1.1.2:
+    resolution: {integrity: sha512-4tO8UTG6PVXOTGIC04ascSnxXha3gY7TKMrvpcpIXiU/nF/S66SCt/ZEoJ7tTSRat0hWExGJ9Pyul3LtUZ5KFQ==}
 
   pino@9.6.0:
     resolution: {integrity: sha512-i85pKRCt4qMjZ1+L7sy2Ag4t1atFcdbEt76+7iRJn1g2BvsnRMGu9p8pivl9fs63M2kF/A0OacFZhTub+m/qMg==}
@@ -3800,25 +3796,11 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino-transport-rotating@1.1.0:
+  pino-transport-rotating@1.1.2:
     dependencies:
-      pino: 9.5.0
+      pino: 9.6.0
       pino-pretty: 13.0.0
       rotating-file-stream: 3.2.5
-
-  pino@9.5.0:
-    dependencies:
-      atomic-sleep: 1.0.0
-      fast-redact: 3.5.0
-      on-exit-leak-free: 2.1.2
-      pino-abstract-transport: 2.0.0
-      pino-std-serializers: 7.0.0
-      process-warning: 4.0.0
-      quick-format-unescaped: 4.0.4
-      real-require: 0.2.0
-      safe-stable-stringify: 2.5.0
-      sonic-boom: 4.2.0
-      thread-stream: 3.1.0
 
   pino@9.6.0:
     dependencies:
