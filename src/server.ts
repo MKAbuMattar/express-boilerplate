@@ -14,6 +14,7 @@ import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
 
 export const app: Express = express();
+const router = express.Router();
 
 app.set('trust proxy', true);
 app.use(compression());
@@ -51,11 +52,20 @@ app.use(requestLogger);
 // Routes
 RegisterRoutes(app);
 
-app.use('/', swaggerUi.serve, (_req: Request, res: Response) => {
+// Redirect to Swagger UI
+router.get('/', (_req: Request, res: Response) => {
+  res.redirect('/docs');
+});
+
+// Swagger UI
+router.use('/docs', swaggerUi.serve, (_req: Request, res: Response) => {
   import('@/generated/swagger.json').then((swaggerDocument) => {
     res.send(swaggerUi.generateHTML(swaggerDocument));
   });
 });
+
+// Mount router
+app.use(router);
 
 // Not found handler
 app.use(notFoundHandler);
