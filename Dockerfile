@@ -1,4 +1,4 @@
-FROM node:jod-alpine@sha256:52928d8fea4e3d872286d724affcb96b994ac1886c88ec6259013312ce76ca62 AS base
+FROM node:jod-alpine@sha256:ee4f0973f1cb8a7fa5aa66a98cfade25fc75f515b9c7b43e4508b5f30e4c2b65 AS base
 
 # Environment variables
 ENV PNPM_HOME="/pnpm"
