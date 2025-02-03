@@ -77,19 +77,19 @@ export function RegisterRoutes(app: Router) {
 
 
     
+        const argsUserController_getUsers: Record<string, TsoaRoute.ParameterSchema> = {
+        };
         app.get('/api/user',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getUsers)),
 
             async function UserController_getUsers(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getUsers, request, response });
 
                 const controller = new UserController();
 
@@ -106,20 +106,20 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsUserController_getUser: Record<string, TsoaRoute.ParameterSchema> = {
+                user_id: {"in":"path","name":"user_id","required":true,"dataType":"double"},
+        };
         app.get('/api/user/:user_id',
             ...(fetchMiddlewares<RequestHandler>(UserController)),
             ...(fetchMiddlewares<RequestHandler>(UserController.prototype.getUser)),
 
             async function UserController_getUser(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-                    user_id: {"in":"path","name":"user_id","required":true,"dataType":"double"},
-            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_getUser, request, response });
 
                 const controller = new UserController();
 
@@ -136,19 +136,19 @@ export function RegisterRoutes(app: Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        const argsHealthController_getHealth: Record<string, TsoaRoute.ParameterSchema> = {
+        };
         app.get('/api/health',
             ...(fetchMiddlewares<RequestHandler>(HealthController)),
             ...(fetchMiddlewares<RequestHandler>(HealthController.prototype.getHealth)),
 
             async function HealthController_getHealth(request: ExRequest, response: ExResponse, next: any) {
-            const args: Record<string, TsoaRoute.ParameterSchema> = {
-            };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args, request, response });
+                validatedArgs = templateService.getValidatedArgs({ args: argsHealthController_getHealth, request, response });
 
                 const controller = new HealthController();
 
