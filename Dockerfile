@@ -1,11 +1,7 @@
 FROM node:jod-alpine@sha256:e2b39f7b64281324929257d0f8004fb6cb4bf0fdfb9aa8cedb235a766aec31da AS base
 
-# Environment variables
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-# Enable corepack and install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm
+RUN npm install -g pnpm@latest
 
 # Copy application code
 COPY . /app
