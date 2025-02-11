@@ -34,7 +34,7 @@
   "dependencies": {
     "@tsoa/cli": "6.6.0",
     "@tsoa/runtime": "6.6.0",
-    "compression": "1.7.5",
+    "compression": "1.8.0",
     "cookie-parser": "1.4.7",
     "cors": "2.8.5",
     "dotenv": "16.4.7",
@@ -77,5 +77,5 @@
   "engines": {
     "node": ">=20.x"
   },
-  "packageManager": "pnpm@10.2.1"
+  "packageManager": "pnpm@10.3.0"
 }
