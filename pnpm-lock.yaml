@@ -65,13 +65,13 @@ importers:
         version: 1.7.5
       '@types/cookie-parser':
         specifier: 1.4.8
-        version: 1.4.8(@types/express@5.0.0)
+        version: 1.4.8(@types/express@5.0.1)
       '@types/cors':
         specifier: 2.8.17
         version: 2.8.17
       '@types/express':
-        specifier: 5.0.0
-        version: 5.0.0
+        specifier: 5.0.1
+        version: 5.0.1
       '@types/lint-staged':
         specifier: 13.3.0
         version: 13.3.0
@@ -605,8 +605,8 @@ packages:
   '@types/express-serve-static-core@5.0.6':
     resolution: {integrity: sha512-3xhRnjJPkULekpSzgtoNYYcTWgEZkp4myc+Saevii5JPnHNvHMRlBSHDbs7Bh1iPPoVTERHEZXyhyLbMEsExsA==}
 
-  '@types/express@5.0.0':
-    resolution: {integrity: sha512-DvZriSMehGHL1ZNLzi6MidnsDhUZM/x2pRdDIKdwbUNqqwHxMlRdkxtn6/EPKyqKpHqTl/4nRZsRNLpZxZRpPQ==}
+  '@types/express@5.0.1':
+    resolution: {integrity: sha512-UZUw8vjpWFXuDnjFTh7/5c2TWDlQqeXHi6hcN7F2XSVT5P+WmUnnbFS3KA6Jnc6IsEqI2qCVu2bK0R0J4A8ZQQ==}
 
   '@types/http-assert@1.5.6':
     resolution: {integrity: sha512-TTEwmtjgVbYAzZYWyeHPrrtWnfVkm8tQkP8P21uQifPgMRgjrow3XDEYqucuC8SKZJT7pUnhU/JymvjggxO9vw==}
@@ -2421,7 +2421,7 @@ snapshots:
 
   '@types/compression@1.7.5':
     dependencies:
-      '@types/express': 5.0.0
+      '@types/express': 5.0.1
 
   '@types/connect@3.4.38':
     dependencies:
@@ -2429,16 +2429,16 @@ snapshots:
 
   '@types/content-disposition@0.5.8': {}
 
-  '@types/cookie-parser@1.4.8(@types/express@5.0.0)':
+  '@types/cookie-parser@1.4.8(@types/express@5.0.1)':
     dependencies:
-      '@types/express': 5.0.0
+      '@types/express': 5.0.1
 
   '@types/cookiejar@2.1.5': {}
 
   '@types/cookies@0.9.0':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/express': 5.0.0
+      '@types/express': 5.0.1
       '@types/keygrip': 1.0.6
       '@types/node': 22.13.10
 
@@ -2455,11 +2455,10 @@ snapshots:
       '@types/range-parser': 1.2.7
       '@types/send': 0.17.4
 
-  '@types/express@5.0.0':
+  '@types/express@5.0.1':
     dependencies:
       '@types/body-parser': 1.19.5
       '@types/express-serve-static-core': 5.0.6
-      '@types/qs': 6.9.18
       '@types/serve-static': 1.15.7
 
   '@types/http-assert@1.5.6': {}
@@ -2491,7 +2490,7 @@ snapshots:
 
   '@types/multer@1.4.12':
     dependencies:
-      '@types/express': 5.0.0
+      '@types/express': 5.0.1
 
   '@types/node@22.13.10':
     dependencies:
@@ -2526,7 +2525,7 @@ snapshots:
 
   '@types/swagger-ui-express@4.1.8':
     dependencies:
-      '@types/express': 5.0.0
+      '@types/express': 5.0.1
       '@types/serve-static': 1.15.7
 
   '@vitest/coverage-v8@3.0.9(vitest@3.0.9(@types/node@22.13.10)(tsx@4.19.3)(yaml@2.7.0))':
