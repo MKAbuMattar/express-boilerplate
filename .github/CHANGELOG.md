@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.5](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.4...v2.3.5) (2025-03-22)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pino-transport-rotating to v2 ([1af111d](https://github.com/MKAbuMattar/express-boilerplate/commit/1af111d8c93067146173d315721073b344017220))
+
 ## [2.3.4](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.3...v2.3.4) (2025-03-18)
 
 
