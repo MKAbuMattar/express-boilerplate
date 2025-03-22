@@ -50,6 +50,9 @@ importers:
       pino-transport-rotating-file:
         specifier: 1.0.0
         version: 1.0.0(pino-pretty@13.0.0)(pino@9.6.0)(rotating-file-stream@3.2.6)
+      rotating-file-stream:
+        specifier: 3.2.6
+        version: 3.2.6
       swagger-ui-express:
         specifier: 5.0.1
         version: 5.0.1(express@4.21.2)
