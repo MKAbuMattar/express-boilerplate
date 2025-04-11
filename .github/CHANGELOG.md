@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.9](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.8...v2.3.9) (2025-04-11)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v16.5.0 ([#343](https://github.com/MKAbuMattar/express-boilerplate/issues/343)) ([549f70d](https://github.com/MKAbuMattar/express-boilerplate/commit/549f70df03f9fa5cd78337f697a7a6d5c3bb47f1))
+
 ## [2.3.8](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.7...v2.3.8) (2025-03-31)
 
 
