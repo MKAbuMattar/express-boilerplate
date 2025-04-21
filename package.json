@@ -60,7 +60,7 @@
     "@types/node": "22.14.1",
     "@types/supertest": "6.0.3",
     "@types/swagger-ui-express": "4.1.8",
-    "@vitest/coverage-v8": "3.1.1",
+    "@vitest/coverage-v8": "3.1.2",
     "lint-staged": "15.5.1",
     "rimraf": "6.0.1",
     "supertest": "7.1.0",
@@ -68,7 +68,7 @@
     "tsx": "4.19.3",
     "typescript": "5.8.3",
     "vite-tsconfig-paths": "5.1.4",
-    "vitest": "3.1.1"
+    "vitest": "3.1.2"
   },
   "lint-staged": {
     "*.{js,ts,cjs,mjs,d.cts,d.mts,json,jsonc}": [
