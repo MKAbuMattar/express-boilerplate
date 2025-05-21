@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@types/compression": "1.7.5",
+    "@types/compression": "1.8.0",
     "@types/cookie-parser": "1.4.8",
     "@types/cors": "2.8.18",
     "@types/express": "5.0.2",
