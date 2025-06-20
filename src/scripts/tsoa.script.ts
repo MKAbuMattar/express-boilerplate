@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import {dirname, resolve} from 'node:path';
-import {logger} from '@/libs/logger.lib';
 import {generateRoutes, generateSpec} from '@tsoa/cli';
 import type {Config, ExtendedRoutesConfig, ExtendedSpecConfig} from 'tsoa';
 import ts from 'typescript';
+import {logger} from '@/libs/logger.lib';
 
 // Helper function to read a JSON file
 const readJsonFile = (filePath: string): any => {

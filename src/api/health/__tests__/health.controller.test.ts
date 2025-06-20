@@ -1,7 +1,7 @@
-import type {IHealthResponse} from '@/api/health/health.model';
-import {app} from '@/server';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
+import type {IHealthResponse} from '@/api/health/health.model';
+import {app} from '@/server';
 
 describe('Health API endpoints', () => {
   it('GET / - success', async () => {

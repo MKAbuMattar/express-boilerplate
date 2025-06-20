@@ -1,8 +1,8 @@
-import {logger} from '@/libs/logger.lib';
-import {ServiceResponse} from '@/models/service-response.model';
 import type {NextFunction, Request, Response} from 'express';
 import {StatusCodes} from 'http-status-codes';
 import type {ValidateError} from 'tsoa';
+import {logger} from '@/libs/logger.lib';
+import {ServiceResponse} from '@/models/service-response.model';
 
 export function notFoundHandler(_req: Request, res: Response) {
   res.status(StatusCodes.NOT_FOUND).json({message: 'Not Found'});

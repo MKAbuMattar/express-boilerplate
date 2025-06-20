@@ -1,7 +1,7 @@
-import type {IHealthResponse} from '@/api/health/health.model';
-import {ServiceResponse} from '@/models/service-response.model';
 import {Controller, Get, Route, SuccessResponse, Tags} from '@tsoa/runtime';
 import {StatusCodes} from 'http-status-codes';
+import type {IHealthResponse} from '@/api/health/health.model';
+import {ServiceResponse} from '@/models/service-response.model';
 
 @Route('health')
 @Tags('Health')

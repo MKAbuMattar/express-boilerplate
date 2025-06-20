@@ -1,7 +1,7 @@
-import requestLogger from '@/middlewares/request-logger.middleware';
 import express from 'express';
 import {StatusCodes} from 'http-status-codes';
 import request from 'supertest';
+import requestLogger from '@/middlewares/request-logger.middleware';
 
 describe('Request Logger Middleware', () => {
   const app = express();
