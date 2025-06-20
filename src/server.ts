@@ -1,3 +1,9 @@
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express, {type Express, type Request, type Response} from 'express';
+import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
 import {RegisterRoutes} from '@/generated/routes';
 import {
   errorHandlers,
@@ -6,12 +12,6 @@ import {
 import requestLogger from '@/middlewares/request-logger.middleware';
 import buildApiSpecAndRoutes from '@/scripts/tsoa.script';
 import {env} from '@/utils/env-config.util';
-import compression from 'compression';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import express, {type Express, type Request, type Response} from 'express';
-import helmet from 'helmet';
-import swaggerUi from 'swagger-ui-express';
 
 export const app: Express = express();
 const router = express.Router();

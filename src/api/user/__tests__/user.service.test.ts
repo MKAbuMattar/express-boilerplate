@@ -1,8 +1,8 @@
+import {StatusCodes} from 'http-status-codes';
+import type {Mock} from 'vitest';
 import type {User} from '@/api/user/user.model';
 import {UserRepository} from '@/api/user/user.repository';
 import {UserService} from '@/api/user/user.service';
-import {StatusCodes} from 'http-status-codes';
-import type {Mock} from 'vitest';
 
 vi.mock('@/api/user/user.repository');
 

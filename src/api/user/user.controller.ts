@@ -1,5 +1,3 @@
-import type {IUserResponse, IUsersResponse} from '@/api/user/user.model';
-import {UserService} from '@/api/user/user.service';
 import {
   Controller,
   Get,
@@ -9,6 +7,8 @@ import {
   Tags,
 } from '@tsoa/runtime';
 import {StatusCodes} from 'http-status-codes';
+import type {IUserResponse, IUsersResponse} from '@/api/user/user.model';
+import {UserService} from '@/api/user/user.service';
 
 @Route('user')
 @Tags('User')

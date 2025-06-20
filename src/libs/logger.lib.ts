@@ -2,9 +2,9 @@ import {join} from 'node:path';
 import {
   type Level,
   type LoggerOptions,
+  pino,
   type TransportPipelineOptions,
   type TransportTargetOptions,
-  pino,
 } from 'pino';
 import type {PinoTransportOptions} from 'pino-transport-rotating-file';
 
