@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.12](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.11...v2.3.12) (2025-06-20)
+
+
+### Bug Fixes
+
+* Refactor imports in health and user controllers, services, and tests for consistency ([395d131](https://github.com/MKAbuMattar/express-boilerplate/commit/395d1316704977d4d6d9cb58b2fb2bcf8e16c63b))
+* reorder import statements for consistency in vite.config.mts ([d844325](https://github.com/MKAbuMattar/express-boilerplate/commit/d8443255ee5ec36256231c6e94816c69a86d299f))
+* specify Biome version as 2.0.0 in CI pipeline ([69f64f9](https://github.com/MKAbuMattar/express-boilerplate/commit/69f64f96b9e35c8cd5f522716c396226a33b35d6))
+* update node version matrix to include version 24 in CI pipeline ([d1b1d35](https://github.com/MKAbuMattar/express-boilerplate/commit/d1b1d3558cd4f8c7af9282cfa128d6048e97b735))
+
 ## [2.3.11](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.10...v2.3.11) (2025-06-06)
 
 
