@@ -27,8 +27,8 @@ importers:
         specifier: 17.2.0
         version: 17.2.0
       envalid:
-        specifier: 8.0.0
-        version: 8.0.0
+        specifier: 8.1.0
+        version: 8.1.0
       express:
         specifier: 5.1.0
         version: 5.1.0
@@ -1000,9 +1000,9 @@ packages:
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
 
-  envalid@8.0.0:
-    resolution: {integrity: sha512-PGeYJnJB5naN0ME6SH8nFcDj9HVbLpYIfg1p5lAyM9T4cH2lwtu2fLbozC/bq+HUUOIFxhX/LP0/GmlqPHT4tQ==}
-    engines: {node: '>=8.12'}
+  envalid@8.1.0:
+    resolution: {integrity: sha512-OT6+qVhKVyCidaGoXflb2iK1tC8pd0OV2Q+v9n33wNhUJ+lus+rJobUj4vJaQBPxPZ0vYrPGuxdrenyCAIJcow==}
+    engines: {node: '>=18'}
 
   environment@1.1.0:
     resolution: {integrity: sha512-xUtoPkMggbz0MPyPiIWr1Kp4aeWJjDZ6SMvURhimjdZgsRuDplF5/s9hcgGhyXMhs+6vpnuoiZ2kFiu3FMnS8Q==}
@@ -1886,8 +1886,8 @@ packages:
       typescript:
         optional: true
 
-  tslib@2.6.2:
-    resolution: {integrity: sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==}
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
   tsoa@6.6.0:
     resolution: {integrity: sha512-7FudRojmbEpbSQ3t1pyG5EjV3scF7/X75giQt1q+tnuGjjJppB8BOEmIdCK/G8S5Dqnmpwz5Q3vxluKozpIW9A==}
@@ -2964,9 +2964,9 @@ snapshots:
     dependencies:
       once: 1.4.0
 
-  envalid@8.0.0:
+  envalid@8.1.0:
     dependencies:
-      tslib: 2.6.2
+      tslib: 2.8.1
 
   environment@1.1.0: {}
 
@@ -3962,7 +3962,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.3
 
-  tslib@2.6.2: {}
+  tslib@2.8.1: {}
 
   tsoa@6.6.0:
     dependencies:
