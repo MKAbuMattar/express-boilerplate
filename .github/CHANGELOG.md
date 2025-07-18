@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.20](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.19...v2.3.20) (2025-07-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency compression to v1.8.1 ([#442](https://github.com/MKAbuMattar/express-boilerplate/issues/442)) ([120a733](https://github.com/MKAbuMattar/express-boilerplate/commit/120a7339c3a8532d5d29ad36bf8afeba55286277))
+
 ## [2.3.19](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.18...v2.3.19) (2025-07-13)
 
 
