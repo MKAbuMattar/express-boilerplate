@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.22](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.21...v2.3.22) (2025-07-30)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pino-pretty to v13.1.1 ([#453](https://github.com/MKAbuMattar/express-boilerplate/issues/453)) ([5e37c38](https://github.com/MKAbuMattar/express-boilerplate/commit/5e37c38b5b96851f6dbf9eef4049058a6cdda8c6))
+
 ## [2.3.21](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.20...v2.3.21) (2025-07-25)
 
 
