@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.25](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.24...v2.3.25) (2025-08-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency rotating-file-stream to v3.2.7 ([#482](https://github.com/MKAbuMattar/express-boilerplate/issues/482)) ([7e18205](https://github.com/MKAbuMattar/express-boilerplate/commit/7e1820576d3692d8285acde79815adbeeb584799))
+
 ## [2.3.24](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.23...v2.3.24) (2025-08-13)
 
 
