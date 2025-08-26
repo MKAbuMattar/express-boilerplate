@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.26](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.25...v2.3.26) (2025-08-26)
+
+
+### Bug Fixes
+
+* **deps:** update pino-transport-rotating-file to version 1.0.2 ([30a9cdb](https://github.com/MKAbuMattar/express-boilerplate/commit/30a9cdba17f09ba352daf2bfac0dd79c4c7cd2be))
+* Refactor user.controller.test.ts for improved readability by using braces in forEach loop ([06f0ed1](https://github.com/MKAbuMattar/express-boilerplate/commit/06f0ed1e311e26285e16ef3d32b58092903ca960))
+
 ## [2.3.25](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.24...v2.3.25) (2025-08-25)
 
 
