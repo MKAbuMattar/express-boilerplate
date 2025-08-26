@@ -2,6 +2,107 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.25](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.24...v2.3.25) (2025-08-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency rotating-file-stream to v3.2.7 ([#482](https://github.com/MKAbuMattar/express-boilerplate/issues/482)) ([7e18205](https://github.com/MKAbuMattar/express-boilerplate/commit/7e1820576d3692d8285acde79815adbeeb584799))
+
+## [2.3.24](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.23...v2.3.24) (2025-08-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pino to v9.9.0 ([#469](https://github.com/MKAbuMattar/express-boilerplate/issues/469)) ([c449622](https://github.com/MKAbuMattar/express-boilerplate/commit/c44962237ba28018b12aaa24ef99a30ca3489d1e))
+
+## [2.3.23](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.22...v2.3.23) (2025-08-07)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([fdcdbfa](https://github.com/MKAbuMattar/express-boilerplate/commit/fdcdbfab4333bedeca571853f25f95bf55a5cf9b))
+
+## [2.3.22](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.21...v2.3.22) (2025-07-30)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pino-pretty to v13.1.1 ([#453](https://github.com/MKAbuMattar/express-boilerplate/issues/453)) ([5e37c38](https://github.com/MKAbuMattar/express-boilerplate/commit/5e37c38b5b96851f6dbf9eef4049058a6cdda8c6))
+
+## [2.3.21](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.20...v2.3.21) (2025-07-25)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v17.2.1 ([#449](https://github.com/MKAbuMattar/express-boilerplate/issues/449)) ([aab5e18](https://github.com/MKAbuMattar/express-boilerplate/commit/aab5e18eab80cfce303df6f7c7e766bf26fbb8e4))
+
+## [2.3.20](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.19...v2.3.20) (2025-07-18)
+
+
+### Bug Fixes
+
+* **deps:** update dependency compression to v1.8.1 ([#442](https://github.com/MKAbuMattar/express-boilerplate/issues/442)) ([120a733](https://github.com/MKAbuMattar/express-boilerplate/commit/120a7339c3a8532d5d29ad36bf8afeba55286277))
+
+## [2.3.19](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.18...v2.3.19) (2025-07-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency envalid to v8.1.0 ([#436](https://github.com/MKAbuMattar/express-boilerplate/issues/436)) ([9e801a6](https://github.com/MKAbuMattar/express-boilerplate/commit/9e801a6f58458cc572ea4ce6e1cc0113c8693a06))
+
+## [2.3.18](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.17...v2.3.18) (2025-07-09)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#434](https://github.com/MKAbuMattar/express-boilerplate/issues/434)) ([96f58c4](https://github.com/MKAbuMattar/express-boilerplate/commit/96f58c49789108a931e014ae5ecdcd729b16377c))
+
+## [2.3.17](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.16...v2.3.17) (2025-07-08)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#430](https://github.com/MKAbuMattar/express-boilerplate/issues/430)) ([a519b57](https://github.com/MKAbuMattar/express-boilerplate/commit/a519b57ef2f46fb74462b3defc653a23168852f9))
+
+## [2.3.16](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.15...v2.3.16) (2025-07-01)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v17.0.1 ([#426](https://github.com/MKAbuMattar/express-boilerplate/issues/426)) ([7f1e52b](https://github.com/MKAbuMattar/express-boilerplate/commit/7f1e52b49dc8b4656b320c55b19b3cf134c2cbd6))
+
+## [2.3.15](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.14...v2.3.15) (2025-06-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v17 ([f684e06](https://github.com/MKAbuMattar/express-boilerplate/commit/f684e061a4e129961f7a618f9ea7377ac780d164))
+
+## [2.3.14](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.13...v2.3.14) (2025-06-28)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#419](https://github.com/MKAbuMattar/express-boilerplate/issues/419)) ([ca6484e](https://github.com/MKAbuMattar/express-boilerplate/commit/ca6484eeae59173451cd5f75f5ad7adce62b5190))
+
+## [2.3.13](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.12...v2.3.13) (2025-06-27)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#417](https://github.com/MKAbuMattar/express-boilerplate/issues/417)) ([421caa6](https://github.com/MKAbuMattar/express-boilerplate/commit/421caa600e2c3d2c392d92a0b2e37bd1dca90b95))
+
+## [2.3.12](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.11...v2.3.12) (2025-06-20)
+
+
+### Bug Fixes
+
+* Refactor imports in health and user controllers, services, and tests for consistency ([395d131](https://github.com/MKAbuMattar/express-boilerplate/commit/395d1316704977d4d6d9cb58b2fb2bcf8e16c63b))
+* reorder import statements for consistency in vite.config.mts ([d844325](https://github.com/MKAbuMattar/express-boilerplate/commit/d8443255ee5ec36256231c6e94816c69a86d299f))
+* specify Biome version as 2.0.0 in CI pipeline ([69f64f9](https://github.com/MKAbuMattar/express-boilerplate/commit/69f64f96b9e35c8cd5f522716c396226a33b35d6))
+* update node version matrix to include version 24 in CI pipeline ([d1b1d35](https://github.com/MKAbuMattar/express-boilerplate/commit/d1b1d3558cd4f8c7af9282cfa128d6048e97b735))
+
 ## [2.3.11](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.10...v2.3.11) (2025-06-06)
 
 
