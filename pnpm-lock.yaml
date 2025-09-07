@@ -24,8 +24,8 @@ importers:
         specifier: 2.8.5
         version: 2.8.5
       dotenv:
-        specifier: 17.2.1
-        version: 17.2.1
+        specifier: 17.2.2
+        version: 17.2.2
       envalid:
         specifier: 8.1.0
         version: 8.1.0
@@ -39,8 +39,8 @@ importers:
         specifier: 2.3.0
         version: 2.3.0
       pino:
-        specifier: 9.9.0
-        version: 9.9.0
+        specifier: 9.9.4
+        version: 9.9.4
       pino-http:
         specifier: 10.5.0
         version: 10.5.0
@@ -49,7 +49,7 @@ importers:
         version: 13.1.1
       pino-transport-rotating-file:
         specifier: 1.0.2
-        version: 1.0.2(pino-pretty@13.1.1)(pino@9.9.0)(rotating-file-stream@3.2.7)
+        version: 1.0.2(pino-pretty@13.1.1)(pino@9.9.4)(rotating-file-stream@3.2.7)
       rotating-file-stream:
         specifier: 3.2.7
         version: 3.2.7
@@ -91,8 +91,8 @@ importers:
         specifier: 3.2.4
         version: 3.2.4(vitest@3.2.4(@types/node@24.3.1)(tsx@4.20.5)(yaml@2.8.1))
       lint-staged:
-        specifier: 16.1.5
-        version: 16.1.5
+        specifier: 16.1.6
+        version: 16.1.6
       rimraf:
         specifier: 6.0.1
         version: 6.0.1
@@ -973,8 +973,8 @@ packages:
   dezalgo@1.0.4:
     resolution: {integrity: sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==}
 
-  dotenv@17.2.1:
-    resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
+  dotenv@17.2.2:
+    resolution: {integrity: sha512-Sf2LSQP+bOlhKWWyhFsn0UsfdK/kCWRv1iuA2gXAwt3dyNabr6QSj00I2V10pidqz69soatm9ZwZvpQMTIOd5Q==}
     engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
@@ -1295,13 +1295,13 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  lint-staged@16.1.5:
-    resolution: {integrity: sha512-uAeQQwByI6dfV7wpt/gVqg+jAPaSp8WwOA8kKC/dv1qw14oGpnpAisY65ibGHUGDUv0rYaZ8CAJZ/1U8hUvC2A==}
+  lint-staged@16.1.6:
+    resolution: {integrity: sha512-U4kuulU3CKIytlkLlaHcGgKscNfJPNTiDF2avIUGFCv7K95/DCYQ7Ra62ydeRWmgQGg9zJYw2dzdbztwJlqrow==}
     engines: {node: '>=20.17'}
     hasBin: true
 
-  listr2@9.0.2:
-    resolution: {integrity: sha512-VVd7cS6W+vLJu2wmq4QmfVj14Iep7cz4r/OWNk36Aq5ZOY7G8/BfCrQFexcwB1OIxB3yERiePfE/REBjEFulag==}
+  listr2@9.0.3:
+    resolution: {integrity: sha512-0aeh5HHHgmq1KRdMMDHfhMWQmIT/m7nRDTlxlFqni2Sp0had9baqsjJRvDGdlvgd6NmPE0nPloOipiQJGFtTHQ==}
     engines: {node: '>=20.0.0'}
 
   load-tsconfig@0.2.5:
@@ -1543,8 +1543,8 @@ packages:
       pino-pretty: 13.1.1
       rotating-file-stream: 3.2.7
 
-  pino@9.9.0:
-    resolution: {integrity: sha512-zxsRIQG9HzG+jEljmvmZupOMDUQ0Jpj0yAgE28jQvvrdYTlEaiGwelJpdndMl/MBuRr70heIj83QyqJUWaU8mQ==}
+  pino@9.9.4:
+    resolution: {integrity: sha512-d1XorUQ7sSKqVcYdXuEYs2h1LKxejSorMEJ76XoZ0pPDf8VzJMe7GlPXpMBZeQ9gE4ZPIp5uGD+5Nw7scxiigg==}
     hasBin: true
 
   pirates@4.0.7:
@@ -2613,7 +2613,7 @@ snapshots:
 
   '@types/lint-staged@14.0.0':
     dependencies:
-      lint-staged: 16.1.5
+      lint-staged: 16.1.6
     transitivePeerDependencies:
       - supports-color
 
@@ -2954,7 +2954,7 @@ snapshots:
       asap: 2.0.6
       wrappy: 1.0.2
 
-  dotenv@17.2.1: {}
+  dotenv@17.2.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -3353,13 +3353,13 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lint-staged@16.1.5:
+  lint-staged@16.1.6:
     dependencies:
       chalk: 5.6.0
       commander: 14.0.0
       debug: 4.4.1
       lilconfig: 3.1.3
-      listr2: 9.0.2
+      listr2: 9.0.3
       micromatch: 4.0.8
       nano-spawn: 1.0.2
       pidtree: 0.6.0
@@ -3368,7 +3368,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  listr2@9.0.2:
+  listr2@9.0.3:
     dependencies:
       cli-truncate: 4.0.0
       colorette: 2.0.20
@@ -3548,7 +3548,7 @@ snapshots:
   pino-http@10.5.0:
     dependencies:
       get-caller-file: 2.0.5
-      pino: 9.9.0
+      pino: 9.9.4
       pino-std-serializers: 7.0.0
       process-warning: 5.0.0
 
@@ -3570,13 +3570,13 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino-transport-rotating-file@1.0.2(pino-pretty@13.1.1)(pino@9.9.0)(rotating-file-stream@3.2.7):
+  pino-transport-rotating-file@1.0.2(pino-pretty@13.1.1)(pino@9.9.4)(rotating-file-stream@3.2.7):
     dependencies:
-      pino: 9.9.0
+      pino: 9.9.4
       pino-pretty: 13.1.1
       rotating-file-stream: 3.2.7
 
-  pino@9.9.0:
+  pino@9.9.4:
     dependencies:
       atomic-sleep: 1.0.0
       fast-redact: 3.5.0
