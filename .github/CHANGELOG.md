@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.30](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.29...v2.3.30) (2025-09-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pino to v9.11.0 ([#505](https://github.com/MKAbuMattar/express-boilerplate/issues/505)) ([e6fb772](https://github.com/MKAbuMattar/express-boilerplate/commit/e6fb77255e0bc8979b0a0769789703e40ed2a67a))
+
 ## [2.3.29](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.28...v2.3.29) (2025-09-17)
 
 
