@@ -29,12 +29,45 @@ jobs:
       - name: Get the repository name lowercase
         run: echo "REPO_NAME=$(echo '${{ github.repository }}' | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
-      - uses: snok/container-retention-policy@4f22ef80902ad409ed55a99dc5133cc1250a0d03 # v3.0.0
-        with:
-          account: user
-          token: ${{ secrets.PAT_DEL_TOKEN }}
-          image-names: "${{ env.REPO_NAME }}"
-          image-tags: "*"
-          cut-off: 1w
-          keep-n-most-recent: 5
-          dry-run: false
+      - name: Delete old container images
+        env:
+          GH_TOKEN: ${{ secrets.PAT_DEL_TOKEN }}
+          REPO_NAME: ${{ env.REPO_NAME }}
+        run: |
+          # Get all package versions sorted by creation date (newest first)
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/user/packages/container/${REPO_NAME}/versions" \
+            --paginate \
+            --jq 'sort_by(.created_at) | reverse' > all_versions.json
+
+          # Get total count
+          TOTAL_COUNT=$(jq 'length' all_versions.json)
+          echo "Total package versions found: $TOTAL_COUNT"
+
+          # If we have more than 5 versions, delete the older ones beyond the 5 most recent
+          if [ "$TOTAL_COUNT" -gt 5 ]; then
+            echo "Keeping 5 most recent versions, deleting $(($TOTAL_COUNT - 5)) older versions"
+            
+            # Get versions to delete (all except the first 5 most recent)
+            jq -r '.[5:] | .[].id' all_versions.json > versions_to_delete.txt
+            
+            # Delete old versions
+            while read version_id; do
+              if [ ! -z "$version_id" ]; then
+                echo "Deleting version ID: $version_id"
+                gh api \
+                  --method DELETE \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "/user/packages/container/${REPO_NAME}/versions/${version_id}" || true
+              fi
+            done < versions_to_delete.txt
+            
+            rm -f versions_to_delete.txt
+          else
+            echo "Total versions ($TOTAL_COUNT) is <= 5, no cleanup needed"
+          fi
+
+          rm -f all_versions.json
