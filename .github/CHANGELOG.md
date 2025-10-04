@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.35](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.34...v2.3.35) (2025-10-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency pino-http to v11 ([f943603](https://github.com/MKAbuMattar/express-boilerplate/commit/f943603679e05d7e3a2e8300ee5fd18e049f8458))
+
 ## [2.3.34](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.33...v2.3.34) (2025-10-03)
 
 
