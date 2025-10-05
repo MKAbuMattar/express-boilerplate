@@ -45,7 +45,7 @@
     "pino": "10.0.0",
     "pino-http": "11.0.0",
     "pino-pretty": "13.1.1",
-    "pino-transport-rotating-file": "1.1.0",
+    "pino-transport-rotating-file": "1.2.0",
     "rotating-file-stream": "3.2.7",
     "swagger-ui-express": "5.0.1",
     "tsoa": "6.6.0"
