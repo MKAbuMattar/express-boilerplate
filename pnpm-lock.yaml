@@ -39,8 +39,8 @@ importers:
         specifier: 2.3.0
         version: 2.3.0
       pino:
-        specifier: 10.0.0
-        version: 10.0.0
+        specifier: 10.1.0
+        version: 10.1.0
       pino-http:
         specifier: 11.0.0
         version: 11.0.0
@@ -49,7 +49,7 @@ importers:
         version: 13.1.2
       pino-transport-rotating-file:
         specifier: 1.2.0
-        version: 1.2.0(pino-pretty@13.1.2)(pino@10.0.0)(rotating-file-stream@3.2.7)
+        version: 1.2.0(pino-pretty@13.1.2)(pino@10.1.0)(rotating-file-stream@3.2.7)
       rotating-file-stream:
         specifier: 3.2.7
         version: 3.2.7
@@ -477,6 +477,9 @@ packages:
 
   '@paralleldrive/cuid2@2.2.2':
     resolution: {integrity: sha512-ZOBkgDwEdoYVlSeRbYYXs0S9MejQofiVYoTbKzy/6GQa39/q5tQU2IX46+shYnUkpEl3wc+J6wRlar7r2EK2xA==}
+
+  '@pinojs/redact@0.4.0':
+    resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1547,8 +1550,8 @@ packages:
       pino-pretty: 13.1.1
       rotating-file-stream: 3.2.7
 
-  pino@10.0.0:
-    resolution: {integrity: sha512-eI9pKwWEix40kfvSzqEP6ldqOoBIN7dwD/o91TY5z8vQI12sAffpR/pOqAD1IVVwIVHDpHjkq0joBPdJD0rafA==}
+  pino@10.1.0:
+    resolution: {integrity: sha512-0zZC2ygfdqvqK8zJIr1e+wT1T/L+LF6qvqvbzEQ6tiMAoTqEVK9a1K3YRu8HEUvGEvNqZyPJTtb2sNIoTkB83w==}
     hasBin: true
 
   pirates@4.0.7:
@@ -1735,9 +1738,6 @@ packages:
   slice-ansi@7.1.2:
     resolution: {integrity: sha512-iOBWFgUX7caIZiuutICxVgX1SdxwAVFFKwt1EvMYYec/NWO5meOJ6K5uQxhrYBdQJne4KxiqZc+KptFOWFSI9w==}
     engines: {node: '>=18'}
-
-  slow-redact@0.3.2:
-    resolution: {integrity: sha512-MseHyi2+E/hBRqdOi5COy6wZ7j7DxXRz9NkseavNYSvvWC06D8a5cidVZX3tcG5eCW3NIyVU4zT63hw0Q486jw==}
 
   sonic-boom@4.2.0:
     resolution: {integrity: sha512-INb7TM37/mAcsGmc9hyyI6+QR3rR1zVRu36B0NeGXKnOOLiZOfER5SA+N7X7k3yUYRzLWafduTDvJAfDswwEww==}
@@ -2444,6 +2444,8 @@ snapshots:
   '@paralleldrive/cuid2@2.2.2':
     dependencies:
       '@noble/hashes': 1.8.0
+
+  '@pinojs/redact@0.4.0': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -3556,7 +3558,7 @@ snapshots:
   pino-http@11.0.0:
     dependencies:
       get-caller-file: 2.0.5
-      pino: 10.0.0
+      pino: 10.1.0
       pino-std-serializers: 7.0.0
       process-warning: 5.0.0
 
@@ -3578,14 +3580,15 @@ snapshots:
 
   pino-std-serializers@7.0.0: {}
 
-  pino-transport-rotating-file@1.2.0(pino-pretty@13.1.2)(pino@10.0.0)(rotating-file-stream@3.2.7):
+  pino-transport-rotating-file@1.2.0(pino-pretty@13.1.2)(pino@10.1.0)(rotating-file-stream@3.2.7):
     dependencies:
-      pino: 10.0.0
+      pino: 10.1.0
       pino-pretty: 13.1.2
       rotating-file-stream: 3.2.7
 
-  pino@10.0.0:
+  pino@10.1.0:
     dependencies:
+      '@pinojs/redact': 0.4.0
       atomic-sleep: 1.0.0
       on-exit-leak-free: 2.1.2
       pino-abstract-transport: 2.0.0
@@ -3594,7 +3597,6 @@ snapshots:
       quick-format-unescaped: 4.0.4
       real-require: 0.2.0
       safe-stable-stringify: 2.5.0
-      slow-redact: 0.3.2
       sonic-boom: 4.2.0
       thread-stream: 3.1.0
 
@@ -3830,8 +3832,6 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.3
       is-fullwidth-code-point: 5.1.0
-
-  slow-redact@0.3.2: {}
 
   sonic-boom@4.2.0:
     dependencies:
