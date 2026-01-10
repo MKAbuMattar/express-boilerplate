@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.42](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.41...v2.3.42) (2026-01-10)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#637](https://github.com/MKAbuMattar/express-boilerplate/issues/637)) ([af95cd1](https://github.com/MKAbuMattar/express-boilerplate/commit/af95cd1755458d68bddf5616ee154aaea6187ad6))
+
 ## [2.3.41](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.40...v2.3.41) (2025-12-02)
 
 
