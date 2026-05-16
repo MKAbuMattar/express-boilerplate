@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.54...v2.4.0) (2026-05-16)
+
+
+### Features
+
+* update ExpressTemplateService configuration and enhance Swagger documentation ([acf30ce](https://github.com/MKAbuMattar/express-boilerplate/commit/acf30cef002323f0a140c32ee5cd94247561073d))
+
 ## [2.3.54](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.53...v2.3.54) (2026-04-12)
 
 
