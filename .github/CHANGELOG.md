@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.4.1](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.4.0...v2.4.1) (2026-07-09)
+
+
+### Bug Fixes
+
+* **ci:** require Node 22+ and approve pnpm build scripts ([#789](https://github.com/MKAbuMattar/express-boilerplate/issues/789)) ([5ecd136](https://github.com/MKAbuMattar/express-boilerplate/commit/5ecd13607b9f99a38184d714646e8408bc2b049e))
+
 ## [2.4.0](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.3.54...v2.4.0) (2026-05-16)
 
 
