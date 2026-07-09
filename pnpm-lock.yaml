@@ -76,8 +76,8 @@ importers:
         specifier: 5.0.6
         version: 5.0.6
       '@types/node':
-        specifier: 25.8.0
-        version: 25.8.0
+        specifier: 25.9.5
+        version: 25.9.5
       '@types/supertest':
         specifier: 7.2.0
         version: 7.2.0
@@ -107,10 +107,10 @@ importers:
         version: 6.0.3
       vite-tsconfig-paths:
         specifier: 6.1.1
-        version: 6.1.1(typescript@6.0.3)(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
+        version: 6.1.1(typescript@6.0.3)(vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
       vitest:
         specifier: 4.1.6
-        version: 4.1.6(@types/node@25.8.0)(@vitest/coverage-v8@4.1.6)(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
+        version: 4.1.6(@types/node@25.9.5)(@vitest/coverage-v8@4.1.6)(vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
 
 packages:
 
@@ -968,6 +968,9 @@ packages:
 
   '@types/node@25.8.0':
     resolution: {integrity: sha512-TCFSk8IZh+iLX1xtksoBVtdmgL+1IX0fC9BeU4QqFSuNdN/K+HUlhqOzEmSYYpZUVsLYcPqc9KX+60iDuninSQ==}
+
+  '@types/node@25.9.5':
+    resolution: {integrity: sha512-OScDchr2fwuUmWdf4kZ9h7PcJiYDVInhJizG/biAq3cAvqwYktuy/TYGGdZNMtNTFUP7rnb0NU4TUdm82kt4Rg==}
 
   '@types/qs@6.15.1':
     resolution: {integrity: sha512-GZHUBZR9hckSUhrxmp1nG6NwdpM9fCunJwyThLW1X3AyHgd9IlHb6VANpQQqDr2o/qQp6McZ3y/IA2rVzKzSbw==}
@@ -2188,6 +2191,7 @@ packages:
   tsconfck@3.1.6:
     resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
     engines: {node: ^18 || >=20}
+    deprecated: unmaintained
     hasBin: true
     peerDependencies:
       typescript: ^5.0.0
@@ -3100,6 +3104,10 @@ snapshots:
     dependencies:
       undici-types: 7.24.6
 
+  '@types/node@25.9.5':
+    dependencies:
+      undici-types: 7.24.6
+
   '@types/qs@6.15.1': {}
 
   '@types/range-parser@1.2.7': {}
@@ -3142,7 +3150,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.6(@types/node@25.8.0)(@vitest/coverage-v8@4.1.6)(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
+      vitest: 4.1.6(@types/node@25.9.5)(@vitest/coverage-v8@4.1.6)(vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
 
   '@vitest/expect@4.1.6':
     dependencies:
@@ -3153,13 +3161,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.6(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.6(vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.6
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)
+      vite: 8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.6':
     dependencies:
@@ -4537,17 +4545,17 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite-tsconfig-paths@6.1.1(typescript@6.0.3)(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)):
+  vite-tsconfig-paths@6.1.1(typescript@6.0.3)(vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)):
     dependencies:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@6.0.3)
-      vite: 8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)
+      vite: 8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0):
+  vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -4555,16 +4563,16 @@ snapshots:
       rolldown: 1.0.0-rc.17
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@types/node': 25.8.0
+      '@types/node': 25.9.5
       esbuild: 0.27.7
       fsevents: 2.3.3
       tsx: 4.22.0
       yaml: 2.9.0
 
-  vitest@4.1.6(@types/node@25.8.0)(@vitest/coverage-v8@4.1.6)(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)):
+  vitest@4.1.6(@types/node@25.9.5)(@vitest/coverage-v8@4.1.6)(vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.6
-      '@vitest/mocker': 4.1.6(vite@8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
+      '@vitest/mocker': 4.1.6(vite@8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.6
       '@vitest/runner': 4.1.6
       '@vitest/snapshot': 4.1.6
@@ -4581,10 +4589,10 @@ snapshots:
       tinyexec: 1.1.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 8.0.10(@types/node@25.8.0)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)
+      vite: 8.0.10(@types/node@25.9.5)(esbuild@0.27.7)(tsx@4.22.0)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 25.8.0
+      '@types/node': 25.9.5
       '@vitest/coverage-v8': 4.1.6(vitest@4.1.6)
     transitivePeerDependencies:
       - msw
