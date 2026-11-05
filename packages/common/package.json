@@ -1,6 +1,6 @@
 {
   "name": "@express-boilerplate/common",
-  "description": "Layer 5, cross-cutting: config, security, errors, cache, queue, observability, util",
+  "description": "Shared infrastructure for every package: environment config, dependency injection, authentication guards, error responses, cache, queues, logging and observability.",
   "private": true,
   "type": "module",
   "version": "0.0.0",

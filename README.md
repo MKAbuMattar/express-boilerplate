@@ -1,6 +1,6 @@
 # Express Boilerplate
 
-A boilerplate for building scalable applications with Express.js, TypeScript, and Pino Logger
+Express and TypeScript API in a pnpm and Turborepo monorepo. HTTPS only on port 443, with separate packages for the API, business logic, data access and shared infrastructure.
 
 <div class="badges" align="center">
 
@@ -49,21 +49,21 @@ Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/d
 
 ## Project structure
 
-A pnpm workspace run by Turborepo. Each layer is its own package, and a layer may only use the layers below it:
+A pnpm workspace run by Turborepo. Each package has its own README:
 
-```
-apps/api              API / controller layer       -> service, common
-packages/service      business layer               -> persistence, common
-packages/persistence  data layer                   -> common
-packages/common       cross-cutting layer          (used by every layer)
-```
+| Package | What it holds | Depends on |
+|---|---|---|
+| [`apps/api`](apps/api/README.md) | HTTP API: REST resources, health and metrics, OpenAPI docs, WebSocket, SSE and TCP on one TLS port | service, common |
+| [`packages/service`](packages/service/README.md) | Business logic: service contracts and their implementations | persistence, common |
+| [`packages/persistence`](packages/persistence/README.md) | Data access: entities, repositories, migrations, the database connection | common |
+| [`packages/common`](packages/common/README.md) | Shared infrastructure: config, dependency injection, security, errors, cache, queues, observability | nothing |
 
 The package dependencies enforce the direction: pnpm only resolves what a package declares, so `persistence` cannot import `service`, and nothing can import `api`. A Biome rule keeps the API layer off `persistence` too; only `application.ts`, the composition root, wires it in. `turbo run build` builds the layers in that order and caches the result.
 
 Inside each package the folders keep the same names: config, constant, controller, converter, enumeration, exceptions, model, repository, rest, security, service (+ impl), util. Every unit is a class. Other layers import by path, for example `@express-boilerplate/service/service/user.service.js`.
 
 ```
-apps/api/src/                          API / controller layer
+apps/api/src/                          HTTP API
 ├── main.ts                            HTTPS server on 443, transports, shutdown
 ├── application.ts                     composition root: registers each layer's @Configuration
 ├── config/openapi.config.ts           OpenAPI (Swagger, development only)
@@ -74,18 +74,18 @@ apps/api/src/                          API / controller layer
 ├── exceptions/                        GlobalExceptionFilter (HTTP errors to RFC 9457)
 └── rest/                              dto/v1, dto/v2, preconditions, resources/v1, resources/v2
 
-packages/service/src/                  business layer
+packages/service/src/                  business logic
 ├── config/service.configuration.ts    service contracts bound to their impls
 ├── dto/                               CreateUserDto (business input)
 ├── model/                             AppEvent, Health
 └── service/ + impl/                   User, Health, Mail, Network, Experiment, EventBus, JobRegistry
 
-packages/persistence/src/              data layer
+packages/persistence/src/              data access
 ├── config/                            DatabaseConfig (DataSource, TLS), PersistenceConfiguration, cli.data-source
 ├── model/                             UserEntity
 └── repository/ + migration/           UserRepository, versioned schema changes
 
-packages/common/src/                   cross-cutting layer
+packages/common/src/                   shared infrastructure
 ├── config/                            AppConfig (env), BeanFactory, stereotypes, CommonConfiguration,
 │                                      TlsConfig, ServerHardening, VaultSecrets, cache/, queue/, observability/
 ├── constant/  enumeration/            shared constants and enums

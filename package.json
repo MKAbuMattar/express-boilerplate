@@ -1,5 +1,6 @@
 {
   "name": "express-boilerplate",
+  "description": "Express and TypeScript API in a pnpm and Turborepo monorepo. HTTPS only on port 443, with separate packages for the API, business logic, data access and shared infrastructure.",
   "private": true,
   "type": "module",
   "version": "0.0.0",

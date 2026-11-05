@@ -1,6 +1,6 @@
 {
   "name": "@express-boilerplate/persistence",
-  "description": "Layer 4, data: entities, repositories, migrations, DataSource",
+  "description": "Data access: TypeORM entities, repositories, versioned migrations and a TLS-enforced connection for Postgres, MySQL, MariaDB, MSSQL, MongoDB and sql.js.",
   "private": true,
   "type": "module",
   "version": "0.0.0",

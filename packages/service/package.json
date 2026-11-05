@@ -1,6 +1,6 @@
 {
   "name": "@express-boilerplate/service",
-  "description": "Layer 3, business: service contracts and implementations",
+  "description": "Business logic: user, health, mail, network and experiment services, each an abstract contract with its implementation, plus the event bus and job registry.",
   "private": true,
   "type": "module",
   "version": "0.0.0",

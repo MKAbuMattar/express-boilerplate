@@ -1,5 +1,6 @@
 {
   "name": "@express-boilerplate/api",
+  "description": "HTTP API: versioned REST resources, health and metrics endpoints, OpenAPI docs, and WebSocket, SSE and TCP on one TLS port.",
   "private": true,
   "type": "module",
   "version": "0.0.0",
