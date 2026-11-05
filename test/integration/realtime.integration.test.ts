@@ -6,12 +6,12 @@ import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {WebSocket} from 'ws';
 import type {Application} from '../../src/application.js';
+import {TcpServer} from '../../src/config/transport/tcp.server.js';
+import {UdpServer} from '../../src/config/transport/udp.server.js';
 import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
 import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {Principal} from '../../src/security/principal.js';
 import {SessionService} from '../../src/security/sso/session.service.js';
-import {TcpServer} from '../../src/transport/tcp.server.js';
-import {UdpServer} from '../../src/transport/udp.server.js';
 import {RawHttp} from '../support/raw-http.js';
 import {TestApp} from '../support/test-app.js';
 
@@ -30,7 +30,7 @@ describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
     raw = await RawHttp.listen(app);
     application.beans
       .getBean(
-        (await import('../../src/transport/websocket.gateway.js'))
+        (await import('../../src/config/transport/websocket.gateway.js'))
           .WebSocketGateway,
       )
       .attach(raw.server);

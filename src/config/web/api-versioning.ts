@@ -1,5 +1,5 @@
 import type {RequestHandler} from 'express';
-import {ApiConstants} from '../constant/api.constants.js';
+import {ApiConstants} from '../../constant/api.constants.js';
 
 /**
  * URL-path versioning: /api/v1/..., /api/v2/...

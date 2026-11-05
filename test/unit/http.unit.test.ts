@@ -1,7 +1,7 @@
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
+import {ApiVersioning} from '../../src/config/web/api-versioning.js';
 import {ProblemDetails} from '../../src/exceptions/problem-details.js';
-import {ApiVersioning} from '../../src/middleware/api-versioning.js';
 import {ApiResponse} from '../../src/rest/dto/api-response.dto.js';
 import {PageDto, PageRequestDto} from '../../src/rest/dto/v2/page.dto.js';
 import {UserPatchDto} from '../../src/rest/dto/v2/user-patch.dto.js';

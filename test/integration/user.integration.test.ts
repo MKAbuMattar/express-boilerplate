@@ -70,6 +70,23 @@ describe('UserV1Resource', () => {
     expect(missing.status).toBe(404);
   });
 
+  it('/livez answers without touching the database', async () => {
+    const dataSource = application.beans.getBean(
+      (await import('typeorm')).DataSource,
+    );
+    await dataSource.destroy();
+    try {
+      const live = await request(app)
+        .get('/livez')
+        .set('host', '10.1.2.3:8080');
+      expect(live.status).toBe(200);
+      expect(JSON.parse(live.text).status).toBe('UP');
+      expect((await request(app).get('/api/v1/health')).status).toBe(503);
+    } finally {
+      await dataSource.initialize();
+    }
+  });
+
   it('returns 404 JSON for unknown routes', async () => {
     const response = await request(app).get('/nope');
     expect(response.status).toBe(404);

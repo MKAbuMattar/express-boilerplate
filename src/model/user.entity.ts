@@ -24,7 +24,7 @@ export class EntityIds {
 }
 
 // Column types are explicit so no code depends on emitted design:type metadata.
-// Schema changes go through a migration in src/migration, never synchronize.
+// Schema changes go through a migration in src/repository/migration, never synchronize.
 @Entity('users')
 export class UserEntity {
   @EntityIds.primary()

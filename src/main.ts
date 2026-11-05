@@ -1,10 +1,10 @@
 import http from 'node:http';
 import https from 'node:https';
 import {Application} from './application.js';
+import {Tracing} from './config/observability/tracing.js';
 import {ServerHardening} from './config/server-hardening.js';
 import {TlsConfig} from './config/tls.config.js';
 import {VaultSecrets} from './config/vault-secrets.js';
-import {Tracing} from './observability/tracing.js';
 import {AppLogger} from './util/app-logger.js';
 
 export class Main {

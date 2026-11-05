@@ -1,0 +1,18 @@
+apiVersion: v2
+name: express-boilerplate
+description: >-
+  Express 5 and TypeScript API with layered classes, several databases,
+  mTLS/HMAC/JWT/OAuth2/OIDC/SAML auth, queues and observability.
+type: application
+# Chart version: bump on every chart change (semver).
+version: 0.1.0
+# Default image tag when values do not set one. Environments pin their own.
+appVersion: "2.4.7"
+kubeVersion: ">=1.29.0-0"
+home: https://github.com/MKAbuMattar/express-boilerplate
+sources:
+  - https://github.com/MKAbuMattar/express-boilerplate
+maintainers:
+  - name: MKAbuMattar
+    url: https://github.com/MKAbuMattar
+keywords: [express, typescript, api]

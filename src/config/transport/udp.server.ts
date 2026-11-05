@@ -1,8 +1,8 @@
 import dgram from 'node:dgram';
 import {isIPv6} from 'node:net';
 import {inject} from 'inversify';
-import {AppConfig} from '../config/app.config.js';
-import {Component} from '../config/stereotypes.js';
+import {AppConfig} from '../app.config.js';
+import {Component} from '../stereotypes.js';
 import {TransportMessage} from './transport-message.js';
 
 /**

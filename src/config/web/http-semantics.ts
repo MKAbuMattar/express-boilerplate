@@ -5,7 +5,7 @@ import type {
   RequestHandler,
   Response,
 } from 'express';
-import {ProblemDetails} from '../exceptions/problem-details.js';
+import {ProblemDetails} from '../../exceptions/problem-details.js';
 
 type RouteLayer = {
   route?: {methods: Record<string, boolean>};

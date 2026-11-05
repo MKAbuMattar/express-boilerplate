@@ -1,13 +1,13 @@
 import net, {type AddressInfo, type Socket} from 'node:net';
 import tls, {TLSSocket} from 'node:tls';
 import {inject} from 'inversify';
-import {AppConfig} from '../config/app.config.js';
-import {Component} from '../config/stereotypes.js';
-import {TlsConfig} from '../config/tls.config.js';
-import {AuthStrategy} from '../enumeration/auth-strategy.enum.js';
-import {TokenProvider} from '../security/jwt/token.provider.js';
-import {Principal} from '../security/principal.js';
-import {AppLogger} from '../util/app-logger.js';
+import {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
+import {TokenProvider} from '../../security/jwt/token.provider.js';
+import {Principal} from '../../security/principal.js';
+import {AppLogger} from '../../util/app-logger.js';
+import {AppConfig} from '../app.config.js';
+import {Component} from '../stereotypes.js';
+import {TlsConfig} from '../tls.config.js';
 import {TransportMessage} from './transport-message.js';
 
 /**

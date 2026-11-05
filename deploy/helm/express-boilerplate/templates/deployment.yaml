@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "eb.fullname" . }}
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+    app.kubernetes.io/component: api
+  annotations:
+    # After config, secrets (-1) and migrations (0).
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # Never below the wanted capacity during a rollout.
+      maxSurge: 25%
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "eb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "eb.labels" . | nindent 8 }}
+        app.kubernetes.io/component: api
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        # Roll the pods when the configuration changes.
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "eb.serviceAccountName" . }}
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      securityContext:
+        {{- include "eb.podSecurityContext" . | nindent 8 }}
+      # The app closes connections and exits within 10 s; preStop adds 5 s.
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- if .Values.topologySpread.enabled }}
+      # Spread replicas across zones and nodes: one failure takes few of them.
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "eb.selectorLabels" . | nindent 14 }}
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              {{- include "eb.selectorLabels" . | nindent 14 }}
+      {{- end }}
+      containers:
+        - name: app
+          image: {{ include "eb.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ include "eb.port" . }}
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: {{ include "eb.fullname" . }}
+            {{- if include "eb.hasSecret" . }}
+            - secretRef:
+                name: {{ include "eb.secretName" . }}
+            {{- end }}
+          {{- with .Values.extraEnv }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          # Slow first boot (DB, cache, JWKS) must not trip liveness.
+          startupProbe:
+            httpGet:
+              path: /livez
+              port: http
+              scheme: {{ include "eb.scheme" . }}
+            periodSeconds: 5
+            failureThreshold: 30
+          # Process alive. No dependency checks: a DB outage must not restart pods.
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: http
+              scheme: {{ include "eb.scheme" . }}
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          # Ready for traffic: database and cache reachable (Actuator readiness).
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+              scheme: {{ include "eb.scheme" . }}
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          lifecycle:
+            preStop:
+              # Let load balancers drop this pod before it stops accepting.
+              exec:
+                command: ["sh", "-c", "sleep 5"]
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- include "eb.containerSecurityContext" . | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- if .Values.tls.enabled }}
+            - name: tls
+              mountPath: /etc/tls
+              readOnly: true
+            {{- end }}
+      volumes:
+        # Read-only root filesystem: /tmp is the only writable path.
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+        {{- if .Values.tls.enabled }}
+        - name: tls
+          secret:
+            secretName: {{ required "tls.secretName is required when tls.enabled" .Values.tls.secretName }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

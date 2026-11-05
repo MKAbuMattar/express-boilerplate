@@ -1,8 +1,8 @@
 import {DataSource, type DataSourceOptions} from 'typeorm';
 import {DatabaseType} from '../enumeration/database-type.enum.js';
-import {CreateUsersTable1793900000000} from '../migration/1793900000000-create-users-table.js';
-import {AddUserPhone1793900000001} from '../migration/1793900000001-add-user-phone.js';
 import {UserEntity} from '../model/user.entity.js';
+import {CreateUsersTable1793900000000} from '../repository/migration/1793900000000-create-users-table.js';
+import {AddUserPhone1793900000001} from '../repository/migration/1793900000001-add-user-phone.js';
 import type {AppConfig} from './app.config.js';
 
 export class DatabaseConfig {

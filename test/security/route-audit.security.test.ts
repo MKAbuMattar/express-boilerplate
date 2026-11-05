@@ -11,6 +11,15 @@ import {TestApp} from '../support/test-app.js';
  */
 const PUBLIC_ROUTES = new Set([
   'GET /api/v1/health',
+  'GET /livez',
+  'GET /readyz',
+  'GET /healthz',
+  'GET /actuator/health',
+  'GET /actuator/health/liveness',
+  'GET /actuator/health/readiness',
+  // Limited to OPS_ALLOWED_CIDRS; loopback is allowed here.
+  'GET /actuator/info',
+  'GET /actuator/prometheus',
   'GET /api/v1/users',
   'GET /api/v1/users/:id',
   'GET /api/v2/users',

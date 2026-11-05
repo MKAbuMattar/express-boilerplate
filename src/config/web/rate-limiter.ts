@@ -1,7 +1,7 @@
 import type {RequestHandler} from 'express';
-import type {AppConfig} from '../config/app.config.js';
-import type {CacheStore} from '../config/cache/cache-store.js';
-import {ProblemDetails} from '../exceptions/problem-details.js';
+import {ProblemDetails} from '../../exceptions/problem-details.js';
+import type {AppConfig} from '../app.config.js';
+import type {CacheStore} from '../cache/cache-store.js';
 
 /**
  * Fixed-window rate limit per client IP, stored in the CacheStore, so with
@@ -17,7 +17,8 @@ import {ProblemDetails} from '../exceptions/problem-details.js';
  * losing rate limiting beats losing the API.
  */
 export class RateLimiter {
-  private static readonly EXEMPT = /^\/api\/(v\d+\/)?health(\/|$)/;
+  private static readonly EXEMPT =
+    /^(\/api\/(v\d+\/)?health(\/|$)|\/livez$|\/readyz$|\/healthz$|\/actuator\/health(\/|$))/;
 
   static middleware(config: AppConfig, store: CacheStore): RequestHandler {
     const {

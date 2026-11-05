@@ -26,7 +26,9 @@ export class Tracing {
         new HttpInstrumentation({
           // Probes and scrapes would drown the real traffic.
           ignoreIncomingRequestHook: (request) =>
-            /^\/(metrics|api\/(v\d+\/)?health)\b/.test(request.url ?? ''),
+            /^\/(metrics|livez|readyz|healthz|actuator|api\/(v\d+\/)?health)\b/.test(
+              request.url ?? '',
+            ),
         }),
       ],
     });

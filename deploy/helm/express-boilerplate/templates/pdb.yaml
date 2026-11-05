@@ -1,0 +1,17 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+# Node drains and upgrades take at most this many pods down at once.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "eb.fullname" . }}
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+spec:
+  maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  # A crash-looping pod must not block a drain.
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      {{- include "eb.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api
+{{- end }}

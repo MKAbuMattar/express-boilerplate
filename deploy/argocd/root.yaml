@@ -1,0 +1,27 @@
+# App of apps: the only manifest you apply by hand, once.
+#   kubectl apply -n argocd -f deploy/argocd/root.yaml
+# Argo CD then manages everything in deploy/argocd/apps from Git: add an
+# environment by adding a file there.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: express-boilerplate-root
+  namespace: argocd
+  # Deleting the root app removes the child apps too.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/MKAbuMattar/express-boilerplate.git
+    targetRevision: main
+    path: deploy/argocd/apps
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -53,30 +53,32 @@ Layered like a Spring Boot application. Every unit is a class.
 
 ```
 src/
-├── main.ts                  Main: HTTPS server, socket limits, transports, graceful shutdown
-├── application.ts           Application: container, middleware, routes, lifecycle
+├── main.ts                  Main: Vault secrets, tracing, HTTPS server, transports, shutdown
+├── application.ts           Application: container, middleware chain, routes, lifecycle
 ├── config/                  AppConfig (env), AppConfiguration (@Bean), BeanFactory, stereotypes,
-│   │                        DatabaseConfig, TlsConfig, ApiVersioning, HttpSemantics,
-│   │                        RateLimiter, ServerHardening, cli.data-source (migrations CLI)
+│   │                        DatabaseConfig, TlsConfig, ServerHardening, VaultSecrets, cli.data-source
 │   ├── cache/               CacheStore, MemoryCacheStore, RedisCacheStore
-│   └── queue/               QueueBroker, MemoryQueueBroker, BullMqQueueBroker
-├── constant/                ApiConstants, SecurityConstants, CacheConstants, QueueConstants, ...
-├── controller/              AuthenticationController (OIDC and SAML login flows)
+│   ├── queue/               QueueBroker, MemoryQueueBroker, BullMqQueueBroker
+│   ├── web/                 ApiVersioning, HttpSemantics, RateLimiter, RequestGuards (middlewares)
+│   ├── observability/       Metrics (Prometheus), Tracing (OpenTelemetry)
+│   └── transport/           WebSocketGateway, TcpServer, UdpServer
+├── constant/                ApiConstants, SecurityConstants, ScopeConstants, ActuatorConstants, ...
+├── controller/              AuthenticationController, ActuatorController + ProbeController,
+│                            WellKnownController (JWKS)
 ├── converter/               UserConverter (entity to v1/v2 DTO, ETag)
-├── enumeration/             AuthStrategy, DatabaseType, CacheType, ExperimentVariant
+├── enumeration/             AuthStrategy, DatabaseType, CacheType, ExperimentVariant, HealthStatus
 ├── exceptions/              AuthException, GlobalExceptionFilter, ProblemDetails (RFC 9457)
-├── migration/               Versioned schema changes, one class each
-├── model/                   UserEntity, AppEvent, DeadLetter
+├── model/                   UserEntity, AppEvent, DeadLetter, Health
 ├── repository/              UserRepository
+│   └── migration/           Versioned schema changes, one class each
 ├── rest/
 │   ├── dto/                 ApiResponse, CreateUserDto; v1/ and v2/ request and response shapes
 │   ├── preconditions.ts     If-Match / If-None-Match
 │   └── resources/v1, v2     REST resources per API version
-├── security/                principal.ts, hmac/ jwt/ mtls/ oauth2/ sso/
-├── service/                 Contracts: UserService, CacheService, ExperimentService, NetworkService;
+├── security/                principal.ts, authorization/ (Scopes), hmac/ jwt/ mtls/ oauth2/ sso/
+├── service/                 Contracts: UserService, CacheService, HealthService, MailService, ...;
 │   │                        EventBus, JobRegistry
-│   └── impl/                Implementations
-├── transport/               WebSocketGateway, TcpServer, UdpServer
+│   └── impl/                Implementations, health indicators
 └── util/                    AppLogger, @Cacheable / @CacheEvict
 ```
 
@@ -201,11 +203,11 @@ Success uses the envelope `{success, message, data}`. Every 4xx and 5xx is [RFC 
 
 ## Database migrations
 
-Schema changes are migration classes in `src/migration`, written with TypeORM's schema builder, so one migration runs on Postgres, MySQL, MariaDB, MSSQL and SQLite alike. They run at startup (`DB_MIGRATIONS_RUN=true`) and are recorded in `schema_migrations`. `synchronize` is off. MongoDB is schemaless and skips them.
+Schema changes are migration classes in `src/repository/migration`, written with TypeORM's schema builder, so one migration runs on Postgres, MySQL, MariaDB, MSSQL and SQLite alike. They run at startup (`DB_MIGRATIONS_RUN=true`) and are recorded in `schema_migrations`. `synchronize` is off. MongoDB is schemaless and skips them.
 
 ```sh
 pnpm migration:show                       # applied and pending
-pnpm migration:create src/migration/AddX  # new file; then add it to DatabaseConfig.migrations
+pnpm migration:create src/repository/migration/AddX  # new file; then add it to DatabaseConfig.migrations
 pnpm migration:run / pnpm migration:revert
 pnpm migration:prod                       # in a built image: node dist/...
 ```

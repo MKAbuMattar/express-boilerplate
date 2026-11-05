@@ -1,0 +1,37 @@
+# Guard rails for every express-boilerplate app: only this repo, only its
+# namespaces, and no cluster-wide objects except the namespaces themselves.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: express-boilerplate
+  namespace: argocd
+  annotations:
+    # Before the applications that use it.
+    argocd.argoproj.io/sync-wave: "-10"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Express Boilerplate API
+  sourceRepos:
+    - https://github.com/MKAbuMattar/express-boilerplate.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: express-boilerplate-*
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceBlacklist:
+    # The chart never needs these; refusing them limits what a bad commit can do.
+    - group: rbac.authorization.k8s.io
+      kind: Role
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+  orphanedResources:
+    warn: true
+  syncWindows:
+    # Production changes only on weekdays, office hours (UTC). Staging any time.
+    - kind: allow
+      schedule: "0 6 * * 1-5"
+      duration: 10h
+      applications: [express-boilerplate-production]
+      manualSync: true

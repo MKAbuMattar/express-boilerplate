@@ -2,15 +2,15 @@ import type {IncomingMessage, Server} from 'node:http';
 import type {Duplex} from 'node:stream';
 import {inject} from 'inversify';
 import {WebSocket, WebSocketServer} from 'ws';
-import {AppConfig} from '../config/app.config.js';
-import {Component} from '../config/stereotypes.js';
-import {SecurityConstants} from '../constant/security.constants.js';
-import {AuthStrategy} from '../enumeration/auth-strategy.enum.js';
-import {TokenProvider} from '../security/jwt/token.provider.js';
-import {Principal} from '../security/principal.js';
-import {SessionService} from '../security/sso/session.service.js';
-import {EventBus} from '../service/event-bus.service.js';
-import {AppLogger} from '../util/app-logger.js';
+import {SecurityConstants} from '../../constant/security.constants.js';
+import {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
+import {TokenProvider} from '../../security/jwt/token.provider.js';
+import {Principal} from '../../security/principal.js';
+import {SessionService} from '../../security/sso/session.service.js';
+import {EventBus} from '../../service/event-bus.service.js';
+import {AppLogger} from '../../util/app-logger.js';
+import {AppConfig} from '../app.config.js';
+import {Component} from '../stereotypes.js';
 import {TransportMessage} from './transport-message.js';
 
 /**

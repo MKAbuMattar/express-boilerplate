@@ -1,8 +1,8 @@
 import {describe, expect, it} from 'vitest';
 import {MemoryQueueBroker} from '../../src/config/queue/memory-queue.broker.js';
+import {TransportMessage} from '../../src/config/transport/transport-message.js';
+import {UdpServer} from '../../src/config/transport/udp.server.js';
 import {PingRequestDto} from '../../src/rest/dto/v1/ping-request.dto.js';
-import {TransportMessage} from '../../src/transport/transport-message.js';
-import {UdpServer} from '../../src/transport/udp.server.js';
 import {UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('TransportMessage', () => {

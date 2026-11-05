@@ -1,10 +1,11 @@
 import {DataSource} from 'typeorm';
 import {CacheType} from '../enumeration/cache-type.enum.js';
-import {Metrics} from '../observability/metrics.js';
 import {CacheService} from '../service/cache.service.js';
 import {ExperimentService} from '../service/experiment.service.js';
+import {HealthService} from '../service/health.service.js';
 import {CacheServiceImpl} from '../service/impl/cache.service.impl.js';
 import {ExperimentServiceImpl} from '../service/impl/experiment.service.impl.js';
+import {HealthServiceImpl} from '../service/impl/health.service.impl.js';
 import {MailServiceImpl} from '../service/impl/mail.service.impl.js';
 import {NetworkServiceImpl} from '../service/impl/network.service.impl.js';
 import {UserServiceImpl} from '../service/impl/user.service.impl.js';
@@ -18,6 +19,7 @@ import {CacheStore} from './cache/cache-store.js';
 import {MemoryCacheStore} from './cache/memory-cache.store.js';
 import {RedisCacheStore} from './cache/redis-cache.store.js';
 import {DatabaseConfig} from './database.config.js';
+import {Metrics} from './observability/metrics.js';
 import {BullMqQueueBroker} from './queue/bullmq-queue.broker.js';
 import {MemoryQueueBroker} from './queue/memory-queue.broker.js';
 import {QueueBroker} from './queue/queue-broker.js';
@@ -75,6 +77,11 @@ export class AppConfiguration {
   @Bean(MailService)
   mailService(beans: BeanFactory): MailService {
     return beans.getBean(MailServiceImpl);
+  }
+
+  @Bean(HealthService)
+  healthService(beans: BeanFactory): HealthService {
+    return beans.getBean(HealthServiceImpl);
   }
 
   @Bean(NetworkService)

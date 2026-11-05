@@ -1,0 +1,51 @@
+# Production: autoscaled, spread across zones, synced by hand in Argo CD.
+image:
+  # Pin an immutable digest for production, never a moving tag.
+  tag: ""
+  digest: ""
+
+config:
+  PUBLIC_URL: https://api.example.com
+  CORS_ORIGINS: https://app.example.com
+
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault
+  remoteKey: express-boilerplate/production
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts: [api.example.com]
+  tls:
+    - secretName: express-boilerplate-production-tls
+      hosts: [api.example.com]
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 384Mi
+  limits:
+    memory: 768Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 65
+
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+priorityClassName: ""
+
+networkPolicy:
+  enabled: true
+
+serviceMonitor:
+  enabled: true

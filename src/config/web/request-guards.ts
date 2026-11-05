@@ -2,9 +2,9 @@ import {createHash, randomUUID} from 'node:crypto';
 import {BlockList, isIPv4, isIPv6} from 'node:net';
 import type {Request, RequestHandler, Response} from 'express';
 import type {Logger} from 'pino';
-import type {AppConfig} from '../config/app.config.js';
-import type {CacheStore} from '../config/cache/cache-store.js';
-import {ProblemDetails} from '../exceptions/problem-details.js';
+import {ProblemDetails} from '../../exceptions/problem-details.js';
+import type {AppConfig} from '../app.config.js';
+import type {CacheStore} from '../cache/cache-store.js';
 
 /**
  * Request-level protections, each a small Express middleware. Application
@@ -18,7 +18,8 @@ export class RequestGuards {
     'QUERY',
   ]);
   /** Probes and scrapes: by IP or container name, not the public host. */
-  private static readonly HEALTH = /^(\/api\/(v\d+\/)?health(\/|$)|\/metrics$)/;
+  private static readonly HEALTH =
+    /^(\/api\/(v\d+\/)?health(\/|$)|\/metrics$|\/livez$|\/readyz$|\/healthz$|\/actuator\/(health|prometheus)(\/|$))/;
   private static readonly REQUEST_ID = /^[A-Za-z0-9._-]{1,128}$/;
 
   /**

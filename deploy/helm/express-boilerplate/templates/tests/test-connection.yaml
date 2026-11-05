@@ -1,0 +1,37 @@
+# helm test: the Service answers /livez. Uses the app image (it has Node and
+# fetch), so no extra image to trust or pin.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "eb.fullname" . }}-test
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+    app.kubernetes.io/component: test
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    {{- include "eb.podSecurityContext" . | nindent 4 }}
+  containers:
+    - name: livez
+      image: {{ include "eb.image" . }}
+      env:
+        {{- if .Values.tls.enabled }}
+        # In-cluster self check only: the service cert is for the public name.
+        - name: NODE_TLS_REJECT_UNAUTHORIZED
+          value: "0"
+        {{- end }}
+      command:
+        - node
+        - -e
+        - >-
+          fetch('{{ include "eb.scheme" . | lower }}://{{ include "eb.fullname" . }}:{{ .Values.service.port }}/livez')
+          .then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))
+      resources:
+        requests: {cpu: 10m, memory: 32Mi}
+        limits: {memory: 128Mi}
+      securityContext:
+        {{- include "eb.containerSecurityContext" . | nindent 8 }}

@@ -196,6 +196,12 @@ export class AppConfig {
         desc: 'Prometheus metrics at GET /metrics',
       }),
       // Read before AppConfig by VaultSecrets and Tracing; listed for docs.
+      HEALTH_SHOW_DETAILS: str({
+        choices: ['never', 'always'],
+        default: 'never',
+        desc: 'Actuator show-details: component details in health responses',
+      }),
+      // Read before AppConfig by VaultSecrets and Tracing; listed for docs.
       VAULT_ADDR: str({
         default: '',
         desc: 'Load secrets from Vault KV v2 at startup',

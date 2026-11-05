@@ -13,14 +13,21 @@ import {AppConfig} from './config/app.config.js';
 import {AppConfiguration} from './config/app.configuration.js';
 import {BeanFactory} from './config/bean-factory.js';
 import {CacheStore} from './config/cache/cache-store.js';
+import {Metrics} from './config/observability/metrics.js';
+import {TcpServer} from './config/transport/tcp.server.js';
+import {UdpServer} from './config/transport/udp.server.js';
+import {WebSocketGateway} from './config/transport/websocket.gateway.js';
+import {ApiVersioning} from './config/web/api-versioning.js';
+import {HttpSemantics} from './config/web/http-semantics.js';
+import {RateLimiter} from './config/web/rate-limiter.js';
+import {RequestGuards} from './config/web/request-guards.js';
+import {
+  ActuatorController,
+  ProbeController,
+} from './controller/actuator.controller.js';
 import {AuthenticationController} from './controller/authentication.controller.js';
 import {WellKnownController} from './controller/well-known.controller.js';
 import {GlobalErrorFilter} from './exceptions/global-exception.filter.js';
-import {ApiVersioning} from './middleware/api-versioning.js';
-import {HttpSemantics} from './middleware/http-semantics.js';
-import {RateLimiter} from './middleware/rate-limiter.js';
-import {RequestGuards} from './middleware/request-guards.js';
-import {Metrics} from './observability/metrics.js';
 import {EventV1Resource} from './rest/resources/v1/event.resource.js';
 import {ExperimentV1Resource} from './rest/resources/v1/experiment.resource.js';
 import {HealthV1Resource} from './rest/resources/v1/health.resource.js';
@@ -30,9 +37,6 @@ import {SecureV1Resource} from './rest/resources/v1/secure.resource.js';
 import {UserV1Resource} from './rest/resources/v1/user.resource.js';
 import {UserV2Resource} from './rest/resources/v2/user.resource.js';
 import {JobRegistry} from './service/job-registry.service.js';
-import {TcpServer} from './transport/tcp.server.js';
-import {UdpServer} from './transport/udp.server.js';
-import {WebSocketGateway} from './transport/websocket.gateway.js';
 import {AppLogger} from './util/app-logger.js';
 
 export class Application {
@@ -47,6 +51,8 @@ export class Application {
     NetworkV1Resource,
     QueueV1Resource,
     WellKnownController,
+    ActuatorController,
+    ProbeController,
   ];
 
   readonly beans: BeanFactory;
@@ -103,11 +109,17 @@ export class Application {
       const metrics = this.beans.getBean(Metrics);
       app.use(metrics.middleware());
       // Same network restriction as the ops routes.
-      app.get(
-        '/metrics',
-        RequestGuards.ipAllowlist(config, /^\/metrics$/),
-        metrics.handler(),
-      );
+      // Also at /actuator/prometheus, Spring's name for it.
+      for (const path of ['/metrics', '/actuator/prometheus']) {
+        app.get(
+          path,
+          RequestGuards.ipAllowlist(
+            config,
+            /^\/(metrics|actuator\/prometheus)$/,
+          ),
+          metrics.handler(),
+        );
+      }
     }
     app.use(RequestGuards.hostValidation(config));
     app.use(RateLimiter.middleware(config, store));
@@ -138,7 +150,10 @@ export class Application {
     app.use(RequestGuards.cacheControl());
     app.use(RequestGuards.deadline(config));
     app.use(
-      RequestGuards.ipAllowlist(config, /^\/api\/v\d+\/(queues|network)(\/|$)/),
+      RequestGuards.ipAllowlist(
+        config,
+        /^(\/api\/v\d+\/(queues|network)(\/|$)|\/actuator\/info$)/,
+      ),
     );
     app.use(RequestGuards.auditLog(logger));
     app.use(RequestGuards.idempotency(config, store));
