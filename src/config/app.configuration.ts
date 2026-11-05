@@ -1,11 +1,14 @@
 import {DataSource} from 'typeorm';
 import {CacheType} from '../enumeration/cache-type.enum.js';
+import {Metrics} from '../observability/metrics.js';
 import {CacheService} from '../service/cache.service.js';
 import {ExperimentService} from '../service/experiment.service.js';
 import {CacheServiceImpl} from '../service/impl/cache.service.impl.js';
 import {ExperimentServiceImpl} from '../service/impl/experiment.service.impl.js';
+import {MailServiceImpl} from '../service/impl/mail.service.impl.js';
 import {NetworkServiceImpl} from '../service/impl/network.service.impl.js';
 import {UserServiceImpl} from '../service/impl/user.service.impl.js';
+import {MailService} from '../service/mail.service.js';
 import {NetworkService} from '../service/network.service.js';
 import {UserService} from '../service/user.service.js';
 import {AppLogger} from '../util/app-logger.js';
@@ -62,6 +65,16 @@ export class AppConfiguration {
   @Bean(ExperimentService)
   experimentService(beans: BeanFactory): ExperimentService {
     return beans.getBean(ExperimentServiceImpl);
+  }
+
+  @Bean(Metrics)
+  metrics(): Metrics {
+    return new Metrics();
+  }
+
+  @Bean(MailService)
+  mailService(beans: BeanFactory): MailService {
+    return beans.getBean(MailServiceImpl);
   }
 
   @Bean(NetworkService)

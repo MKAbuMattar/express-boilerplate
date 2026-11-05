@@ -47,3 +47,5 @@ minimumReleaseAgeExclude:
   - "bullmq@6.7.0"
   - "inversify@8.2.4"
   - "rimraf@6.1.4"
+# Pin exact versions on `pnpm add` (pnpm 12 reads this here, not from .npmrc).
+saveExact: true

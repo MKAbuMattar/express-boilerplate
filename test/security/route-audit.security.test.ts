@@ -20,6 +20,7 @@ const PUBLIC_ROUTES = new Set([
   'GET /api/v1/experiments/:name',
   'GET /api/v1/events',
   'GET /.well-known/jwks.json',
+  'GET /metrics', // limited to OPS_ALLOWED_CIDRS; loopback is allowed here
   // Login flows must be reachable before login.
   'GET /auth/oidc/login',
   'GET /auth/oidc/callback',

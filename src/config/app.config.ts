@@ -186,6 +186,28 @@ export class AppConfig {
       HTTP_REQUEST_TIMEOUT_MS: num({default: 30_000}),
       HTTP_KEEP_ALIVE_TIMEOUT_MS: num({default: 5_000}),
 
+      SMTP_URL: str({
+        default: '',
+        desc: 'smtp://host:port or smtps://; empty logs instead of sending',
+      }),
+      MAIL_FROM: str({default: 'Express Boilerplate <no-reply@example.com>'}),
+      METRICS_ENABLED: bool({
+        default: true,
+        desc: 'Prometheus metrics at GET /metrics',
+      }),
+      // Read before AppConfig by VaultSecrets and Tracing; listed for docs.
+      VAULT_ADDR: str({
+        default: '',
+        desc: 'Load secrets from Vault KV v2 at startup',
+      }),
+      VAULT_TOKEN: str({default: ''}),
+      VAULT_ROLE_ID: str({default: ''}),
+      VAULT_SECRET_ID: str({default: ''}),
+      VAULT_KV_MOUNT: str({default: 'secret'}),
+      VAULT_SECRET_PATH: str({default: 'express-boilerplate'}),
+      OTEL_EXPORTER_OTLP_ENDPOINT: str({default: '', desc: 'Turns tracing on'}),
+      OTEL_SERVICE_NAME: str({default: 'express-boilerplate'}),
+
       EXPERIMENTS: str({
         default: 'new-checkout:50',
         desc: 'A/B experiments as name:percentInA,name:percentInA',

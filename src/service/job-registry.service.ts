@@ -1,9 +1,12 @@
+import {isHttpResponse} from '@inversifyjs/http-core';
 import {inject} from 'inversify';
 import {QueueBroker} from '../config/queue/queue-broker.js';
 import {Service} from '../config/stereotypes.js';
 import {QueueConstants} from '../constant/queue.constants.js';
 import {AppLogger} from '../util/app-logger.js';
 import {EventBus} from './event-bus.service.js';
+import {MailMessage, MailService} from './mail.service.js';
+import {UserService} from './user.service.js';
 
 /**
  * Wires queues to their handlers and to the events that feed them.
@@ -17,13 +20,30 @@ export class JobRegistry {
     @inject(QueueBroker) private readonly broker: QueueBroker,
     @inject(EventBus) private readonly eventBus: EventBus,
     @inject(AppLogger) private readonly appLogger: AppLogger,
+    @inject(UserService) private readonly userService: UserService,
+    @inject(MailService) private readonly mailService: MailService,
   ) {}
 
   async start(): Promise<void> {
     const {logger} = this.appLogger;
 
+    // The queue carries only the user id; the address is read at send time.
+    // A failed send throws, so the job is retried and then dead-lettered.
     this.broker.process(QueueConstants.WELCOME_EMAIL, async (payload) => {
-      // Replace with your mailer. Throwing here retries, then dead-letters.
+      let user: {name: string; email: string};
+      try {
+        user = await this.userService.findById(String(payload.userId));
+      } catch (error) {
+        if (isHttpResponse(error) && error.statusCode === 404) return; // deleted since
+        throw error;
+      }
+      await this.mailService.send(
+        new MailMessage(
+          user.email,
+          'Welcome',
+          `Hi ${user.name}, your account is ready.`,
+        ),
+      );
       logger.info({userId: payload.userId}, 'Welcome email sent');
     });
 

@@ -17,7 +17,8 @@ export class RequestGuards {
     'OPTIONS',
     'QUERY',
   ]);
-  private static readonly HEALTH = /^\/api\/(v\d+\/)?health(\/|$)/;
+  /** Probes and scrapes: by IP or container name, not the public host. */
+  private static readonly HEALTH = /^(\/api\/(v\d+\/)?health(\/|$)|\/metrics$)/;
   private static readonly REQUEST_ID = /^[A-Za-z0-9._-]{1,128}$/;
 
   /**

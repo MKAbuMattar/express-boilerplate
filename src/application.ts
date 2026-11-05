@@ -20,6 +20,7 @@ import {ApiVersioning} from './middleware/api-versioning.js';
 import {HttpSemantics} from './middleware/http-semantics.js';
 import {RateLimiter} from './middleware/rate-limiter.js';
 import {RequestGuards} from './middleware/request-guards.js';
+import {Metrics} from './observability/metrics.js';
 import {EventV1Resource} from './rest/resources/v1/event.resource.js';
 import {ExperimentV1Resource} from './rest/resources/v1/experiment.resource.js';
 import {HealthV1Resource} from './rest/resources/v1/health.resource.js';
@@ -98,6 +99,16 @@ export class Application {
           String(response.getHeader('X-Request-Id')),
       }),
     );
+    if (config.env.METRICS_ENABLED) {
+      const metrics = this.beans.getBean(Metrics);
+      app.use(metrics.middleware());
+      // Same network restriction as the ops routes.
+      app.get(
+        '/metrics',
+        RequestGuards.ipAllowlist(config, /^\/metrics$/),
+        metrics.handler(),
+      );
+    }
     app.use(RequestGuards.hostValidation(config));
     app.use(RateLimiter.middleware(config, store));
     app.use(HttpSemantics.options(() => built));
