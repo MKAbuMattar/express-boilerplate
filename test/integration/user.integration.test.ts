@@ -1,9 +1,9 @@
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
-import type {Application} from '../src/application.js';
-import {TokenProvider} from '../src/security/jwt/token.provider.js';
-import {TestApp} from './test-app.js';
+import type {Application} from '../../src/application.js';
+import {TokenProvider} from '../../src/security/jwt/token.provider.js';
+import {TestApp} from '../support/test-app.js';
 
 describe('UserResource', () => {
   let application: Application;

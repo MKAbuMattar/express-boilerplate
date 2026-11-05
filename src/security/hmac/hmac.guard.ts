@@ -1,4 +1,5 @@
 import {createHmac, timingSafeEqual} from 'node:crypto';
+import {ServiceUnavailableHttpResponse} from '@inversifyjs/http-core';
 import type {ExpressGuard} from '@inversifyjs/http-express';
 import type {Request} from 'express';
 import {inject} from 'inversify';
@@ -8,6 +9,7 @@ import {CacheConstants} from '../../constant/cache.constants.js';
 import {SecurityConstants} from '../../constant/security.constants.js';
 import {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
 import {AuthException} from '../../exceptions/auth.exception.js';
+import {ApiResponse} from '../../rest/dto/api-response.dto.js';
 import {CacheService} from '../../service/cache.service.js';
 import {Principal} from '../principal.js';
 
@@ -82,7 +84,16 @@ export class HmacGuard implements ExpressGuard {
     // A timestamp is valid for skew on either side, so remember it for both.
     const windowSeconds = (SecurityConstants.HMAC_MAX_CLOCK_SKEW_MS * 2) / 1000;
     const nonceKey = `${CacheConstants.HMAC_NONCE_PREFIX}${signature}`;
-    if (!(await this.cache.setIfAbsent(nonceKey, windowSeconds))) {
+    let firstUse: boolean;
+    try {
+      firstUse = await this.cache.setIfAbsent(nonceKey, windowSeconds);
+    } catch {
+      // Fail closed: without the replay check a captured request could repeat.
+      throw new ServiceUnavailableHttpResponse(
+        ApiResponse.fail('Replay protection unavailable, retry later'),
+      );
+    }
+    if (!firstUse) {
       throw AuthException.unauthorized(
         AuthStrategy.Hmac,
         'signature already used',

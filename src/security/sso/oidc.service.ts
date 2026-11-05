@@ -1,3 +1,4 @@
+import {ServiceUnavailableHttpResponse} from '@inversifyjs/http-core';
 import {inject} from 'inversify';
 import {
   authorizationCodeGrant,
@@ -14,6 +15,7 @@ import {ApiConstants} from '../../constant/api.constants.js';
 import {SecurityConstants} from '../../constant/security.constants.js';
 import {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
 import {AuthException} from '../../exceptions/auth.exception.js';
+import {ApiResponse} from '../../rest/dto/api-response.dto.js';
 import {Principal} from '../principal.js';
 
 export class OidcLoginState {
@@ -87,9 +89,11 @@ export class OidcService {
       new URL(OIDC_ISSUER),
       OIDC_CLIENT_ID,
       OIDC_CLIENT_SECRET,
-    ).catch((error: unknown) => {
+    ).catch(() => {
       this.configuration = undefined; // retry discovery on the next login
-      throw error;
+      throw new ServiceUnavailableHttpResponse(
+        ApiResponse.fail('Identity provider unavailable, retry later'),
+      );
     });
     return this.configuration;
   }

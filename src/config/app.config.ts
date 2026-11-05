@@ -10,10 +10,26 @@ export class AppConfig {
   readonly env: Env;
   readonly hmacClients: ReadonlyMap<string, string>;
   readonly corsOrigins: string[];
+  readonly experiments: ReadonlyMap<string, number>;
 
   constructor(source: NodeJS.ProcessEnv = process.env) {
     this.env = AppConfig.read(source);
     this.corsOrigins = AppConfig.list(this.env.CORS_ORIGINS);
+    this.experiments = new Map(
+      AppConfig.list(this.env.EXPERIMENTS).map((pair) => {
+        const [name = '', percent = ''] = pair.split(':');
+        const percentA = percent.trim() === '' ? Number.NaN : Number(percent);
+        if (
+          !name ||
+          !Number.isInteger(percentA) ||
+          percentA < 0 ||
+          percentA > 100
+        ) {
+          throw new Error(`EXPERIMENTS: "${pair}" must be name:0..100`);
+        }
+        return [name, percentA] as const;
+      }),
+    );
     this.hmacClients = new Map(
       AppConfig.list(this.env.HMAC_CLIENTS).map((pair) => {
         const index = pair.indexOf(':');
@@ -86,6 +102,15 @@ export class AppConfig {
       }),
       CACHE_TTL_SECONDS: num({default: 60}),
       CACHE_PREFIX: str({default: 'app:'}),
+      CACHE_TIMEOUT_MS: num({
+        default: 200,
+        desc: 'Cache calls slower than this count as a miss',
+      }),
+
+      EXPERIMENTS: str({
+        default: 'new-checkout:50',
+        desc: 'A/B experiments as name:percentInA,name:percentInA',
+      }),
 
       SESSION_SECRET: AppConfig.secret({
         devDefault: 'dev-only-session-secret-0123456789abcdef',

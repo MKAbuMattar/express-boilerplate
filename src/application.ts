@@ -16,6 +16,7 @@ import {CacheStore} from './config/cache/cache-store.js';
 import {AuthenticationController} from './controller/authentication.controller.js';
 import {GlobalErrorFilter} from './exceptions/global-exception.filter.js';
 import {ApiResponse} from './rest/dto/api-response.dto.js';
+import {ExperimentResource} from './rest/resources/experiment.resource.js';
 import {HealthResource} from './rest/resources/health.resource.js';
 import {SecureResource} from './rest/resources/secure.resource.js';
 import {UserResource} from './rest/resources/user.resource.js';
@@ -27,6 +28,7 @@ export class Application {
     UserResource,
     AuthenticationController,
     SecureResource,
+    ExperimentResource,
   ];
 
   readonly beans: BeanFactory;
@@ -88,6 +90,25 @@ export class Application {
     built.use((_request: express.Request, response: express.Response) => {
       response.status(404).json(ApiResponse.fail('Not Found'));
     });
+    // Errors thrown before a controller runs (malformed JSON, body too large)
+    // never reach GlobalErrorFilter; answer them in JSON too.
+    built.use(
+      (
+        error: {status?: number; statusCode?: number},
+        _request: express.Request,
+        response: express.Response,
+        _next: express.NextFunction,
+      ) => {
+        const status = error.status ?? error.statusCode ?? 500;
+        response
+          .status(status)
+          .json(
+            ApiResponse.fail(
+              status < 500 ? 'Invalid request' : 'Internal Server Error',
+            ),
+          );
+      },
+    );
     return built;
   }
 

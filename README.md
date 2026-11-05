@@ -37,7 +37,9 @@ Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/d
 | `pnpm dev` | Watch mode with tsx |
 | `pnpm build` | Compile with TypeScript 7 to `dist/` |
 | `pnpm start` | Run `dist/main.js` |
-| `pnpm test` / `pnpm test:cov` | Vitest |
+| `pnpm test` | Every test type (see Testing) |
+| `pnpm test:<type>` | One type: `unit`, `integration`, `containers`, `e2e`, `monkey`, `chaos` |
+| `pnpm test:cov` | Coverage for unit and integration |
 | `pnpm lint` / `pnpm lint:fix` | Biome |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm certs [dir] [--force]` | Generate local TLS and mTLS certs |
@@ -144,6 +146,35 @@ delete(id: string): Promise<void> { ... }
 ```
 
 `@Cacheable` returns the cached value, or runs the method and stores the result for `CACHE_TTL_SECONDS`. `@CacheEvict` runs the method, then deletes the listed keys. Values round-trip through JSON, so the converters accept dates as either `Date` or ISO strings. The HMAC guard also uses the cache to reject replayed signatures, so run Redis when you have more than one instance.
+
+## A/B experiments
+
+Configure experiments as `name:percentInA` pairs:
+
+```sh
+EXPERIMENTS=new-checkout:50,new-search:10
+```
+
+`GET /api/experiments/{name}` returns `{experiment, variant}` and an `X-Experiment-Variant` header. Signed-in (SSO) users are bucketed by their subject, so they keep their variant across devices. Visitors get a signed `ab_id` cookie. Bucketing hashes `experiment:subject` into 0..99, so it needs no storage, every instance agrees, and each experiment splits users independently. In code, inject `ExperimentService` and call `assign(name, subjectId)`.
+
+## Testing
+
+Vitest runs one project per test type. `pnpm test` runs them all.
+
+| Type | Folder | What it proves |
+|---|---|---|
+| `unit` | `test/unit/` | One class at a time with fakes: guards, DTO validation, converter, cache, decorators, `BeanFactory`, config, A/B bucketing |
+| `integration` | `test/integration/` | The whole app in-process through HTTP, on sql.js and the memory cache |
+| `containers` | `test/containers/` | The same flows on real Postgres, MySQL, MariaDB, MongoDB, Redis and Valkey via Testcontainers. Skipped when Docker is not running. |
+| `e2e` | `test/e2e/` | The real server process over HTTPS with a mock OIDC/OAuth2 provider: every endpoint and auth strategy, including the full OIDC login |
+| `monkey` | `test/monkey/` | 1500 random methods, paths, headers and bodies (fast-check). No unexpected 5xx, always JSON, still healthy afterwards. |
+| `chaos` | `test/chaos/` | Dependencies fail on purpose: database down (503, then recovers), cache down or hanging (requests still succeed), cache down for HMAC (503, fails closed), IdP down (503), JWKS down (401), a flaky repository, 300 concurrent requests |
+
+What the chaos tests pin down:
+
+- **Cache reads and writes fail open.** A cache error or a call slower than `CACHE_TIMEOUT_MS` (default 200) counts as a miss.
+- **The HMAC replay check fails closed** with 503, so a cache outage never lets a replayed request through.
+- **An unreachable database answers 503**, not 500, so load balancers and clients retry.
 
 ## Docker
 

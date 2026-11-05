@@ -2,9 +2,9 @@ import {mkdtempSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import type express from 'express';
-import {LocalCertificateGenerator} from '../scripts/generate-certs.js';
-import {Application} from '../src/application.js';
-import {AppConfig} from '../src/config/app.config.js';
+import {LocalCertificateGenerator} from '../../scripts/generate-certs.js';
+import {Application} from '../../src/application.js';
+import {AppConfig} from '../../src/config/app.config.js';
 
 export class TestApp {
   static readonly JWT_SECRET = 'test-jwt-secret-0123456789abcdef0123';

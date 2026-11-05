@@ -1,3 +1,7 @@
 allowBuilds:
   "@scarf/scarf": false
   esbuild: true
+  # testcontainers deps: optional native addons and a version banner; not needed
+  cpu-features: false
+  protobufjs: false
+  ssh2: false

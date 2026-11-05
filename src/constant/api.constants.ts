@@ -11,6 +11,7 @@ export class ApiConstants {
   static readonly API_HEALTH = '/api/health';
   static readonly API_USERS = '/api/users';
   static readonly API_SECURE = '/api/secure';
+  static readonly API_EXPERIMENTS = '/api/experiments';
 
   static readonly DOCS = '/docs';
 }

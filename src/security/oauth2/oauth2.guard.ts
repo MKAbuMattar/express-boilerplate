@@ -24,7 +24,9 @@ export class OAuth2Guard implements ExpressGuard {
       throw AuthException.notConfigured(AuthStrategy.OAuth2);
     }
     const token = AuthException.bearerToken(request, AuthStrategy.OAuth2);
-    this.jwks ??= createRemoteJWKSet(new URL(OAUTH2_JWKS_URI));
+    this.jwks ??= createRemoteJWKSet(new URL(OAUTH2_JWKS_URI), {
+      timeoutDuration: 3000,
+    });
     try {
       const {payload} = await jwtVerify(token, this.jwks, {
         issuer: OAUTH2_ISSUER,
