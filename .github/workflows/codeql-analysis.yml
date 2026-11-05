@@ -3,6 +3,10 @@ name: CodeQL Analysis
 on:
   schedule:
     - cron: "0 0 * * *"
+  # Pull requests too: main has results from this workflow, so a PR without
+  # them fails code scanning with "configuration not found".
+  pull_request:
+    branches: [main]
 
 permissions: write-all
 

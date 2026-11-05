@@ -85,14 +85,10 @@ export class Application {
     app.set('trust proxy', config.trustProxy);
     // Flat query strings only: no nested objects, so no qs prototype tricks.
     app.set('query parser', 'simple');
-    // Development: Swagger UI needs inline scripts, and HSTS on localhost
-    // makes browsers refuse to click through an untrusted local CA.
-    app.use(
-      helmet({
-        contentSecurityPolicy: config.isDevelopment ? false : {},
-        strictTransportSecurity: !config.isDevelopment,
-      }),
-    );
+    // The default CSP everywhere: Swagger UI loads its scripts from /docs, so
+    // it needs nothing looser. No HSTS in development: on localhost it makes
+    // browsers refuse to click through an untrusted local CA.
+    app.use(helmet({strictTransportSecurity: !config.isDevelopment}));
     app.use(
       compression({
         // Compression buffers output, which would hold back SSE events.

@@ -33,8 +33,11 @@ export class TlsConfig {
       ALPNProtocols: config.env.TCP_ENABLED
         ? ['http/1.1', TlsConfig.LINE_PROTOCOL]
         : ['http/1.1'],
-      // Ask every client for a cert but let the handshake pass without one,
-      // so only routes behind MtlsGuard require it.
+      // Optional mTLS: ask every client for a cert, but let the handshake pass
+      // without one so browsers and token clients still connect. A presented
+      // cert is still verified against TLS_CA_FILE; socket.authorized is true
+      // only when it chains, and MtlsGuard refuses the route otherwise. This
+      // is not disabled certificate validation (CodeQL flags it anyway).
       requestCert: true,
       rejectUnauthorized: false,
     };

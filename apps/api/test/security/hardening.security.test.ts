@@ -206,5 +206,26 @@ describe('Security: runtime hardening', () => {
         await application.close();
       }
     });
+
+    it('development keeps the CSP, and Swagger UI works under it', async () => {
+      const {application, app} = await TestApp.create({
+        NODE_ENV: 'development',
+      });
+      try {
+        const docs = await request(app).get('/docs/');
+        expect(docs.status).toBe(200);
+        expect(docs.headers['content-security-policy']).toMatch(
+          /default-src 'self'.*script-src 'self'/,
+        );
+        // script-src 'self' allows only same-origin files: no inline code.
+        const scripts = [...docs.text.matchAll(/<script([^>]*)>/g)];
+        expect(scripts.length).toBeGreaterThan(0);
+        for (const [, attributes] of scripts) {
+          expect(attributes).toMatch(/src="\/docs\//);
+        }
+      } finally {
+        await application.close();
+      }
+    });
   });
 });
