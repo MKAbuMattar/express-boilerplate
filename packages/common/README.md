@@ -4,18 +4,18 @@ Shared infrastructure that every package uses: configuration, dependency injecti
 
 ## Contents
 
-| Folder | What |
-|---|---|
-| `config/` | `AppConfig` (validated environment, including the encrypted-transit check), `BeanFactory` with `@Configuration` and `@Bean`, stereotypes (`@Component`, `@Service`, `@Repository`), `TlsConfig`, `ServerHardening`, `VaultSecrets`, `CommonConfiguration` |
-| `config/cache/` | `CacheStore`: in-memory, or Redis/Valkey/ElastiCache over `rediss://` |
-| `config/queue/` | `QueueBroker`: in-memory, or BullMQ with retries and a dead-letter queue |
-| `config/observability/` | Prometheus `Metrics`, OpenTelemetry `Tracing` |
-| `security/` | `Principal`, `Scopes`, and the guards: mTLS, HMAC, JWT (`TokenProvider` with key rotation and revocation), OAuth2, SSO (OIDC with PKCE, SAML, sessions) |
-| `exceptions/` | `AuthException`, `ProblemDetails` (RFC 9457) |
-| `rest/dto/` | `ApiResponse`, the response envelope |
-| `service/` | `CacheService` and its implementation |
-| `constant/`, `enumeration/` | Route paths, scopes, security limits; auth strategy, database and cache types, health status |
-| `util/` | `AppLogger` (pino), `@Cacheable` and `@CacheEvict` |
+| Folder                      | What                                                                                                                                                                                                                                                      |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config/`                   | `AppConfig` (validated environment, including the encrypted-transit check), `BeanFactory` with `@Configuration` and `@Bean`, stereotypes (`@Component`, `@Service`, `@Repository`), `TlsConfig`, `ServerHardening`, `VaultSecrets`, `CommonConfiguration` |
+| `config/cache/`             | `CacheStore`: in-memory, or Redis/Valkey/ElastiCache over `rediss://`                                                                                                                                                                                     |
+| `config/queue/`             | `QueueBroker`: in-memory, or BullMQ with retries and a dead-letter queue                                                                                                                                                                                  |
+| `config/observability/`     | Prometheus `Metrics`, OpenTelemetry `Tracing`                                                                                                                                                                                                             |
+| `security/`                 | `Principal`, `Scopes`, and the guards: mTLS, HMAC, JWT (`TokenProvider` with key rotation and revocation), OAuth2, SSO (OIDC with PKCE, SAML, sessions)                                                                                                   |
+| `exceptions/`               | `AuthException`, `ProblemDetails` (RFC 9457)                                                                                                                                                                                                              |
+| `rest/dto/`                 | `ApiResponse`, the response envelope                                                                                                                                                                                                                      |
+| `service/`                  | `CacheService` and its implementation                                                                                                                                                                                                                     |
+| `constant/`, `enumeration/` | Route paths, scopes, security limits; auth strategy, database and cache types, health status                                                                                                                                                              |
+| `util/`                     | `AppLogger` (pino), `@Cacheable` and `@CacheEvict`                                                                                                                                                                                                        |
 
 ## Configuration
 

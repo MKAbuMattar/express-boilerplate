@@ -6,13 +6,13 @@ Depends on `@express-boilerplate/persistence` and `@express-boilerplate/common`.
 
 ## Contents
 
-| Contract | Implementation | What it does |
-|---|---|---|
-| `UserService` | `UserServiceImpl` | Create, read, update, delete and page users; publishes `user.*` events |
-| `HealthService` | `HealthServiceImpl` | Liveness and readiness groups, one `HealthIndicator` per dependency, each with a timeout |
-| `MailService` | `MailServiceImpl` | Sends mail over SMTP, or logs it when `SMTP_URL` is empty |
-| `NetworkService` | `NetworkServiceImpl` | ICMP ping with strict host validation and no shell |
-| `ExperimentService` | `ExperimentServiceImpl` | Stable A/B variant per user from `EXPERIMENTS` |
+| Contract            | Implementation          | What it does                                                                             |
+| ------------------- | ----------------------- | ---------------------------------------------------------------------------------------- |
+| `UserService`       | `UserServiceImpl`       | Create, read, update, delete and page users; publishes `user.*` events                   |
+| `HealthService`     | `HealthServiceImpl`     | Liveness and readiness groups, one `HealthIndicator` per dependency, each with a timeout |
+| `MailService`       | `MailServiceImpl`       | Sends mail over SMTP, or logs it when `SMTP_URL` is empty                                |
+| `NetworkService`    | `NetworkServiceImpl`    | ICMP ping with strict host validation and no shell                                       |
+| `ExperimentService` | `ExperimentServiceImpl` | Stable A/B variant per user from `EXPERIMENTS`                                           |
 
 Also here:
 

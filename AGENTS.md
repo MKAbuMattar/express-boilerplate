@@ -24,12 +24,12 @@ A change is done when `pnpm lint`, `pnpm typecheck` and `pnpm test` pass. Contai
 
 ## Layout and layers
 
-| Package | Holds | May import |
-|---|---|---|
-| `apps/api` | Controllers, REST resources, request DTOs, middleware, transports, composition root | service, common |
-| `packages/service` | Service contracts and implementations | persistence, common |
-| `packages/persistence` | Entities, repositories, migrations, DataSource | common |
-| `packages/common` | Config, DI, security, errors, cache, queues, observability | nothing in the workspace |
+| Package                | Holds                                                                               | May import               |
+| ---------------------- | ----------------------------------------------------------------------------------- | ------------------------ |
+| `apps/api`             | Controllers, REST resources, request DTOs, middleware, transports, composition root | service, common          |
+| `packages/service`     | Service contracts and implementations                                               | persistence, common      |
+| `packages/persistence` | Entities, repositories, migrations, DataSource                                      | common                   |
+| `packages/common`      | Config, DI, security, errors, cache, queues, observability                          | nothing in the workspace |
 
 - Never import upward. pnpm and the package dependencies enforce it; do not add a workspace dependency to get around it.
 - `apps/api` must not import `@express-boilerplate/persistence`, except entity types in converters and `application.ts`. A Biome rule fails otherwise.

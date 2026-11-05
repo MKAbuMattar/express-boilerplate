@@ -8,18 +8,18 @@ Depends on `@express-boilerplate/service` and `@express-boilerplate/common`. Con
 
 Everything runs on one TLS listener, port 443. There is no plaintext port.
 
-| Path | What |
-|---|---|
-| `/api/v1/users`, `/api/v2/users` | Users CRUD. v2 adds paging, PATCH, ETags and `QUERY /api/v2/users/search` |
-| `/api/v1/health`, `/actuator/health`, `/livez`, `/readyz`, `/healthz` | Health for load balancers and Kubernetes probes |
-| `/metrics` | Prometheus metrics, ops networks only |
-| `/auth/*` | OIDC and SAML login, `/auth/me`, logout, token revoke |
-| `/.well-known/jwks.json` | Public keys for ES256 tokens |
-| `/api/v1/secure/*` | One demo route per auth guard: mTLS, HMAC, JWT, OAuth2, SSO |
-| `/api/v1/events` | Server-sent events |
-| `/ws` | WebSocket (`wss://`) |
-| TLS with ALPN `ndjson/1` | Newline-delimited JSON over TCP, when `TCP_ENABLED=true` |
-| `/docs` | Swagger UI, development only |
+| Path                                                                  | What                                                                      |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `/api/v1/users`, `/api/v2/users`                                      | Users CRUD. v2 adds paging, PATCH, ETags and `QUERY /api/v2/users/search` |
+| `/api/v1/health`, `/actuator/health`, `/livez`, `/readyz`, `/healthz` | Health for load balancers and Kubernetes probes                           |
+| `/metrics`                                                            | Prometheus metrics, ops networks only                                     |
+| `/auth/*`                                                             | OIDC and SAML login, `/auth/me`, logout, token revoke                     |
+| `/.well-known/jwks.json`                                              | Public keys for ES256 tokens                                              |
+| `/api/v1/secure/*`                                                    | One demo route per auth guard: mTLS, HMAC, JWT, OAuth2, SSO               |
+| `/api/v1/events`                                                      | Server-sent events                                                        |
+| `/ws`                                                                 | WebSocket (`wss://`)                                                      |
+| TLS with ALPN `ndjson/1`                                              | Newline-delimited JSON over TCP, when `TCP_ENABLED=true`                  |
+| `/docs`                                                               | Swagger UI, development only                                              |
 
 ## Layout
 
@@ -42,12 +42,12 @@ test/                        unit, integration, e2e, security, monkey, chaos, co
 
 Run from the repo root (`pnpm dev`) or here with `pnpm --filter @express-boilerplate/api <script>`.
 
-| Script | What |
-|---|---|
-| `dev` | Restarts on changes here or in a rebuilt package |
-| `build`, `start` | Compile to `dist/`, run it |
-| `certs` | Local CA, server cert and mTLS client certs in `certs/` |
-| `jwt`, `jwt:keygen` | Dev token; ES256 key pair |
+| Script                | What                                                                         |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `dev`                 | Restarts on changes here or in a rebuilt package                             |
+| `build`, `start`      | Compile to `dist/`, run it                                                   |
+| `certs`               | Local CA, server cert and mTLS client certs in `certs/`                      |
+| `jwt`, `jwt:keygen`   | Dev token; ES256 key pair                                                    |
 | `test`, `test:<type>` | Vitest projects: unit, integration, e2e, security, monkey, chaos, containers |
 
 The tests live here because they exercise the assembled app. They start a real TLS server, so HTTPS, WSS and TCP are all tested on the production code path.

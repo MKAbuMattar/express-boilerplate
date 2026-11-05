@@ -43,7 +43,13 @@ jobs:
         uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
           languages: ${{ matrix.language }}
-          source-root: src
+          # The app and the layer packages; tests and build output are left out.
+          config: |
+            paths:
+              - apps/api/src
+              - packages
+            paths-ignore:
+              - "**/dist"
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3

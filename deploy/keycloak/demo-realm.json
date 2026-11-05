@@ -9,23 +9,32 @@
     {
       "name": "users:write",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "false"}
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
     },
     {
       "name": "ops:queues",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "false"}
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
     },
     {
       "name": "ops:network",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "false"}
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "false"
+      }
     },
     {
       "name": "api-audience",
       "description": "Puts the API in aud, so OAUTH2_AUDIENCE matches",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "false"},
+      "attributes": { "include.in.token.scope": "false" },
       "protocolMappers": [
         {
           "name": "api audience",
@@ -49,9 +58,12 @@
       "secret": "dev-oidc-secret-change-me",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
-      "redirectUris": ["https://localhost/auth/oidc/callback", "https://localhost:8443/auth/oidc/callback"],
+      "redirectUris": [
+        "https://localhost/auth/oidc/callback",
+        "https://localhost:8443/auth/oidc/callback"
+      ],
       "webOrigins": ["https://localhost"],
-      "attributes": {"pkce.code.challenge.method": "S256"},
+      "attributes": { "pkce.code.challenge.method": "S256" },
       "defaultClientScopes": ["profile", "email"]
     },
     {
@@ -74,7 +86,9 @@
       "lastName": "Demo",
       "enabled": true,
       "emailVerified": true,
-      "credentials": [{"type": "password", "value": "alice", "temporary": false}]
+      "credentials": [
+        { "type": "password", "value": "alice", "temporary": false }
+      ]
     },
     {
       "username": "service-account-api-client",

@@ -6,7 +6,12 @@
       "!**/dist/**/*",
       "!**/node_modules/**/*",
       "!**/coverage/**/*",
-      "!**/CHANGELOG.md"
+      "!**/CHANGELOG.md",
+      "!**/.turbo/**/*",
+      // Agent skill front matter must stay byte-exact; the formatter breaks it.
+      "!**/SKILL.md",
+      // Helm templates are Go templates, not YAML; helm lint checks them.
+      "!deploy/helm/**/templates/**/*"
     ],
     "ignoreUnknown": true
   },

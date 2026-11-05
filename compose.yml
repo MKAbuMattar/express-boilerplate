@@ -21,7 +21,7 @@
 #   CACHE_URL=redis://valkey:6379                                   + --profile valkey
 services:
   certs:
-    build: {context: ., target: certs}
+    build: { context: ., target: certs }
     volumes:
       - ./certs:/certs
 
@@ -42,10 +42,10 @@ services:
     cap_add: [NET_BIND_SERVICE]
     security_opt: ["no-new-privileges:true"]
     depends_on:
-      app: {condition: service_started}
+      app: { condition: service_started }
 
   app:
-    build: {context: ., target: runtime}
+    build: { context: ., target: runtime }
     container_name: express-boilerplate
     restart: unless-stopped
     env_file:
@@ -78,15 +78,15 @@ services:
     security_opt: ["no-new-privileges:true"]
     pids_limit: 256
     depends_on:
-      certs: {condition: service_completed_successfully}
-      postgres: {condition: service_healthy, required: false}
-      redis: {condition: service_healthy, required: false}
-      mysql: {condition: service_healthy, required: false}
-      mariadb: {condition: service_healthy, required: false}
-      mongodb: {condition: service_healthy, required: false}
-      valkey: {condition: service_healthy, required: false}
-      vault-seed: {condition: service_completed_successfully, required: false}
-      keycloak: {condition: service_healthy, required: false}
+      certs: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy, required: false }
+      redis: { condition: service_healthy, required: false }
+      mysql: { condition: service_healthy, required: false }
+      mariadb: { condition: service_healthy, required: false }
+      mongodb: { condition: service_healthy, required: false }
+      valkey: { condition: service_healthy, required: false }
+      vault-seed: { condition: service_completed_successfully, required: false }
+      keycloak: { condition: service_healthy, required: false }
 
   postgres:
     image: postgres:18-alpine@sha256:eaef288f54a90a909e49f0121d5d047a5e974e922699de4249625cf7cde34f36
@@ -188,7 +188,7 @@ services:
       interval: 5s
       retries: 60
     depends_on:
-      certs: {condition: service_completed_successfully}
+      certs: { condition: service_completed_successfully }
 
   # --- API gateway ---------------------------------------------------------
   apisix:
@@ -199,7 +199,7 @@ services:
       - ./deploy/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./deploy/apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
     depends_on:
-      app: {condition: service_started}
+      app: { condition: service_started }
 
   # --- Secrets ---------------------------------------------------------------
   vault:
@@ -232,7 +232,7 @@ services:
         JWT_SECRET="$$(head -c 32 /dev/urandom | base64)"
         HMAC_CLIENTS="partner-a:$$(head -c 24 /dev/urandom | base64)"
     depends_on:
-      vault: {condition: service_healthy}
+      vault: { condition: service_healthy }
 
   # --- Observability -------------------------------------------------------
   prometheus:

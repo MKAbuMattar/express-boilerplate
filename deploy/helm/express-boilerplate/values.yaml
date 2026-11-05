@@ -57,8 +57,8 @@ migrations:
   backoffLimit: 1
   activeDeadlineSeconds: 600
   resources:
-    requests: {cpu: 50m, memory: 128Mi}
-    limits: {memory: 256Mi}
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 256Mi }
 
 # TLS is not optional: the pod serves HTTPS on 443 only, and the ingress or
 # gateway re-encrypts to it. Encrypted in transit on every hop.

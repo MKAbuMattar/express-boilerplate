@@ -32,31 +32,31 @@ pnpm dev            # https://localhost/docs
 
 Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/docs` runs only when `NODE_ENV=development`.
 
-| Script | What it does |
-|---|---|
-| `pnpm dev` | Watch mode with tsx |
-| `pnpm build` | Compile with TypeScript 7 to `dist/` |
-| `pnpm start` | Run `dist/main.js` |
-| `pnpm test` | Every test type (see Testing) |
-| `pnpm test:<type>` | One type: `unit`, `integration`, `containers`, `e2e`, `security`, `monkey`, `chaos` |
-| `pnpm migration:show` / `:run` / `:revert` / `:create` | Database migrations |
-| `pnpm test:cov` | Coverage for unit and integration |
-| `pnpm lint` / `pnpm lint:fix` | Biome |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm certs [dir] [--force]` | Generate local TLS and mTLS certs |
-| `pnpm jwt [subject] [ttl] [scopes]` | Print a dev JWT (all scopes by default) |
-| `pnpm jwt:keygen` | New ES256 key pair for `JWT_ALGORITHM=ES256` |
+| Script                                                 | What it does                                                                        |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `pnpm dev`                                             | Watch mode with tsx                                                                 |
+| `pnpm build`                                           | Compile with TypeScript 7 to `dist/`                                                |
+| `pnpm start`                                           | Run `dist/main.js`                                                                  |
+| `pnpm test`                                            | Every test type (see Testing)                                                       |
+| `pnpm test:<type>`                                     | One type: `unit`, `integration`, `containers`, `e2e`, `security`, `monkey`, `chaos` |
+| `pnpm migration:show` / `:run` / `:revert` / `:create` | Database migrations                                                                 |
+| `pnpm test:cov`                                        | Coverage for unit and integration                                                   |
+| `pnpm lint` / `pnpm lint:fix`                          | Biome                                                                               |
+| `pnpm typecheck`                                       | `tsc --noEmit`                                                                      |
+| `pnpm certs [dir] [--force]`                           | Generate local TLS and mTLS certs                                                   |
+| `pnpm jwt [subject] [ttl] [scopes]`                    | Print a dev JWT (all scopes by default)                                             |
+| `pnpm jwt:keygen`                                      | New ES256 key pair for `JWT_ALGORITHM=ES256`                                        |
 
 ## Project structure
 
 A pnpm workspace run by Turborepo. Each package has its own README:
 
-| Package | What it holds | Depends on |
-|---|---|---|
-| [`apps/api`](apps/api/README.md) | HTTP API: REST resources, health and metrics, OpenAPI docs, WebSocket, SSE and TCP on one TLS port | service, common |
-| [`packages/service`](packages/service/README.md) | Business logic: service contracts and their implementations | persistence, common |
-| [`packages/persistence`](packages/persistence/README.md) | Data access: entities, repositories, migrations, the database connection | common |
-| [`packages/common`](packages/common/README.md) | Shared infrastructure: config, dependency injection, security, errors, cache, queues, observability | nothing |
+| Package                                                  | What it holds                                                                                       | Depends on          |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------- |
+| [`apps/api`](apps/api/README.md)                         | HTTP API: REST resources, health and metrics, OpenAPI docs, WebSocket, SSE and TCP on one TLS port  | service, common     |
+| [`packages/service`](packages/service/README.md)         | Business logic: service contracts and their implementations                                         | persistence, common |
+| [`packages/persistence`](packages/persistence/README.md) | Data access: entities, repositories, migrations, the database connection                            | common              |
+| [`packages/common`](packages/common/README.md)           | Shared infrastructure: config, dependency injection, security, errors, cache, queues, observability | nothing             |
 
 The package dependencies enforce the direction: pnpm only resolves what a package declares, so `persistence` cannot import `service`, and nothing can import `api`. A Biome rule keeps the API layer off `persistence` too; only `application.ts`, the composition root, wires it in. `turbo run build` builds the layers in that order and caches the result.
 
@@ -119,15 +119,15 @@ export class ServiceConfiguration {
 
 Put a guard on a route or a whole controller with `@UseGuard(...)`. Each guard sets `request.principal`. `/api/secure/*` has one demo route per guard. A strategy with no configuration returns **501**; bad credentials return **401**.
 
-| Strategy | Guard | Configure | Client sends |
-|---|---|---|---|
-| Public | none | nothing | nothing |
-| mTLS | `MtlsGuard` | `TLS_CA_FILE` | a client certificate signed by that CA |
-| HMAC | `HmacGuard` | `HMAC_CLIENTS=id:secret,...` | `X-Client-Id`, `X-Timestamp`, `X-Signature` |
-| JWT | `JwtGuard` | `JWT_SECRET` (32+ chars) | `Authorization: Bearer <token from TokenProvider>` |
-| OAuth 2.0 | `OAuth2Guard` | `OAUTH2_ISSUER`, `OAUTH2_AUDIENCE`, `OAUTH2_JWKS_URI` | a Bearer access token from Keycloak, Auth0, Entra ID, Okta |
-| OIDC (SSO) | `SsoGuard` | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | browser login at `/auth/oidc/login` |
-| SAML 2.0 (SSO) | `SsoGuard` | `SAML_ENTRY_POINT`, `SAML_ISSUER`, `SAML_IDP_CERT` | browser login at `/auth/saml/login` |
+| Strategy       | Guard         | Configure                                             | Client sends                                               |
+| -------------- | ------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| Public         | none          | nothing                                               | nothing                                                    |
+| mTLS           | `MtlsGuard`   | `TLS_CA_FILE`                                         | a client certificate signed by that CA                     |
+| HMAC           | `HmacGuard`   | `HMAC_CLIENTS=id:secret,...`                          | `X-Client-Id`, `X-Timestamp`, `X-Signature`                |
+| JWT            | `JwtGuard`    | `JWT_SECRET` (32+ chars)                              | `Authorization: Bearer <token from TokenProvider>`         |
+| OAuth 2.0      | `OAuth2Guard` | `OAUTH2_ISSUER`, `OAUTH2_AUDIENCE`, `OAUTH2_JWKS_URI` | a Bearer access token from Keycloak, Auth0, Entra ID, Okta |
+| OIDC (SSO)     | `SsoGuard`    | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | browser login at `/auth/oidc/login`                        |
+| SAML 2.0 (SSO) | `SsoGuard`    | `SAML_ENTRY_POINT`, `SAML_ISSUER`, `SAML_IDP_CERT`    | browser login at `/auth/saml/login`                        |
 
 **HMAC signature:** hex `HMAC-SHA256(secret, "<unix-seconds>\n<METHOD>\n<path?query>\n<raw body>")`. The timestamp must be within 5 minutes, and each signature is accepted once.
 
@@ -145,10 +145,10 @@ Authentication says who the caller is; scopes say what they may do. Put `Scopes.
 
 A caller missing a scope gets `403` with `WWW-Authenticate: Bearer error="insufficient_scope"`. Scopes come from the token claims IdPs use: `scope` (OAuth 2.0), `scp` (Entra ID), `roles`, `permissions` (Auth0). HMAC and mTLS clients get scopes from `HMAC_CLIENT_SCOPES` and `MTLS_CLIENT_SCOPES`.
 
-| Scope | Routes |
-|---|---|
-| `users:write` | every user write, v1 and v2 |
-| `ops:queues` | `/api/v1/queues/*` (also limited to `OPS_ALLOWED_CIDRS`) |
+| Scope         | Routes                                                       |
+| ------------- | ------------------------------------------------------------ |
+| `users:write` | every user write, v1 and v2                                  |
+| `ops:queues`  | `/api/v1/queues/*` (also limited to `OPS_ALLOWED_CIDRS`)     |
 | `ops:network` | `/api/v1/network/ping` (also limited to `OPS_ALLOWED_CIDRS`) |
 
 `pnpm test:security` includes a route audit: every route must refuse an anonymous caller unless it is on the public list in `test/security/route-audit.security.test.ts`, so a route that forgets its guard fails CI.
@@ -170,25 +170,25 @@ Every request passes, in order: request id (`X-Request-Id`, also in error bodies
 
 Every route lives under a version: `/api/v1/...`, `/api/v2/...`. Unversioned `/api/...` keeps working as an alias of v1, and every API response carries an `API-Version` header. A new version gets its own folder in `rest/resources/` and its own DTOs; older versions keep their shape.
 
-| | v1 | v2 |
-|---|---|---|
-| `GET /users` | array | page: `?page=&size=&search=` returns `{items, page, size, total, pages}` |
-| user fields | id, name, email, age, dates | v1 plus `phone` |
-| writes | POST, DELETE | POST, PUT, PATCH, DELETE, QUERY |
+|              | v1                          | v2                                                                       |
+| ------------ | --------------------------- | ------------------------------------------------------------------------ |
+| `GET /users` | array                       | page: `?page=&size=&search=` returns `{items, page, size, total, pages}` |
+| user fields  | id, name, email, age, dates | v1 plus `phone`                                                          |
+| writes       | POST, DELETE                | POST, PUT, PATCH, DELETE, QUERY                                          |
 
 ### Methods
 
 v2 users follow RFC 9110 meanings:
 
-| Method | Does | Safe | Idempotent | Success |
-|---|---|---|---|---|
-| GET / HEAD | read | yes | yes | 200, or 304 with `If-None-Match` |
-| QUERY `/search` | search, criteria in the body | yes | yes | 200 |
-| POST | create, server picks the id | no | no | 201 + `Location` |
-| PUT | replace every field, or create at this id | no | yes | 200, or 201 + `Location` |
-| PATCH | change some fields (`application/merge-patch+json`) | no | no | 200 |
-| DELETE | remove | no | yes | 204 (404 if already gone) |
-| OPTIONS | list allowed methods | yes | yes | 204 + `Allow` |
+| Method          | Does                                                | Safe | Idempotent | Success                          |
+| --------------- | --------------------------------------------------- | ---- | ---------- | -------------------------------- |
+| GET / HEAD      | read                                                | yes  | yes        | 200, or 304 with `If-None-Match` |
+| QUERY `/search` | search, criteria in the body                        | yes  | yes        | 200                              |
+| POST            | create, server picks the id                         | no   | no         | 201 + `Location`                 |
+| PUT             | replace every field, or create at this id           | no   | yes        | 200, or 201 + `Location`         |
+| PATCH           | change some fields (`application/merge-patch+json`) | no   | no         | 200                              |
+| DELETE          | remove                                              | no   | yes        | 204 (404 if already gone)        |
+| OPTIONS         | list allowed methods                                | yes  | yes        | 204 + `Allow`                    |
 
 Reads return an `ETag`. Send it back as `If-Match` on PUT, PATCH or DELETE to get `412` if someone changed the resource in between. `If-None-Match: *` on PUT means create only.
 
@@ -197,23 +197,31 @@ Reads return an `ETag`. Send it back as `If-Match` on PUT, PATCH or DELETE to ge
 Success uses the envelope `{success, message, data}`. Every 4xx and 5xx is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details (`application/problem+json`), and keeps `success`, `message` and `data` so older clients still parse it:
 
 ```json
-{"type": "about:blank", "title": "Bad Request", "status": 400, "detail": "Validation failed",
- "instance": "/api/v2/users", "success": false, "message": "Validation failed", "data": {"age": "must be an integer from 0 to 150"}}
+{
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Validation failed",
+  "instance": "/api/v2/users",
+  "success": false,
+  "message": "Validation failed",
+  "data": { "age": "must be an integer from 0 to 150" }
+}
 ```
 
-| Status | When | Extra header |
-|---|---|---|
-| 400 | validation failed (`data` lists fields), malformed JSON | |
-| 401 | no or bad credentials | `WWW-Authenticate` |
-| 404 | unknown resource or route | |
-| 405 | known path, wrong method; TRACE always | `Allow` |
-| 409 | email already used | |
-| 412 | `If-Match` stale, or `If-None-Match: *` and it exists | |
-| 415 | body is not JSON | `Accept-Post`, `Accept-Patch` |
-| 429 | rate limit | `Retry-After`, `RateLimit-*` |
-| 500 | bug (logged, never leaks a stack) | |
-| 501 | auth strategy not configured | |
-| 503 | database, cache (for HMAC) or IdP down | `Retry-After` |
+| Status | When                                                    | Extra header                  |
+| ------ | ------------------------------------------------------- | ----------------------------- |
+| 400    | validation failed (`data` lists fields), malformed JSON |                               |
+| 401    | no or bad credentials                                   | `WWW-Authenticate`            |
+| 404    | unknown resource or route                               |                               |
+| 405    | known path, wrong method; TRACE always                  | `Allow`                       |
+| 409    | email already used                                      |                               |
+| 412    | `If-Match` stale, or `If-None-Match: *` and it exists   |                               |
+| 415    | body is not JSON                                        | `Accept-Post`, `Accept-Patch` |
+| 429    | rate limit                                              | `Retry-After`, `RateLimit-*`  |
+| 500    | bug (logged, never leaks a stack)                       |                               |
+| 501    | auth strategy not configured                            |                               |
+| 503    | database, cache (for HMAC) or IdP down                  | `Retry-After`                 |
 
 ## Database migrations
 
@@ -236,12 +244,12 @@ Everything runs on one TLS listener on port 443. There is no plaintext listener 
 openssl s_client -connect localhost:443 -alpn ndjson/1 -CAfile apps/api/certs/ca.crt
 ```
 
-| Protocol | Where | Auth | Notes |
-|---|---|---|---|
-| WebSocket | `wss://host/ws` | JWT (`Authorization` or `?access_token=`), or SSO cookie from an allowed Origin | JSON `{type}`: ping, echo, whoami, broadcast; server events pushed as `event`; dead clients dropped by heartbeat |
-| SSE | `GET /api/v1/events` | public, ids only | `new EventSource(...)`; heartbeat every 15 s |
-| TCP | port 443, TLS with ALPN `ndjson/1` | mTLS cert, or `{"type":"auth","token":"<jwt>"}` first | newline-delimited JSON, 64 KB lines, 60 s idle |
-| ICMP | `POST /api/v1/network/ping` | JWT | strict host validation, `ping` run without a shell |
+| Protocol  | Where                              | Auth                                                                            | Notes                                                                                                            |
+| --------- | ---------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| WebSocket | `wss://host/ws`                    | JWT (`Authorization` or `?access_token=`), or SSO cookie from an allowed Origin | JSON `{type}`: ping, echo, whoami, broadcast; server events pushed as `event`; dead clients dropped by heartbeat |
+| SSE       | `GET /api/v1/events`               | public, ids only                                                                | `new EventSource(...)`; heartbeat every 15 s                                                                     |
+| TCP       | port 443, TLS with ALPN `ndjson/1` | mTLS cert, or `{"type":"auth","token":"<jwt>"}` first                           | newline-delimited JSON, 64 KB lines, 60 s idle                                                                   |
+| ICMP      | `POST /api/v1/network/ping`        | JWT                                                                             | strict host validation, `ping` run without a shell                                                               |
 
 Events (`user.created`, `user.updated`, `user.deleted`) come from the in-process `EventBus`. With several instances, back it with Redis pub/sub.
 
@@ -261,14 +269,14 @@ POST /api/v1/queues/demo/dead-letters/{id}/replay                   -> 202, back
 
 TypeORM 1.x. Set `DB_TYPE` and `DB_URL`.
 
-| `DB_TYPE` | Driver | `DB_URL` example |
-|---|---|---|
-| `postgres` | `pg` | `postgres://app:app@localhost:5432/app` |
-| `mysql` | `mysql2` | `mysql://app:app@localhost:3306/app` |
-| `mariadb` | `mysql2` | `mysql://app:app@localhost:3307/app` |
-| `mongodb` | `mongodb` | `mongodb://app:app@localhost:27017/app?authSource=admin` |
-| `mssql` | `mssql` (install it) | `mssql://sa:Passw0rd!@localhost:1433/app` |
-| `sqljs` | `sql.js` | empty for in-memory, or a file path |
+| `DB_TYPE`  | Driver               | `DB_URL` example                                         |
+| ---------- | -------------------- | -------------------------------------------------------- |
+| `postgres` | `pg`                 | `postgres://app:app@localhost:5432/app`                  |
+| `mysql`    | `mysql2`             | `mysql://app:app@localhost:3306/app`                     |
+| `mariadb`  | `mysql2`             | `mysql://app:app@localhost:3307/app`                     |
+| `mongodb`  | `mongodb`            | `mongodb://app:app@localhost:27017/app?authSource=admin` |
+| `mssql`    | `mssql` (install it) | `mssql://sa:Passw0rd!@localhost:1433/app`                |
+| `sqljs`    | `sql.js`             | empty for in-memory, or a file path                      |
 
 `DB_SYNCHRONIZE=true` creates tables for development. Production should use TypeORM migrations instead.
 
@@ -305,15 +313,15 @@ EXPERIMENTS=new-checkout:50,new-search:10
 
 Vitest runs one project per test type. `pnpm test` runs them all.
 
-| Type | Folder | What it proves |
-|---|---|---|
-| `unit` | `test/unit/` | One class at a time with fakes: guards, DTO validation, converter, cache, decorators, `BeanFactory`, config, A/B bucketing |
-| `integration` | `test/integration/` | The whole app in-process through HTTP, on sql.js and the memory cache |
-| `containers` | `test/containers/` | The same flows on real Postgres, MySQL, MariaDB, MongoDB, Redis and Valkey via Testcontainers. Skipped when Docker is not running. |
-| `e2e` | `test/e2e/` | The real server process over HTTPS with a mock OIDC/OAuth2 provider: every endpoint and auth strategy, including the full OIDC login |
-| `security` | `test/security/` | SQL and command injection payloads at every input; rate limits, prototype pollution, slowloris, oversized headers, security headers |
-| `monkey` | `test/monkey/` | 1500 random methods, paths, headers and bodies (fast-check). No unexpected 5xx, always JSON, still healthy afterwards. |
-| `chaos` | `test/chaos/` | Dependencies fail on purpose: database down (503, then recovers), cache down or hanging (requests still succeed), cache down for HMAC (503, fails closed), IdP down (503), JWKS down (401), a flaky repository, 300 concurrent requests |
+| Type          | Folder              | What it proves                                                                                                                                                                                                                          |
+| ------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `unit`        | `test/unit/`        | One class at a time with fakes: guards, DTO validation, converter, cache, decorators, `BeanFactory`, config, A/B bucketing                                                                                                              |
+| `integration` | `test/integration/` | The whole app in-process through HTTP, on sql.js and the memory cache                                                                                                                                                                   |
+| `containers`  | `test/containers/`  | The same flows on real Postgres, MySQL, MariaDB, MongoDB, Redis and Valkey via Testcontainers. Skipped when Docker is not running.                                                                                                      |
+| `e2e`         | `test/e2e/`         | The real server process over HTTPS with a mock OIDC/OAuth2 provider: every endpoint and auth strategy, including the full OIDC login                                                                                                    |
+| `security`    | `test/security/`    | SQL and command injection payloads at every input; rate limits, prototype pollution, slowloris, oversized headers, security headers                                                                                                     |
+| `monkey`      | `test/monkey/`      | 1500 random methods, paths, headers and bodies (fast-check). No unexpected 5xx, always JSON, still healthy afterwards.                                                                                                                  |
+| `chaos`       | `test/chaos/`       | Dependencies fail on purpose: database down (503, then recovers), cache down or hanging (requests still succeed), cache down for HMAC (503, fails closed), IdP down (503), JWKS down (401), a flaky repository, 300 concurrent requests |
 
 What the chaos tests pin down:
 
@@ -325,14 +333,14 @@ What the chaos tests pin down:
 
 ### Known CVEs
 
-| Layer | Guard |
-|---|---|
-| npm dependencies | `pnpm audit --prod --audit-level=high` fails CI; also daily, because new CVEs hit unchanged code |
-| Docker image | Trivy scans OS packages and `node_modules` (fails on fixable HIGH/CRITICAL), results in GitHub code scanning, CycloneDX SBOM as an artifact |
-| Dockerfile, compose, Caddyfile | Trivy config scan |
-| updates | Renovate opens CVE fixes at any time; other npm updates wait 3 days |
-| supply chain | pnpm `minimumReleaseAge` refuses versions younger than 3 days (most hijacked releases are pulled within hours); install scripts are off unless listed in `allowBuilds` |
-| code | CodeQL, dependency review on PRs, OpenSSF Scorecard (existing workflows) |
+| Layer                          | Guard                                                                                                                                                                  |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| npm dependencies               | `pnpm audit --prod --audit-level=high` fails CI; also daily, because new CVEs hit unchanged code                                                                       |
+| Docker image                   | Trivy scans OS packages and `node_modules` (fails on fixable HIGH/CRITICAL), results in GitHub code scanning, CycloneDX SBOM as an artifact                            |
+| Dockerfile, compose, Caddyfile | Trivy config scan                                                                                                                                                      |
+| updates                        | Renovate opens CVE fixes at any time; other npm updates wait 3 days                                                                                                    |
+| supply chain                   | pnpm `minimumReleaseAge` refuses versions younger than 3 days (most hijacked releases are pulled within hours); install scripts are off unless listed in `allowBuilds` |
+| code                           | CodeQL, dependency review on PRs, OpenSSF Scorecard (existing workflows)                                                                                               |
 
 Dev-only advisories are patched with `overrides` in `pnpm-workspace.yaml`; each entry says why and when to drop it.
 
@@ -376,14 +384,14 @@ pnpm certs
 APP_ENV_FILE=deploy/full-stack.env docker compose --profile full up --build
 ```
 
-| Profile | Service | Open | What it shows |
-|---|---|---|---|
-| default | Caddy, app, Postgres, Redis | https://localhost | HTTP/3, the API, Swagger at `/docs` |
-| `idp` | Keycloak 26 | https://keycloak.localhost:8543 (admin/admin) | realm `demo`: browser login as alice/alice through OIDC; `api-client` gets tokens with `users:write` by client credentials, checked by `OAuth2Guard` and scopes |
-| `gateway` | APISIX 3 | http://localhost:9080 | the same API behind a gateway: request id, edge rate limit, body limit, metrics |
-| `vault` | Vault | http://localhost:8200 (dev-root-token) | `vault-seed` writes random `SESSION_SECRET`, `JWT_SECRET`, `HMAC_CLIENTS`; the app loads them at boot |
-| `observability` | Prometheus, Grafana, Loki, Tempo, Alloy | http://localhost:3000 (admin/admin) | dashboard "API overview": rate, p95 latency, status classes, event-loop lag, logs; traces in Tempo |
-| `mail` | Mailpit | http://localhost:8025 | the welcome email sent when a user is created |
+| Profile         | Service                                 | Open                                          | What it shows                                                                                                                                                   |
+| --------------- | --------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| default         | Caddy, app, Postgres, Redis             | https://localhost                             | HTTP/3, the API, Swagger at `/docs`                                                                                                                             |
+| `idp`           | Keycloak 26                             | https://keycloak.localhost:8543 (admin/admin) | realm `demo`: browser login as alice/alice through OIDC; `api-client` gets tokens with `users:write` by client credentials, checked by `OAuth2Guard` and scopes |
+| `gateway`       | APISIX 3                                | http://localhost:9080                         | the same API behind a gateway: request id, edge rate limit, body limit, metrics                                                                                 |
+| `vault`         | Vault                                   | http://localhost:8200 (dev-root-token)        | `vault-seed` writes random `SESSION_SECRET`, `JWT_SECRET`, `HMAC_CLIENTS`; the app loads them at boot                                                           |
+| `observability` | Prometheus, Grafana, Loki, Tempo, Alloy | http://localhost:3000 (admin/admin)           | dashboard "API overview": rate, p95 latency, status classes, event-loop lag, logs; traces in Tempo                                                              |
+| `mail`          | Mailpit                                 | http://localhost:8025                         | the welcome email sent when a user is created                                                                                                                   |
 
 Try OAuth2 machine-to-machine:
 
@@ -547,7 +555,6 @@ jobs:
 
 By following these guidelines, you can establish a robust and secure CI/CD process that enhances your development workflow while maintaining best practices for managing sensitive information.
 
-
 ## Contributing
 
 Contributions are welcome! Please follow the guidelines in [CONTRIBUTING.md](.github/CONTRIBUTING.md). If you don't have this file, consider creating one with instructions for how to fork the project, make changes, and submit pull requests.
@@ -561,7 +568,6 @@ Contributions are welcome! Please follow the guidelines in [CONTRIBUTING.md](.gi
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details by [@MKAbuMattar](https://github.com/MKAbuMattar).
-
 
 ## Further reading
 
