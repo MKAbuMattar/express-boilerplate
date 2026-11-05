@@ -1,5 +1,5 @@
+import {MemoryCacheStore} from '@express-boilerplate/common/config/cache/memory-cache.store.js';
 import {afterEach, describe, expect, it, vi} from 'vitest';
-import {MemoryCacheStore} from '../../src/config/cache/memory-cache.store.js';
 
 describe('MemoryCacheStore', () => {
   afterEach(() => {

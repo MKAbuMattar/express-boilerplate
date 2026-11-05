@@ -1,10 +1,10 @@
+import {MemoryCacheStore} from '@express-boilerplate/common/config/cache/memory-cache.store.js';
+import {Scopes} from '@express-boilerplate/common/security/authorization/scopes.js';
+import {HmacGuard} from '@express-boilerplate/common/security/hmac/hmac.guard.js';
+import {CacheServiceImpl} from '@express-boilerplate/common/service/impl/cache.service.impl.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it, vi} from 'vitest';
-import {MemoryCacheStore} from '../../src/config/cache/memory-cache.store.js';
-import {Scopes} from '../../src/security/authorization/scopes.js';
-import {HmacGuard} from '../../src/security/hmac/hmac.guard.js';
-import {CacheServiceImpl} from '../../src/service/impl/cache.service.impl.js';
-import {AppLogger} from '../../src/util/app-logger.js';
 import {UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('HmacGuard', () => {

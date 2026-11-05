@@ -1,6 +1,6 @@
 import {isIP} from 'node:net';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
 import {BadRequestHttpResponse} from '@inversifyjs/http-core';
-import {ApiResponse} from '../api-response.dto.js';
 
 /**
  * A host to ping: an IP address or an RFC 1123 hostname, nothing else.

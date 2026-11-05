@@ -1,10 +1,10 @@
+import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {MemoryCacheStore} from '@express-boilerplate/common/config/cache/memory-cache.store.js';
+import {JwtKeys} from '@express-boilerplate/common/security/jwt/jwt-keys.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {TokenRevocation} from '@express-boilerplate/common/security/jwt/token-revocation.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
 import type {Request} from 'express';
-import {AppConfig} from '../../src/config/app.config.js';
-import {MemoryCacheStore} from '../../src/config/cache/memory-cache.store.js';
-import {JwtKeys} from '../../src/security/jwt/jwt-keys.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
-import {TokenRevocation} from '../../src/security/jwt/token-revocation.js';
-import {AppLogger} from '../../src/util/app-logger.js';
 
 /** Small builders for unit tests that run classes without the app. */
 export class UnitFixtures {

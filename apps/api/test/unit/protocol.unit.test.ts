@@ -1,5 +1,5 @@
+import {MemoryQueueBroker} from '@express-boilerplate/common/config/queue/memory-queue.broker.js';
 import {describe, expect, it} from 'vitest';
-import {MemoryQueueBroker} from '../../src/config/queue/memory-queue.broker.js';
 import {TransportMessage} from '../../src/config/transport/transport-message.js';
 import {PingRequestDto} from '../../src/rest/dto/v1/ping-request.dto.js';
 

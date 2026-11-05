@@ -1,7 +1,7 @@
+import {MemoryCacheStore} from '@express-boilerplate/common/config/cache/memory-cache.store.js';
+import {CacheServiceImpl} from '@express-boilerplate/common/service/impl/cache.service.impl.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
 import {describe, expect, it, vi} from 'vitest';
-import {MemoryCacheStore} from '../../src/config/cache/memory-cache.store.js';
-import {CacheServiceImpl} from '../../src/service/impl/cache.service.impl.js';
-import {AppLogger} from '../../src/util/app-logger.js';
 import {UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('CacheServiceImpl', () => {

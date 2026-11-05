@@ -1,5 +1,5 @@
 import {createHash} from 'node:crypto';
-import type {UserEntity} from '../model/user.entity.js';
+import type {UserEntity} from '@express-boilerplate/persistence/model/user.entity.js';
 import {UserV1Dto} from '../rest/dto/v1/user.dto.js';
 import {UserV2Dto} from '../rest/dto/v2/user.dto.js';
 

@@ -1,7 +1,7 @@
+import {ExperimentVariant} from '@express-boilerplate/common/enumeration/experiment-variant.enum.js';
+import {ExperimentServiceImpl} from '@express-boilerplate/service/service/impl/experiment.service.impl.js';
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
-import {ExperimentVariant} from '../../src/enumeration/experiment-variant.enum.js';
-import {ExperimentServiceImpl} from '../../src/service/impl/experiment.service.impl.js';
 import {UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('ExperimentServiceImpl (A/B)', () => {

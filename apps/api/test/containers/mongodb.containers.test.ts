@@ -7,7 +7,7 @@ import {Containers} from '../support/containers.js';
 process.env.DB_TYPE = 'mongodb';
 const {TestApp} = await import('../support/test-app.js');
 const {TokenProvider} = await import(
-  '../../src/security/jwt/token.provider.js'
+  '@express-boilerplate/common/security/jwt/token.provider.js'
 );
 
 const docker = await Containers.dockerAvailable();

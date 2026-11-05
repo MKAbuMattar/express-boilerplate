@@ -49,37 +49,51 @@ Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/d
 
 ## Project structure
 
-Layered by responsibility: config, controller, service, repository, and so on. Every unit is a class.
+A pnpm workspace run by Turborepo. Each layer is its own package, and a layer may only use the layers below it:
 
 ```
-src/
-├── main.ts                  Main: Vault secrets, tracing, HTTPS server, transports, shutdown
-├── application.ts           Application: container, middleware chain, routes, lifecycle
-├── config/                  AppConfig (env), AppConfiguration (@Bean), BeanFactory, stereotypes,
-│   │                        DatabaseConfig, TlsConfig, ServerHardening, VaultSecrets, cli.data-source
-│   ├── cache/               CacheStore, MemoryCacheStore, RedisCacheStore
-│   ├── queue/               QueueBroker, MemoryQueueBroker, BullMqQueueBroker
-│   ├── web/                 ApiVersioning, HttpSemantics, RateLimiter, RequestGuards (middlewares)
-│   ├── observability/       Metrics (Prometheus), Tracing (OpenTelemetry)
-│   └── transport/           WebSocketGateway, TcpServer, UdpServer
-├── constant/                ApiConstants, SecurityConstants, ScopeConstants, ActuatorConstants, ...
-├── controller/              AuthenticationController, ActuatorController + ProbeController,
-│                            WellKnownController (JWKS)
-├── converter/               UserConverter (entity to v1/v2 DTO, ETag)
-├── enumeration/             AuthStrategy, DatabaseType, CacheType, ExperimentVariant, HealthStatus
-├── exceptions/              AuthException, GlobalExceptionFilter, ProblemDetails (RFC 9457)
-├── model/                   UserEntity, AppEvent, DeadLetter, Health
-├── repository/              UserRepository
-│   └── migration/           Versioned schema changes, one class each
-├── rest/
-│   ├── dto/                 ApiResponse, CreateUserDto; v1/ and v2/ request and response shapes
-│   ├── preconditions.ts     If-Match / If-None-Match
-│   └── resources/v1, v2     REST resources per API version
-├── security/                principal.ts, authorization/ (Scopes), hmac/ jwt/ mtls/ oauth2/ sso/
-├── service/                 Contracts: UserService, CacheService, HealthService, MailService, ...;
-│   │                        EventBus, JobRegistry
-│   └── impl/                Implementations, health indicators
-└── util/                    AppLogger, @Cacheable / @CacheEvict
+apps/api              API / controller layer       -> service, common
+packages/service      business layer               -> persistence, common
+packages/persistence  data layer                   -> common
+packages/common       cross-cutting layer          (used by every layer)
+```
+
+The package dependencies enforce the direction: pnpm only resolves what a package declares, so `persistence` cannot import `service`, and nothing can import `api`. A Biome rule keeps the API layer off `persistence` too; only `application.ts`, the composition root, wires it in. `turbo run build` builds the layers in that order and caches the result.
+
+Inside each package the folders keep the same names: config, constant, controller, converter, enumeration, exceptions, model, repository, rest, security, service (+ impl), util. Every unit is a class. Other layers import by path, for example `@express-boilerplate/service/service/user.service.js`.
+
+```
+apps/api/src/                          API / controller layer
+├── main.ts                            HTTPS server on 443, transports, shutdown
+├── application.ts                     composition root: registers each layer's @Configuration
+├── config/openapi.config.ts           OpenAPI (Swagger, development only)
+├── config/web/                        ApiVersioning, HttpSemantics, RateLimiter, RequestGuards
+├── config/transport/                  WebSocketGateway, TcpServer (ALPN ndjson/1 on 443)
+├── controller/                        Authentication, Actuator + Probe, WellKnown (JWKS)
+├── converter/                         UserConverter (entity to v1/v2 DTO, ETag)
+├── exceptions/                        GlobalExceptionFilter (HTTP errors to RFC 9457)
+└── rest/                              dto/v1, dto/v2, preconditions, resources/v1, resources/v2
+
+packages/service/src/                  business layer
+├── config/service.configuration.ts    service contracts bound to their impls
+├── dto/                               CreateUserDto (business input)
+├── model/                             AppEvent, Health
+└── service/ + impl/                   User, Health, Mail, Network, Experiment, EventBus, JobRegistry
+
+packages/persistence/src/              data layer
+├── config/                            DatabaseConfig (DataSource, TLS), PersistenceConfiguration, cli.data-source
+├── model/                             UserEntity
+└── repository/ + migration/           UserRepository, versioned schema changes
+
+packages/common/src/                   cross-cutting layer
+├── config/                            AppConfig (env), BeanFactory, stereotypes, CommonConfiguration,
+│                                      TlsConfig, ServerHardening, VaultSecrets, cache/, queue/, observability/
+├── constant/  enumeration/            shared constants and enums
+├── exceptions/                        AuthException, ProblemDetails
+├── rest/dto/                          ApiResponse
+├── security/                          principal, authorization (Scopes), hmac, jwt, mtls, oauth2, sso
+├── service/ + impl/                   CacheService
+└── util/                              AppLogger, @Cacheable / @CacheEvict
 ```
 
 ### Beans and dependency injection
@@ -87,11 +101,11 @@ src/
 `BeanFactory` wraps an Inversify 8 container. Beans are singletons by default.
 
 - `@Component()`, `@Service()` and `@Repository()` mark classes the container builds itself.
-- A `@Configuration()` class holds `@Bean(Token)` methods for everything else: third-party objects, and an abstract service bound to its implementation.
+- A `@Configuration()` class holds `@Bean(Token)` methods for everything else: third-party objects, and an abstract service bound to its implementation. Each layer has one: `CommonConfiguration`, `PersistenceConfiguration`, `ServiceConfiguration`.
 
 ```ts
 @Configuration()
-export class AppConfiguration {
+export class ServiceConfiguration {
   @Bean(UserService)
   userService(beans: BeanFactory): UserService {
     return beans.getBean(UserServiceImpl);
@@ -203,11 +217,11 @@ Success uses the envelope `{success, message, data}`. Every 4xx and 5xx is [RFC 
 
 ## Database migrations
 
-Schema changes are migration classes in `src/repository/migration`, written with TypeORM's schema builder, so one migration runs on Postgres, MySQL, MariaDB, MSSQL and SQLite alike. They run at startup (`DB_MIGRATIONS_RUN=true`) and are recorded in `schema_migrations`. `synchronize` is off. MongoDB is schemaless and skips them.
+Schema changes are migration classes in `packages/persistence/src/repository/migration`, written with TypeORM's schema builder, so one migration runs on Postgres, MySQL, MariaDB, MSSQL and SQLite alike. They run at startup (`DB_MIGRATIONS_RUN=true`) and are recorded in `schema_migrations`. `synchronize` is off. MongoDB is schemaless and skips them.
 
 ```sh
 pnpm migration:show                       # applied and pending
-pnpm migration:create src/repository/migration/AddX  # new file; then add it to DatabaseConfig.migrations
+pnpm migration:create src/repository/migration/AddX  # in packages/persistence; then add it to DatabaseConfig.migrations
 pnpm migration:run / pnpm migration:revert
 pnpm migration:prod                       # in a built image: node dist/...
 ```

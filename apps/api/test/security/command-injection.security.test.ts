@@ -1,9 +1,9 @@
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {NetworkService} from '@express-boilerplate/service/service/network.service.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
-import {NetworkService} from '../../src/service/network.service.js';
 import {TestApp} from '../support/test-app.js';
 
 /**

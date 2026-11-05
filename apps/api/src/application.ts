@@ -1,5 +1,15 @@
 import 'reflect-metadata';
 import type https from 'node:https';
+import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {BeanFactory} from '@express-boilerplate/common/config/bean-factory.js';
+import {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
+import {CommonConfiguration} from '@express-boilerplate/common/config/common.configuration.js';
+import {Metrics} from '@express-boilerplate/common/config/observability/metrics.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
+import {DataSource} from '@express-boilerplate/persistence/config/database.config.js';
+import {PersistenceConfiguration} from '@express-boilerplate/persistence/config/persistence.configuration.js';
+import {ServiceConfiguration} from '@express-boilerplate/service/config/service.configuration.js';
+import {JobRegistry} from '@express-boilerplate/service/service/job-registry.service.js';
 import {InversifyExpressHttpAdapter} from '@inversifyjs/http-express';
 import {SwaggerUiProvider} from '@inversifyjs/http-open-api';
 import compression from 'compression';
@@ -8,12 +18,6 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import {pinoHttp} from 'pino-http';
-import {DataSource} from 'typeorm';
-import {AppConfig} from './config/app.config.js';
-import {AppConfiguration} from './config/app.configuration.js';
-import {BeanFactory} from './config/bean-factory.js';
-import {CacheStore} from './config/cache/cache-store.js';
-import {Metrics} from './config/observability/metrics.js';
 import {OpenApiConfig} from './config/openapi.config.js';
 import {TcpServer} from './config/transport/tcp.server.js';
 import {WebSocketGateway} from './config/transport/websocket.gateway.js';
@@ -36,8 +40,6 @@ import {QueueV1Resource} from './rest/resources/v1/queue.resource.js';
 import {SecureV1Resource} from './rest/resources/v1/secure.resource.js';
 import {UserV1Resource} from './rest/resources/v1/user.resource.js';
 import {UserV2Resource} from './rest/resources/v2/user.resource.js';
-import {JobRegistry} from './service/job-registry.service.js';
-import {AppLogger} from './util/app-logger.js';
 
 export class Application {
   static readonly controllers = [
@@ -60,7 +62,12 @@ export class Application {
   constructor(readonly config: AppConfig = new AppConfig()) {
     this.beans = new BeanFactory()
       .registerInstance(AppConfig, config)
-      .register(new AppConfiguration());
+      // One configuration per layer; this class is the composition root.
+      .register(
+        new CommonConfiguration(),
+        new PersistenceConfiguration(),
+        new ServiceConfiguration(),
+      );
     for (const controller of Application.controllers) {
       this.beans.container.bind<object>(controller).toSelf();
     }

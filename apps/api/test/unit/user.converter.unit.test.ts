@@ -1,6 +1,6 @@
+import type {UserEntity} from '@express-boilerplate/persistence/model/user.entity.js';
 import {describe, expect, it} from 'vitest';
 import {UserConverter} from '../../src/converter/user.converter.js';
-import type {UserEntity} from '../../src/model/user.entity.js';
 
 describe('UserConverter', () => {
   const created = new Date('2026-01-02T03:04:05.000Z');

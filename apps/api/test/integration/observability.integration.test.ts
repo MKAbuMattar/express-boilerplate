@@ -1,12 +1,12 @@
 import {createServer, type Server} from 'node:http';
 import type {AddressInfo} from 'node:net';
+import {VaultSecrets} from '@express-boilerplate/common/config/vault-secrets.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {MailService} from '@express-boilerplate/service/service/mail.service.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {VaultSecrets} from '../../src/config/vault-secrets.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
-import {MailService} from '../../src/service/mail.service.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('Vault secrets', () => {

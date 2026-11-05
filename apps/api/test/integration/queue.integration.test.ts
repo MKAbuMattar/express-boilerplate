@@ -1,9 +1,9 @@
+import {QueueBroker} from '@express-boilerplate/common/config/queue/queue-broker.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {QueueBroker} from '../../src/config/queue/queue-broker.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('Queues and dead-letter queues', () => {

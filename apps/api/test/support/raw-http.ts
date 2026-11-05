@@ -3,9 +3,9 @@ import type http from 'node:http';
 import https from 'node:https';
 import type {AddressInfo} from 'node:net';
 import {join} from 'node:path';
+import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {TlsConfig} from '@express-boilerplate/common/config/tls.config.js';
 import type express from 'express';
-import {AppConfig} from '../../src/config/app.config.js';
-import {TlsConfig} from '../../src/config/tls.config.js';
 import {TestApp} from './test-app.js';
 
 export class RawResult {

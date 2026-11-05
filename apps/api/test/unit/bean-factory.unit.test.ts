@@ -1,10 +1,10 @@
-import {describe, expect, it, vi} from 'vitest';
 import {
   Bean,
   BeanFactory,
   Configuration,
-} from '../../src/config/bean-factory.js';
-import {Service} from '../../src/config/stereotypes.js';
+} from '@express-boilerplate/common/config/bean-factory.js';
+import {Service} from '@express-boilerplate/common/config/stereotypes.js';
+import {describe, expect, it, vi} from 'vitest';
 
 abstract class Clock {
   abstract now(): number;

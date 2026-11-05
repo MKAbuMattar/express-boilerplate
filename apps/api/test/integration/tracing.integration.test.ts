@@ -1,7 +1,7 @@
 import http, {createServer, type Server} from 'node:http';
 import type {AddressInfo} from 'node:net';
+import {Tracing} from '@express-boilerplate/common/config/observability/tracing.js';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
-import {Tracing} from '../../src/config/observability/tracing.js';
 
 /** Own file: the OpenTelemetry SDK registers process-wide globals. */
 describe('Tracing (OpenTelemetry)', () => {

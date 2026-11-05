@@ -1,9 +1,9 @@
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {DataSource} from '@express-boilerplate/persistence/config/database.config.js';
 import type express from 'express';
 import request from 'supertest';
-import {DataSource} from 'typeorm';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {TestApp} from '../support/test-app.js';
 
 /**

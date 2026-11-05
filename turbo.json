@@ -5,21 +5,22 @@
   "envMode": "loose",
   "tasks": {
     "build": {
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", "!test/**"],
       "outputs": ["dist/**"]
     },
-    "typecheck": {},
-    "test": {"inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
-    "test:unit": {"outputs": []},
-    "test:integration": {"inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
-    "test:security": {"inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
+    "typecheck": {"dependsOn": ["^build"]},
+    "test": {"dependsOn": ["^build"], "inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
+    "test:unit": {"dependsOn": ["^build"], "outputs": []},
+    "test:integration": {"dependsOn": ["^build"], "inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
+    "test:security": {"dependsOn": ["^build"], "inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
     // Depend on Docker, timing or random input: never cached.
-    "test:containers": {"cache": false},
-    "test:e2e": {"cache": false},
-    "test:monkey": {"cache": false},
-    "test:chaos": {"cache": false},
-    "test:cov": {"outputs": ["coverage/**"]},
-    "dev": {"cache": false, "persistent": true},
+    "test:containers": {"dependsOn": ["^build"], "cache": false},
+    "test:e2e": {"dependsOn": ["^build"], "cache": false},
+    "test:monkey": {"dependsOn": ["^build"], "cache": false},
+    "test:chaos": {"dependsOn": ["^build"], "cache": false},
+    "test:cov": {"dependsOn": ["^build"], "outputs": ["coverage/**"]},
+    "dev": {"cache": false, "persistent": true, "dependsOn": ["^build"]},
     "start": {"cache": false, "persistent": true, "dependsOn": ["build"]}
   }
 }

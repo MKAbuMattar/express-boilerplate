@@ -1,6 +1,6 @@
+import {CreateUserDto} from '@express-boilerplate/service/dto/create-user.dto.js';
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
-import {CreateUserDto} from '../../src/rest/dto/create-user.dto.js';
 
 describe('CreateUserDto.from', () => {
   it('trims the name and lowercases the email', () => {

@@ -1,10 +1,10 @@
 import https from 'node:https';
+import {Tracing} from '@express-boilerplate/common/config/observability/tracing.js';
+import {ServerHardening} from '@express-boilerplate/common/config/server-hardening.js';
+import {TlsConfig} from '@express-boilerplate/common/config/tls.config.js';
+import {VaultSecrets} from '@express-boilerplate/common/config/vault-secrets.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
 import {Application} from './application.js';
-import {Tracing} from './config/observability/tracing.js';
-import {ServerHardening} from './config/server-hardening.js';
-import {TlsConfig} from './config/tls.config.js';
-import {VaultSecrets} from './config/vault-secrets.js';
-import {AppLogger} from './util/app-logger.js';
 
 export class Main {
   private static readonly SHUTDOWN_TIMEOUT_MS = 10_000;

@@ -1,15 +1,15 @@
 import {mkdtempSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {Principal} from '@express-boilerplate/common/security/principal.js';
+import {SessionService} from '@express-boilerplate/common/security/sso/session.service.js';
 import type express from 'express';
 import {exportPKCS8, exportSPKI, generateKeyPair, SignJWT} from 'jose';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
-import {Principal} from '../../src/security/principal.js';
-import {SessionService} from '../../src/security/sso/session.service.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('Security: authentication', () => {

@@ -1,9 +1,12 @@
+import {MemoryCacheStore} from '@express-boilerplate/common/config/cache/memory-cache.store.js';
+import type {CacheService} from '@express-boilerplate/common/service/cache.service.js';
+import {CacheServiceImpl} from '@express-boilerplate/common/service/impl/cache.service.impl.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
+import {
+  Cacheable,
+  CacheEvict,
+} from '@express-boilerplate/common/util/cache.decorators.js';
 import {describe, expect, it, vi} from 'vitest';
-import {MemoryCacheStore} from '../../src/config/cache/memory-cache.store.js';
-import type {CacheService} from '../../src/service/cache.service.js';
-import {CacheServiceImpl} from '../../src/service/impl/cache.service.impl.js';
-import {AppLogger} from '../../src/util/app-logger.js';
-import {Cacheable, CacheEvict} from '../../src/util/cache.decorators.js';
 import {UnitFixtures} from '../support/unit-fixtures.js';
 
 class Greeter {

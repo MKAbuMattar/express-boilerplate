@@ -1,3 +1,11 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {Scopes} from '@express-boilerplate/common/security/authorization/scopes.js';
+import {JwtGuard} from '@express-boilerplate/common/security/jwt/jwt.guard.js';
+import {CreateUserDto} from '@express-boilerplate/service/dto/create-user.dto.js';
+import {UserService} from '@express-boilerplate/service/service/user.service.js';
 import {
   All,
   Body,
@@ -28,15 +36,7 @@ import {
 } from '@inversifyjs/http-open-api';
 import type {Request as ExpressRequest} from 'express';
 import {inject} from 'inversify';
-import {ApiConstants} from '../../../constant/api.constants.js';
-import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import {ScopeConstants} from '../../../constant/scope.constants.js';
 import {UserConverter} from '../../../converter/user.converter.js';
-import {Scopes} from '../../../security/authorization/scopes.js';
-import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
-import {UserService} from '../../../service/user.service.js';
-import {ApiResponse} from '../../dto/api-response.dto.js';
-import {CreateUserDto} from '../../dto/create-user.dto.js';
 import {PageDto, PageRequestDto} from '../../dto/v2/page.dto.js';
 import type {UserV2Dto} from '../../dto/v2/user.dto.js';
 import {UserPatchDto} from '../../dto/v2/user-patch.dto.js';

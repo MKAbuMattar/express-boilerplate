@@ -45,6 +45,8 @@ spec:
         - name: migrate
           image: {{ include "eb.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # Migrations live in the persistence layer, next to the entities.
+          workingDir: /app/packages/persistence
           command:
             - node
             - node_modules/typeorm/cli.js

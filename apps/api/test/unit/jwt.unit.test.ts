@@ -1,6 +1,6 @@
+import {JwtGuard} from '@express-boilerplate/common/security/jwt/jwt.guard.js';
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
-import {JwtGuard} from '../../src/security/jwt/jwt.guard.js';
 import {TokenProviders, UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('TokenProvider + JwtGuard', () => {

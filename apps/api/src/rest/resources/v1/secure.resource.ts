@@ -1,3 +1,12 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {HmacGuard} from '@express-boilerplate/common/security/hmac/hmac.guard.js';
+import {JwtGuard} from '@express-boilerplate/common/security/jwt/jwt.guard.js';
+import {MtlsGuard} from '@express-boilerplate/common/security/mtls/mtls.guard.js';
+import {OAuth2Guard} from '@express-boilerplate/common/security/oauth2/oauth2.guard.js';
+import type {Principal} from '@express-boilerplate/common/security/principal.js';
+import {SsoGuard} from '@express-boilerplate/common/security/sso/sso.guard.js';
 import {
   Controller,
   Get,
@@ -15,15 +24,6 @@ import {
   OasTag,
 } from '@inversifyjs/http-open-api';
 import type {Request as ExpressRequest} from 'express';
-import {ApiConstants} from '../../../constant/api.constants.js';
-import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import {HmacGuard} from '../../../security/hmac/hmac.guard.js';
-import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
-import {MtlsGuard} from '../../../security/mtls/mtls.guard.js';
-import {OAuth2Guard} from '../../../security/oauth2/oauth2.guard.js';
-import type {Principal} from '../../../security/principal.js';
-import {SsoGuard} from '../../../security/sso/sso.guard.js';
-import {ApiResponse} from '../../dto/api-response.dto.js';
 
 /** One endpoint per auth strategy. Copy the guard you need onto your own routes. */
 @Controller(ApiConstants.V1_SECURE)

@@ -1,9 +1,9 @@
 import {randomUUID} from 'node:crypto';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {RawHttp} from '../support/raw-http.js';
 import {TestApp} from '../support/test-app.js';
 

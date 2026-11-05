@@ -1,3 +1,13 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {Scopes} from '@express-boilerplate/common/security/authorization/scopes.js';
+import {JwtGuard} from '@express-boilerplate/common/security/jwt/jwt.guard.js';
+import {
+  NetworkService,
+  type PingResult,
+} from '@express-boilerplate/service/service/network.service.js';
 import {
   Body,
   Controller,
@@ -13,16 +23,6 @@ import {
   OasTag,
 } from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
-import {ApiConstants} from '../../../constant/api.constants.js';
-import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import {ScopeConstants} from '../../../constant/scope.constants.js';
-import {Scopes} from '../../../security/authorization/scopes.js';
-import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
-import {
-  NetworkService,
-  type PingResult,
-} from '../../../service/network.service.js';
-import {ApiResponse} from '../../dto/api-response.dto.js';
 import {PingRequestDto} from '../../dto/v1/ping-request.dto.js';
 
 /** Network checks. JWT only: pinging reveals which internal hosts are up. */

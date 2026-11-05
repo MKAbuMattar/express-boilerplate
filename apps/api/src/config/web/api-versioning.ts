@@ -1,5 +1,5 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
 import type {RequestHandler} from 'express';
-import {ApiConstants} from '../../constant/api.constants.js';
 
 /**
  * URL-path versioning: /api/v1/..., /api/v2/...

@@ -1,9 +1,9 @@
+import {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
+import {DataSource} from '@express-boilerplate/persistence/config/database.config.js';
 import type express from 'express';
 import request from 'supertest';
-import {DataSource} from 'typeorm';
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {CacheStore} from '../../src/config/cache/cache-store.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('Actuator health', () => {

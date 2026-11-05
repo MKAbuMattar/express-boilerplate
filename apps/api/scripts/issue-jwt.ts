@@ -1,8 +1,8 @@
 import 'reflect-metadata';
+import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
 import {Application} from '../src/application.js';
-import {AppConfig} from '../src/config/app.config.js';
-import {ScopeConstants} from '../src/constant/scope.constants.js';
-import {TokenProvider} from '../src/security/jwt/token.provider.js';
 
 /**
  * Dev helper: pnpm jwt <subject> [expiresIn] [scopes].

@@ -1,10 +1,10 @@
+import {ProblemDetails} from '@express-boilerplate/common/exceptions/problem-details.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
+import {HealthService} from '@express-boilerplate/service/service/health.service.js';
 import {CatchError, isHttpResponse} from '@inversifyjs/http-core';
 import type {ExpressErrorFilter} from '@inversifyjs/http-express';
 import type {Request, Response} from 'express';
 import {inject} from 'inversify';
-import {DataSource} from 'typeorm';
-import {AppLogger} from '../util/app-logger.js';
-import {ProblemDetails} from './problem-details.js';
 
 @CatchError() // also registers the class as injectable
 export class GlobalErrorFilter implements ExpressErrorFilter {
@@ -30,7 +30,7 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
 
   constructor(
     @inject(AppLogger) private readonly appLogger: AppLogger,
-    @inject(DataSource) private readonly dataSource: DataSource,
+    @inject(HealthService) private readonly health: HealthService,
   ) {}
 
   catch(error: unknown, request: Request, response: Response): void {
@@ -58,7 +58,7 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
   }
 
   private isUnavailable(error: unknown): boolean {
-    if (!this.dataSource.isInitialized) return true;
+    if (!this.health.databaseUp) return true;
     if (!(error instanceof Error)) return false;
     const {code, driverError} = error as {
       code?: string;

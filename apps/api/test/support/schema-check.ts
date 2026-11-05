@@ -1,4 +1,4 @@
-import type {DataSource} from 'typeorm';
+import type {DataSource} from '@express-boilerplate/persistence/config/database.config.js';
 
 export class SchemaCheck {
   /** SQL TypeORM would still run to match the entities; empty means in sync. */

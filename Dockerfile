@@ -10,15 +10,20 @@ ARG APP
 ENV APP=${APP}
 RUN npm install -g pnpm@12.16.1
 WORKDIR /app
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.base.json ./
 COPY apps/api/package.json ./apps/api/
+COPY packages/common/package.json ./packages/common/
+COPY packages/persistence/package.json ./packages/persistence/
+COPY packages/service/package.json ./packages/service/
 
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile --filter "${APP}..."
+COPY packages ./packages
 COPY apps/api/tsconfig.json apps/api/tsconfig.build.json ./apps/api/
 COPY apps/api/src ./apps/api/src
-RUN pnpm --filter "${APP}" build
+# The api and every layer package it depends on, in dependency order.
+RUN pnpm --filter "${APP}..." build
 
 # One-shot local cert generator used by compose (see compose.yml `certs`).
 FROM build AS certs
@@ -29,7 +34,7 @@ ENTRYPOINT ["sh", "-c", "node_modules/.bin/tsx scripts/generate-certs.ts /certs 
 
 FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --prod --frozen-lockfile --filter "${APP}"
+    pnpm install --prod --frozen-lockfile --filter "${APP}..."
 
 FROM ${NODE_IMAGE} AS runtime
 # Patch OS packages to the latest fixes, then remove tools the app never
@@ -44,10 +49,14 @@ ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=443 \
     NODE_OPTIONS=--disable-proto=delete
-# pnpm links apps/api/node_modules into /app/node_modules/.pnpm, so both
-# keep their paths.
+# pnpm links each package's node_modules into /app/node_modules/.pnpm, so
+# every path is kept as is. Layers: api -> service -> persistence -> common.
 COPY --from=prod-deps --chown=node:node /app/node_modules /app/node_modules
 COPY --from=prod-deps --chown=node:node /app/apps/api/node_modules /app/apps/api/node_modules
+COPY --from=prod-deps --chown=node:node /app/packages /app/packages
+COPY --from=build --chown=node:node /app/packages/common/dist /app/packages/common/dist
+COPY --from=build --chown=node:node /app/packages/persistence/dist /app/packages/persistence/dist
+COPY --from=build --chown=node:node /app/packages/service/dist /app/packages/service/dist
 COPY --chown=node:node apps/api/package.json /app/apps/api/
 COPY --from=build --chown=node:node /app/apps/api/dist /app/apps/api/dist
 WORKDIR /app/apps/api

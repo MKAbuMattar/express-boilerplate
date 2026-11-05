@@ -1,4 +1,10 @@
 import {randomUUID} from 'node:crypto';
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {ExperimentConstants} from '@express-boilerplate/common/constant/experiment.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {SessionService} from '@express-boilerplate/common/security/sso/session.service.js';
+import {ExperimentService} from '@express-boilerplate/service/service/experiment.service.js';
 import {
   Controller,
   Get,
@@ -18,12 +24,6 @@ import type {
   Response as ExpressResponse,
 } from 'express';
 import {inject} from 'inversify';
-import {ApiConstants} from '../../../constant/api.constants.js';
-import {ExperimentConstants} from '../../../constant/experiment.constants.js';
-import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import {SessionService} from '../../../security/sso/session.service.js';
-import {ExperimentService} from '../../../service/experiment.service.js';
-import {ApiResponse} from '../../dto/api-response.dto.js';
 
 @Controller(ApiConstants.V1_EXPERIMENTS)
 export class ExperimentV1Resource {

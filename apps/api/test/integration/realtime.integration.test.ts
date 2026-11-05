@@ -1,15 +1,15 @@
 import https from 'node:https';
 import tls from 'node:tls';
+import {TlsConfig} from '@express-boilerplate/common/config/tls.config.js';
+import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {Principal} from '@express-boilerplate/common/security/principal.js';
+import {SessionService} from '@express-boilerplate/common/security/sso/session.service.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {WebSocket} from 'ws';
 import type {Application} from '../../src/application.js';
-import {TlsConfig} from '../../src/config/tls.config.js';
-import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
-import {Principal} from '../../src/security/principal.js';
-import {SessionService} from '../../src/security/sso/session.service.js';
 import {RawHttp} from '../support/raw-http.js';
 import {TestApp} from '../support/test-app.js';
 

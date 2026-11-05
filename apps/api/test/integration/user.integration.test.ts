@@ -1,8 +1,8 @@
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('UserV1Resource', () => {
@@ -72,7 +72,11 @@ describe('UserV1Resource', () => {
 
   it('/livez answers without touching the database', async () => {
     const dataSource = application.beans.getBean(
-      (await import('typeorm')).DataSource,
+      (
+        await import(
+          '@express-boilerplate/persistence/config/database.config.js'
+        )
+      ).DataSource,
     );
     await dataSource.destroy();
     try {

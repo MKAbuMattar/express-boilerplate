@@ -1,3 +1,8 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {CacheService} from '@express-boilerplate/common/service/cache.service.js';
+import {HealthService} from '@express-boilerplate/service/service/health.service.js';
 import {
   Controller,
   Get,
@@ -6,16 +11,11 @@ import {
 } from '@inversifyjs/http-core';
 import {OasResponse, OasSummary, OasTag} from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
-import {DataSource} from 'typeorm';
-import {ApiConstants} from '../../../constant/api.constants.js';
-import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import {CacheService} from '../../../service/cache.service.js';
-import {ApiResponse} from '../../dto/api-response.dto.js';
 
 @Controller(ApiConstants.V1_HEALTH)
 export class HealthV1Resource {
   constructor(
-    @inject(DataSource) private readonly dataSource: DataSource,
+    @inject(HealthService) private readonly health: HealthService,
     @inject(CacheService) private readonly cache: CacheService,
   ) {}
 
@@ -35,13 +35,13 @@ export class HealthV1Resource {
   )
   @Get()
   getHealth(): ApiResponse<{database: string; cache: string}> {
-    if (!this.dataSource.isInitialized) {
+    if (!this.health.databaseUp) {
       throw new ServiceUnavailableHttpResponse(
         ApiResponse.fail('Database not connected'),
       );
     }
     return ApiResponse.ok('Service is healthy', {
-      database: this.dataSource.options.type,
+      database: this.health.databaseType,
       cache: this.cache.type,
     });
   }

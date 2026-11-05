@@ -1,12 +1,12 @@
 import http from 'node:http';
 import net, {type AddressInfo} from 'node:net';
+import {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
+import {ServerHardening} from '@express-boilerplate/common/config/server-hardening.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {CacheStore} from '../../src/config/cache/cache-store.js';
-import {ServerHardening} from '../../src/config/server-hardening.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('Security: runtime hardening', () => {

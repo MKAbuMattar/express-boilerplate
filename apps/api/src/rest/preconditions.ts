@@ -1,5 +1,5 @@
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
 import {ErrorHttpResponse} from '@inversifyjs/http-core';
-import {ApiResponse} from './dto/api-response.dto.js';
 
 /**
  * Conditional requests (RFC 9110 section 13) for optimistic locking:

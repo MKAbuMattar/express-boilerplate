@@ -1,3 +1,12 @@
+import {QueueBroker} from '@express-boilerplate/common/config/queue/queue-broker.js';
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {QueueConstants} from '@express-boilerplate/common/constant/queue.constants.js';
+import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
+import type {DeadLetter} from '@express-boilerplate/common/model/dead-letter.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {Scopes} from '@express-boilerplate/common/security/authorization/scopes.js';
+import {JwtGuard} from '@express-boilerplate/common/security/jwt/jwt.guard.js';
 import {
   AcceptedHttpResponse,
   Body,
@@ -18,15 +27,6 @@ import {
   OasTag,
 } from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
-import {QueueBroker} from '../../../config/queue/queue-broker.js';
-import {ApiConstants} from '../../../constant/api.constants.js';
-import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import {QueueConstants} from '../../../constant/queue.constants.js';
-import {ScopeConstants} from '../../../constant/scope.constants.js';
-import type {DeadLetter} from '../../../model/dead-letter.js';
-import {Scopes} from '../../../security/authorization/scopes.js';
-import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
-import {ApiResponse} from '../../dto/api-response.dto.js';
 
 /** Enqueue jobs, inspect and replay dead letters. JWT on every route. */
 @Controller(ApiConstants.V1_QUEUES)

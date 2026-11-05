@@ -1,8 +1,8 @@
+import {ProblemDetails} from '@express-boilerplate/common/exceptions/problem-details.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
 import {ApiVersioning} from '../../src/config/web/api-versioning.js';
-import {ProblemDetails} from '../../src/exceptions/problem-details.js';
-import {ApiResponse} from '../../src/rest/dto/api-response.dto.js';
 import {PageDto, PageRequestDto} from '../../src/rest/dto/v2/page.dto.js';
 import {UserPatchDto} from '../../src/rest/dto/v2/user-patch.dto.js';
 import {Preconditions} from '../../src/rest/preconditions.js';

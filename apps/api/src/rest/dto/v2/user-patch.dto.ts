@@ -1,6 +1,6 @@
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {CreateUserDto} from '@express-boilerplate/service/dto/create-user.dto.js';
 import {BadRequestHttpResponse} from '@inversifyjs/http-core';
-import {ApiResponse} from '../api-response.dto.js';
-import {CreateUserDto} from '../create-user.dto.js';
 
 /**
  * PATCH body (JSON or application/merge-patch+json, RFC 7396): only the

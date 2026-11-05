@@ -1,7 +1,7 @@
+import type {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import type {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
+import {ProblemDetails} from '@express-boilerplate/common/exceptions/problem-details.js';
 import type {RequestHandler} from 'express';
-import {ProblemDetails} from '../../exceptions/problem-details.js';
-import type {AppConfig} from '../app.config.js';
-import type {CacheStore} from '../cache/cache-store.js';
 
 /**
  * Fixed-window rate limit per client IP, stored in the CacheStore, so with

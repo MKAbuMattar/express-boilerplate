@@ -1,10 +1,10 @@
+import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
+import {Principal} from '@express-boilerplate/common/security/principal.js';
+import {SessionService} from '@express-boilerplate/common/security/sso/session.service.js';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
-import {Principal} from '../../src/security/principal.js';
-import {SessionService} from '../../src/security/sso/session.service.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('ExperimentV1Resource (A/B over HTTP)', () => {

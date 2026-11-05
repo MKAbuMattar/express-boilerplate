@@ -1,9 +1,9 @@
+import {CacheService} from '@express-boilerplate/common/service/cache.service.js';
+import {UserRepository} from '@express-boilerplate/persistence/repository/user.repository.js';
+import {CreateUserDto} from '@express-boilerplate/service/dto/create-user.dto.js';
+import {UserService} from '@express-boilerplate/service/service/user.service.js';
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {UserRepository} from '../../src/repository/user.repository.js';
-import {CreateUserDto} from '../../src/rest/dto/create-user.dto.js';
-import {CacheService} from '../../src/service/cache.service.js';
-import {UserService} from '../../src/service/user.service.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('@Cacheable / @CacheEvict on UserService', () => {

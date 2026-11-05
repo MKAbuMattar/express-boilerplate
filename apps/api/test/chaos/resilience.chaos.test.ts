@@ -1,10 +1,10 @@
 import {createHmac} from 'node:crypto';
+import {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {UserRepository} from '@express-boilerplate/persistence/repository/user.repository.js';
 import request from 'supertest';
 import {afterEach, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {CacheStore} from '../../src/config/cache/cache-store.js';
-import {UserRepository} from '../../src/repository/user.repository.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {HttpsClient} from '../support/https-client.js';
 import {TestApp} from '../support/test-app.js';
 
@@ -35,7 +35,11 @@ describe('Chaos: dependencies fail, the app degrades cleanly', () => {
   it('database down: 503 on health and queries, then recovers', async () => {
     const {application: appCtx, app} = await boot();
     const dataSource = appCtx.beans.getBean(
-      (await import('typeorm')).DataSource,
+      (
+        await import(
+          '@express-boilerplate/persistence/config/database.config.js'
+        )
+      ).DataSource,
     );
     await dataSource.destroy();
 

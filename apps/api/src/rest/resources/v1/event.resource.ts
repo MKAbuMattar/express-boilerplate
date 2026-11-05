@@ -1,3 +1,7 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import type {AppEvent} from '@express-boilerplate/service/model/app-event.js';
+import {EventBus} from '@express-boilerplate/service/service/event-bus.service.js';
 import {
   Controller,
   Get,
@@ -11,10 +15,6 @@ import type {
   Response as ExpressResponse,
 } from 'express';
 import {inject} from 'inversify';
-import {ApiConstants} from '../../../constant/api.constants.js';
-import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import type {AppEvent} from '../../../model/app-event.js';
-import {EventBus} from '../../../service/event-bus.service.js';
 
 /**
  * Server-Sent Events: one long HTTP response the browser reads with

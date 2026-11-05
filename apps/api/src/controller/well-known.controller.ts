@@ -1,3 +1,6 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {JwtKeys} from '@express-boilerplate/common/security/jwt/jwt-keys.js';
 import {
   Controller,
   Get,
@@ -6,9 +9,6 @@ import {
 } from '@inversifyjs/http-core';
 import {OasResponse, OasSummary, OasTag} from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
-import {ApiConstants} from '../constant/api.constants.js';
-import {OpenApiConstants} from '../constant/openapi.constants.js';
-import {JwtKeys} from '../security/jwt/jwt-keys.js';
 
 /** Standard discovery documents. */
 @Controller(ApiConstants.WELL_KNOWN)

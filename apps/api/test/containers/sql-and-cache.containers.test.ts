@@ -1,8 +1,8 @@
 import {createHmac} from 'node:crypto';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {DataSource} from '@express-boilerplate/persistence/config/database.config.js';
 import request from 'supertest';
-import {DataSource} from 'typeorm';
 import {describe, expect, it, vi} from 'vitest';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {Containers, type StartedService} from '../support/containers.js';
 import {SchemaCheck} from '../support/schema-check.js';
 import {TestApp} from '../support/test-app.js';

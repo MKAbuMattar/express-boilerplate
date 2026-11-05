@@ -1,10 +1,10 @@
 import {createHash, randomUUID} from 'node:crypto';
 import {BlockList, isIPv4, isIPv6} from 'node:net';
+import type {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import type {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
+import {ProblemDetails} from '@express-boilerplate/common/exceptions/problem-details.js';
 import type {Request, RequestHandler, Response} from 'express';
 import type {Logger} from 'pino';
-import {ProblemDetails} from '../../exceptions/problem-details.js';
-import type {AppConfig} from '../app.config.js';
-import type {CacheStore} from '../cache/cache-store.js';
 
 /**
  * Request-level protections, each a small Express middleware. Application

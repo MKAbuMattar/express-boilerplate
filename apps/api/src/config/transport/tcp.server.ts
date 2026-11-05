@@ -1,13 +1,13 @@
 import type tls from 'node:tls';
 import type {TLSSocket} from 'node:tls';
+import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {Component} from '@express-boilerplate/common/config/stereotypes.js';
+import {TlsConfig} from '@express-boilerplate/common/config/tls.config.js';
+import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {Principal} from '@express-boilerplate/common/security/principal.js';
+import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
 import {inject} from 'inversify';
-import {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
-import {TokenProvider} from '../../security/jwt/token.provider.js';
-import {Principal} from '../../security/principal.js';
-import {AppLogger} from '../../util/app-logger.js';
-import {AppConfig} from '../app.config.js';
-import {Component} from '../stereotypes.js';
-import {TlsConfig} from '../tls.config.js';
 import {TransportMessage} from './transport-message.js';
 
 /**

@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs';
+import type {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
 import type {OpenApi3Dot1Object} from '@inversifyjs/open-api-types/v3Dot1';
-import {OpenApiConstants} from '../constant/openapi.constants.js';
-import type {AppConfig} from './app.config.js';
 
 /**
  * The OpenAPI 3.1 document behind Swagger UI (/docs, development only):

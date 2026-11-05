@@ -1,4 +1,8 @@
 import {readFileSync} from 'node:fs';
+import {ActuatorConstants} from '@express-boilerplate/common/constant/actuator.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import type {HealthReport} from '@express-boilerplate/service/model/health.js';
+import {HealthService} from '@express-boilerplate/service/service/health.service.js';
 import {
   Controller,
   Get,
@@ -8,10 +12,6 @@ import {
 import {OasResponse, OasSummary, OasTag} from '@inversifyjs/http-open-api';
 import type {Response as ExpressResponse} from 'express';
 import {inject} from 'inversify';
-import {ActuatorConstants} from '../constant/actuator.constants.js';
-import {OpenApiConstants} from '../constant/openapi.constants.js';
-import type {HealthReport} from '../model/health.js';
-import {HealthService} from '../service/health.service.js';
 
 /**
  * Health, info and metrics endpoints, plus the Kubernetes short paths.

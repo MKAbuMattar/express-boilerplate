@@ -1,3 +1,4 @@
+import {ProblemDetails} from '@express-boilerplate/common/exceptions/problem-details.js';
 import type {
   Application,
   NextFunction,
@@ -5,7 +6,6 @@ import type {
   RequestHandler,
   Response,
 } from 'express';
-import {ProblemDetails} from '../../exceptions/problem-details.js';
 
 type RouteLayer = {
   route?: {methods: Record<string, boolean>};

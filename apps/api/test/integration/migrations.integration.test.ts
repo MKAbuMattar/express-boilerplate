@@ -1,7 +1,7 @@
 import 'reflect-metadata';
+import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {DatabaseConfig} from '@express-boilerplate/persistence/config/database.config.js';
 import {afterEach, describe, expect, it} from 'vitest';
-import {AppConfig} from '../../src/config/app.config.js';
-import {DatabaseConfig} from '../../src/config/database.config.js';
 import {SchemaCheck} from '../support/schema-check.js';
 
 describe('Migrations', () => {

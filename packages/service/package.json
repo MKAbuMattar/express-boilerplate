@@ -1,0 +1,31 @@
+{
+  "name": "@express-boilerplate/service",
+  "description": "Layer 3, business: service contracts and implementations",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    "./*": "./dist/*"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@express-boilerplate/common": "workspace:*",
+    "@express-boilerplate/persistence": "workspace:*",
+    "@inversifyjs/http-core": "5.9.2",
+    "inversify": "8.2.4",
+    "nodemailer": "10.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@types/nodemailer": "8.0.2",
+    "rimraf": "6.1.4",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=26"
+  }
+}

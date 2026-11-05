@@ -1,14 +1,14 @@
+import {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
+import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
+import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
+import {Principal} from '@express-boilerplate/common/security/principal.js';
+import {UserService} from '@express-boilerplate/service/service/user.service.js';
 import express from 'express';
 import type {Logger} from 'pino';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it, vi} from 'vitest';
 import type {Application} from '../../src/application.js';
-import {CacheStore} from '../../src/config/cache/cache-store.js';
 import {RequestGuards} from '../../src/config/web/request-guards.js';
-import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
-import {Principal} from '../../src/security/principal.js';
-import {UserService} from '../../src/service/user.service.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('Security: request guards', () => {
