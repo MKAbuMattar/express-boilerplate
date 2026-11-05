@@ -4,14 +4,22 @@ import {
   CreatedHttpResponse,
   Delete,
   Get,
+  HttpStatusCode,
   NoContentHttpResponse,
   Params,
   Post,
   UseGuard,
 } from '@inversifyjs/http-core';
-import {OasSecurity, OasSummary} from '@inversifyjs/http-open-api';
+import {
+  OasParameter,
+  OasRequestBody,
+  OasResponse,
+  OasSecurity,
+  OasSummary,
+} from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
 import {ApiConstants} from '../../constant/api.constants.js';
+import {OpenApiConstants} from '../../constant/openapi.constants.js';
 import {UserConverter} from '../../converter/user.converter.js';
 import {JwtGuard} from '../../security/jwt/jwt.guard.js';
 import {UserService} from '../../service/user.service.js';
@@ -24,6 +32,7 @@ export class UserResource {
   constructor(@inject(UserService) private readonly userService: UserService) {}
 
   @OasSummary('List users (public)')
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Users found'))
   @Get()
   async getUsers(): Promise<ApiResponse<UserDto[]>> {
     const users = await this.userService.findAll();
@@ -31,6 +40,12 @@ export class UserResource {
   }
 
   @OasSummary('Get a user by id (public)')
+  @OasParameter(OpenApiConstants.ID_PATH_PARAM)
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('User found'))
+  @OasResponse(
+    HttpStatusCode.NOT_FOUND,
+    OpenApiConstants.json('User not found'),
+  )
   @Get('/:id')
   async getUser(
     @Params({name: 'id'}) id: string,
@@ -40,6 +55,20 @@ export class UserResource {
   }
 
   @OasSummary('Create a user (JWT)')
+  @OasRequestBody(OpenApiConstants.CREATE_USER_BODY)
+  @OasResponse(HttpStatusCode.CREATED, OpenApiConstants.json('User created'))
+  @OasResponse(
+    HttpStatusCode.BAD_REQUEST,
+    OpenApiConstants.json('Validation failed'),
+  )
+  @OasResponse(
+    HttpStatusCode.UNAUTHORIZED,
+    OpenApiConstants.json('Missing or invalid JWT'),
+  )
+  @OasResponse(
+    HttpStatusCode.CONFLICT,
+    OpenApiConstants.json('Email already in use'),
+  )
   @OasSecurity({bearerAuth: []})
   @UseGuard(JwtGuard)
   @Post()
@@ -51,6 +80,16 @@ export class UserResource {
   }
 
   @OasSummary('Delete a user (JWT)')
+  @OasParameter(OpenApiConstants.ID_PATH_PARAM)
+  @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
+  @OasResponse(
+    HttpStatusCode.UNAUTHORIZED,
+    OpenApiConstants.json('Missing or invalid JWT'),
+  )
+  @OasResponse(
+    HttpStatusCode.NOT_FOUND,
+    OpenApiConstants.json('User not found'),
+  )
   @OasSecurity({bearerAuth: []})
   @UseGuard(JwtGuard)
   @Delete('/:id')

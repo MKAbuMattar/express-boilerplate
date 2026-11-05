@@ -236,6 +236,9 @@ importers:
       '@biomejs/biome':
         specifier: 2.6.5
         version: 2.6.5
+      '@inversifyjs/open-api-types':
+        specifier: 2.0.1
+        version: 2.0.1
       '@types/compression':
         specifier: 1.8.1
         version: 1.8.1
@@ -583,6 +586,9 @@ packages:
     resolution: {integrity: sha512-8ReKiziSjTEpmxSNNHetE0BOoSNterf6WPUVG3QRgm00EUplSKJCKCNRmqUm+ITEwJpuZ6aaark9RzUpyflpog==}
     peerDependencies:
       winston: ^3.19.0
+
+  '@inversifyjs/open-api-types@2.0.1':
+    resolution: {integrity: sha512-I69vA+0deR6o5OKVTejNMDh1haZbqxEbPTfb/hGaayW3rQEv1KeYMVwadpDqa+fAz6wJS6w/eUlVsZZzIJdZMw==}
 
   '@inversifyjs/plugin@0.3.2':
     resolution: {integrity: sha512-1s3Jdnv/rtrTjN1WlfwLlNRUf5OJIaxvThIi05EkYhlxqZTsH1cfpR3INzEZyFyNTEf58eYdIvDh9J9iXiTtIg==}
@@ -2431,6 +2437,8 @@ snapshots:
   '@inversifyjs/logger@2.0.1(winston@3.19.0)':
     dependencies:
       winston: 3.19.0
+
+  '@inversifyjs/open-api-types@2.0.1': {}
 
   '@inversifyjs/plugin@0.3.2': {}
 

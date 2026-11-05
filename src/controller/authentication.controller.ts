@@ -2,18 +2,20 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatusCode,
   Post,
   Request,
   Response,
   UseGuard,
 } from '@inversifyjs/http-core';
-import {OasSummary} from '@inversifyjs/http-open-api';
+import {OasResponse, OasSummary} from '@inversifyjs/http-open-api';
 import type {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
 import {inject} from 'inversify';
 import {ApiConstants} from '../constant/api.constants.js';
+import {OpenApiConstants} from '../constant/openapi.constants.js';
 import {SecurityConstants} from '../constant/security.constants.js';
 import {ApiResponse} from '../rest/dto/api-response.dto.js';
 import type {Principal} from '../security/principal.js';
@@ -32,6 +34,11 @@ export class AuthenticationController {
   ) {}
 
   @OasSummary('Start OIDC login (redirects to the IdP)')
+  @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
+  @OasResponse(
+    HttpStatusCode.NOT_IMPLEMENTED,
+    OpenApiConstants.json('OIDC not configured'),
+  )
   @Get(ApiConstants.AUTH_OIDC_LOGIN)
   async oidcLogin(@Response() response: ExpressResponse): Promise<void> {
     const {url, loginState} = await this.oidcService.createLoginUrl();
@@ -48,6 +55,11 @@ export class AuthenticationController {
   }
 
   @OasSummary('OIDC redirect URI')
+  @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
+  @OasResponse(
+    HttpStatusCode.UNAUTHORIZED,
+    OpenApiConstants.json('Login failed'),
+  )
   @Get(ApiConstants.AUTH_OIDC_CALLBACK)
   async oidcCallback(
     @Request() request: ExpressRequest,
@@ -76,12 +88,22 @@ export class AuthenticationController {
   }
 
   @OasSummary('Start SAML login (redirects to the IdP)')
+  @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
+  @OasResponse(
+    HttpStatusCode.NOT_IMPLEMENTED,
+    OpenApiConstants.json('SAML not configured'),
+  )
   @Get(ApiConstants.AUTH_SAML_LOGIN)
   async samlLogin(@Response() response: ExpressResponse): Promise<void> {
     response.redirect(await this.samlService.createLoginUrl());
   }
 
   @OasSummary('SAML assertion consumer service (HTTP-POST)')
+  @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
+  @OasResponse(
+    HttpStatusCode.UNAUTHORIZED,
+    OpenApiConstants.json('Invalid assertion'),
+  )
   @Post(ApiConstants.AUTH_SAML_ACS)
   async samlAcs(
     @Body() body: Record<string, string>,
@@ -93,12 +115,22 @@ export class AuthenticationController {
   }
 
   @OasSummary('SAML service provider metadata')
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.XML)
+  @OasResponse(
+    HttpStatusCode.NOT_IMPLEMENTED,
+    OpenApiConstants.json('SAML not configured'),
+  )
   @Get(ApiConstants.AUTH_SAML_METADATA)
   samlMetadata(@Response() response: ExpressResponse): void {
     response.type('application/xml').send(this.samlService.metadata());
   }
 
   @OasSummary('Current SSO session (OIDC or SAML)')
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('Authenticated principal'),
+  )
+  @OasResponse(HttpStatusCode.UNAUTHORIZED, OpenApiConstants.json('No session'))
   @UseGuard(SsoGuard)
   @Get(ApiConstants.AUTH_ME)
   me(@Request() request: ExpressRequest): ApiResponse<Principal> {
@@ -106,6 +138,7 @@ export class AuthenticationController {
   }
 
   @OasSummary('End the SSO session')
+  @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
   @Post(ApiConstants.AUTH_LOGOUT)
   logout(@Response() response: ExpressResponse): void {
     this.sessionService.end(response);
