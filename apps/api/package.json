@@ -4,7 +4,7 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
-    "dev": "tsx watch --disable-proto=delete --env-file=.env.development --env-file-if-exists=.env src/main.ts",
+    "dev": "node --watch --import tsx --disable-proto=delete --env-file=.env.development --env-file-if-exists=.env src/main.ts",
     "build": "rimraf dist && tsc -p tsconfig.build.json",
     "start": "node --disable-proto=delete --env-file-if-exists=.env dist/main.js",
     "certs": "tsx scripts/generate-certs.ts",

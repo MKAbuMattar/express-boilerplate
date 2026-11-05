@@ -42,6 +42,7 @@ export class RawHttp {
     const tls = TlsConfig.serverOptions(
       new AppConfig({
         NODE_ENV: 'test',
+        TCP_ENABLED: 'true',
         TLS_KEY_FILE: join(dir, 'server.key'),
         TLS_CERT_FILE: join(dir, 'server.crt'),
         TLS_CA_FILE: join(dir, 'ca.crt'),

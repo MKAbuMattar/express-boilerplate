@@ -28,8 +28,11 @@ export class TlsConfig {
       minVersion: 'TLSv1.2',
       ciphers: TlsConfig.CIPHERS,
       honorCipherOrder: true,
-      // One port: HTTP/1.1 (and WebSocket upgrades) or the TCP line protocol.
-      ALPNProtocols: ['http/1.1', TlsConfig.LINE_PROTOCOL],
+      // One port: HTTP/1.1 (and WebSocket upgrades), plus the TCP line
+      // protocol only when it is on, so no client negotiates a dead protocol.
+      ALPNProtocols: config.env.TCP_ENABLED
+        ? ['http/1.1', TlsConfig.LINE_PROTOCOL]
+        : ['http/1.1'],
       // Ask every client for a cert but let the handshake pass without one,
       // so only routes behind MtlsGuard require it.
       requestCert: true,
