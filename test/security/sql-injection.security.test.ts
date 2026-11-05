@@ -48,7 +48,7 @@ describe('Security: SQL injection', () => {
   beforeAll(async () => {
     ({application, app} = await TestApp.create());
     auth = {
-      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('sec')}`,
+      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('sec', TestApp.ALL_SCOPES)}`,
     };
     for (const name of ['Alice', 'Bob']) {
       await request(app)

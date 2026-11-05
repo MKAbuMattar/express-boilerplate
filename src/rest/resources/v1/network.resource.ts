@@ -14,6 +14,8 @@ import {
 import {inject} from 'inversify';
 import {ApiConstants} from '../../../constant/api.constants.js';
 import {OpenApiConstants} from '../../../constant/openapi.constants.js';
+import {ScopeConstants} from '../../../constant/scope.constants.js';
+import {Scopes} from '../../../security/authorization/scopes.js';
 import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
 import {
   NetworkService,
@@ -52,7 +54,7 @@ export class NetworkV1Resource {
     HttpStatusCode.UNAUTHORIZED,
     OpenApiConstants.json('Missing or invalid JWT'),
   )
-  @UseGuard(JwtGuard)
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.OPS_NETWORK))
   @Post('/ping')
   async ping(@Body() body: unknown): Promise<ApiResponse<PingResult>> {
     const {host} = PingRequestDto.from(body);

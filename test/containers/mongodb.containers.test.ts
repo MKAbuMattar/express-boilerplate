@@ -28,7 +28,7 @@ describe.skipIf(!docker)('Containers: MongoDB', () => {
       ).toBe(404);
       const token = await application.beans
         .getBean(TokenProvider)
-        .createToken('it');
+        .createToken('it', TestApp.ALL_SCOPES);
       await Containers.userLifecycle(app, token);
     } finally {
       await application.close();

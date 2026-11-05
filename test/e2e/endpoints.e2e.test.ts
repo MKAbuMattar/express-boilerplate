@@ -79,7 +79,7 @@ describe('E2E: real HTTPS server', () => {
   });
 
   const jwt = () =>
-    new SignJWT({})
+    new SignJWT({scope: 'users:write ops:queues ops:network'})
       .setProtectedHeader({alg: 'HS256'})
       .setSubject('e2e-admin')
       .setIssuer('express-boilerplate')

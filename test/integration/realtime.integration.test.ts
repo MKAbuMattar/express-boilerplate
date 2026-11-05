@@ -38,7 +38,7 @@ describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
     await application.beans.getBean(UdpServer).start(0);
     token = await application.beans
       .getBean(TokenProvider)
-      .createToken('rt-user');
+      .createToken('rt-user', TestApp.ALL_SCOPES);
   });
   afterAll(async () => {
     await application.close();

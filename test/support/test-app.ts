@@ -9,6 +9,8 @@ import {AppConfig} from '../../src/config/app.config.js';
 export class TestApp {
   static readonly JWT_SECRET = 'test-jwt-secret-0123456789abcdef0123';
   static readonly HMAC_SECRET = 'test-hmac-secret';
+  /** Claims for a token that may call every protected route. */
+  static readonly ALL_SCOPES = {scope: 'users:write ops:queues ops:network'};
 
   private static certDir?: string;
 

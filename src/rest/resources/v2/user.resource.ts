@@ -30,6 +30,8 @@ import {inject} from 'inversify';
 import {ApiConstants} from '../../../constant/api.constants.js';
 import {OpenApiConstants} from '../../../constant/openapi.constants.js';
 import {UserConverter} from '../../../converter/user.converter.js';
+import {ScopeConstants} from '../../../constant/scope.constants.js';
+import {Scopes} from '../../../security/authorization/scopes.js';
 import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
 import {UserService} from '../../../service/user.service.js';
 import {ApiResponse} from '../../dto/api-response.dto.js';
@@ -171,7 +173,7 @@ export class UserV2Resource {
     HttpStatusCode.CONFLICT,
     OpenApiConstants.json('Email already in use'),
   )
-  @UseGuard(JwtGuard)
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Post()
   async createUser(@Body() body: unknown): Promise<CreatedHttpResponse> {
     const user = await this.userService.create(CreateUserDto.fromV2(body));
@@ -190,7 +192,7 @@ export class UserV2Resource {
     HttpStatusCode.PRECONDITION_FAILED,
     OpenApiConstants.json('ETag mismatch'),
   )
-  @UseGuard(JwtGuard)
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Put('/:id')
   async replaceUser(
     @Params({name: 'id'}) id: string,
@@ -233,7 +235,7 @@ export class UserV2Resource {
     HttpStatusCode.PRECONDITION_FAILED,
     OpenApiConstants.json('ETag mismatch'),
   )
-  @UseGuard(JwtGuard)
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Patch('/:id')
   async patchUser(
     @Params({name: 'id'}) id: string,
@@ -257,7 +259,7 @@ export class UserV2Resource {
     HttpStatusCode.NOT_FOUND,
     OpenApiConstants.json('User not found'),
   )
-  @UseGuard(JwtGuard)
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Delete('/:id')
   async deleteUser(
     @Params({name: 'id'}) id: string,

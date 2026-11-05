@@ -12,7 +12,9 @@ describe('API versioning (/api/v1, /api/v2)', () => {
 
   beforeAll(async () => {
     ({application, app} = await TestApp.create());
-    token = await application.beans.getBean(TokenProvider).createToken('admin');
+    token = await application.beans
+      .getBean(TokenProvider)
+      .createToken('admin', TestApp.ALL_SCOPES);
     for (const [name, email, phone] of [
       ['Alice', 'alice@example.com', '+962 79 123 4567'],
       ['Bob', 'bob@example.com', null],

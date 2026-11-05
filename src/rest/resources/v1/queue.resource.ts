@@ -22,12 +22,14 @@ import {ApiConstants} from '../../../constant/api.constants.js';
 import {OpenApiConstants} from '../../../constant/openapi.constants.js';
 import {QueueConstants} from '../../../constant/queue.constants.js';
 import type {DeadLetter} from '../../../model/dead-letter.js';
+import {ScopeConstants} from '../../../constant/scope.constants.js';
+import {Scopes} from '../../../security/authorization/scopes.js';
 import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
 import {ApiResponse} from '../../dto/api-response.dto.js';
 
 /** Enqueue jobs, inspect and replay dead letters. JWT on every route. */
 @Controller(ApiConstants.V1_QUEUES)
-@UseGuard(JwtGuard)
+@UseGuard(JwtGuard, Scopes.require(ScopeConstants.OPS_QUEUES))
 export class QueueV1Resource {
   constructor(@inject(QueueBroker) private readonly broker: QueueBroker) {}
 

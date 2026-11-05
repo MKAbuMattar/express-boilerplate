@@ -67,7 +67,7 @@ describe('Chaos: dependencies fail, the app degrades cleanly', () => {
     }
     const token = await appCtx.beans
       .getBean(TokenProvider)
-      .createToken('chaos');
+      .createToken('chaos', TestApp.ALL_SCOPES);
     const created = await request(app)
       .post('/api/users')
       .auth(token, {type: 'bearer'})

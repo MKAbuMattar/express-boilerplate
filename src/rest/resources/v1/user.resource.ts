@@ -21,6 +21,8 @@ import {inject} from 'inversify';
 import {ApiConstants} from '../../../constant/api.constants.js';
 import {OpenApiConstants} from '../../../constant/openapi.constants.js';
 import {UserConverter} from '../../../converter/user.converter.js';
+import {ScopeConstants} from '../../../constant/scope.constants.js';
+import {Scopes} from '../../../security/authorization/scopes.js';
 import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
 import {UserService} from '../../../service/user.service.js';
 import {ApiResponse} from '../../dto/api-response.dto.js';
@@ -70,7 +72,7 @@ export class UserV1Resource {
     OpenApiConstants.json('Email already in use'),
   )
   @OasSecurity({bearerAuth: []})
-  @UseGuard(JwtGuard)
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Post()
   async createUser(@Body() body: unknown): Promise<CreatedHttpResponse> {
     const user = await this.userService.create(CreateUserDto.from(body));
@@ -91,7 +93,7 @@ export class UserV1Resource {
     OpenApiConstants.json('User not found'),
   )
   @OasSecurity({bearerAuth: []})
-  @UseGuard(JwtGuard)
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Delete('/:id')
   async deleteUser(
     @Params({name: 'id'}) id: string,

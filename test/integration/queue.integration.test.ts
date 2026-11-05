@@ -17,7 +17,7 @@ describe('Queues and dead-letter queues', () => {
       QUEUE_BACKOFF_MS: '5',
     }));
     auth = {
-      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('ops')}`,
+      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('ops', TestApp.ALL_SCOPES)}`,
     };
   });
   afterAll(() => application.close());

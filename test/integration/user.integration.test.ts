@@ -12,7 +12,9 @@ describe('UserV1Resource', () => {
 
   beforeAll(async () => {
     ({application, app} = await TestApp.create());
-    token = await application.beans.getBean(TokenProvider).createToken('admin');
+    token = await application.beans
+      .getBean(TokenProvider)
+      .createToken('admin', TestApp.ALL_SCOPES);
   });
   afterAll(() => application.close());
 

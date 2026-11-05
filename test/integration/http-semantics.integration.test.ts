@@ -17,7 +17,7 @@ describe('HTTP semantics and standard responses', () => {
     ({application, app} = await TestApp.create());
     raw = await RawHttp.listen(app);
     auth = {
-      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('admin')}`,
+      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('admin', TestApp.ALL_SCOPES)}`,
     };
   });
   afterAll(async () => {

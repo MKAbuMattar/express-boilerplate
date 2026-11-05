@@ -44,7 +44,7 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
         ).toEqual([]);
         const token = await application.beans
           .getBean(TokenProvider)
-          .createToken('it');
+          .createToken('it', TestApp.ALL_SCOPES);
         await Containers.userLifecycle(app, token);
       } finally {
         await application.close();
@@ -74,7 +74,7 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
             ).toBe('redis');
             const token = await application.beans
               .getBean(TokenProvider)
-              .createToken('it');
+              .createToken('it', TestApp.ALL_SCOPES);
             await Containers.userLifecycle(app, token);
 
             const ts = String(Math.floor(Date.now() / 1000));

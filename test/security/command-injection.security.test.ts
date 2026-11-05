@@ -18,7 +18,7 @@ describe('Security: command injection (ping)', () => {
   beforeAll(async () => {
     ({application, app} = await TestApp.create());
     auth = {
-      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('sec')}`,
+      authorization: `Bearer ${await application.beans.getBean(TokenProvider).createToken('sec', TestApp.ALL_SCOPES)}`,
     };
   });
   afterAll(() => application.close());
