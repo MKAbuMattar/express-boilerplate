@@ -1,31 +1,67 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", "customManagers:biomeVersions"],
-  "labels": ["renovate"],
+  "extends": [
+    "config:recommended",
+    "customManagers:biomeVersions"
+  ],
+  "labels": [
+    "renovate"
+  ],
   "dependencyDashboard": true,
   "lockFileMaintenance": {
     "enabled": true
   },
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "description": "Supply-chain guard: let new npm releases age 3 days before Renovate proposes them (security fixes are exempt).",
+      "matchDatasources": [
+        "npm"
+      ],
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch",
       "automerge": true
     },
     {
-      "matchPackageNames": ["@biomejs/biome"],
+      "matchPackageNames": [
+        "@biomejs/biome"
+      ],
       "groupName": "biome",
       "groupSlug": "biome",
       "automerge": true
     },
     {
-      "packagePatterns": ["@types", "typescript"],
+      "packagePatterns": [
+        "@types",
+        "typescript"
+      ],
       "groupName": "typescript"
     },
     {
-      "packagePatterns": ["@vitest", "vitest"],
+      "packagePatterns": [
+        "@vitest",
+        "vitest"
+      ],
       "groupName": "vitest"
     }
-  ]
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security"
+    ],
+    "schedule": [
+      "at any time"
+    ],
+    "automerge": true
+  },
+  "osvVulnerabilityAlerts": true
 }

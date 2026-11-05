@@ -1,6 +1,7 @@
 import http from 'node:http';
 import https from 'node:https';
 import {Application} from './application.js';
+import {ServerHardening} from './config/server-hardening.js';
 import {TlsConfig} from './config/tls.config.js';
 import {AppLogger} from './util/app-logger.js';
 
@@ -13,9 +14,16 @@ export class Main {
     const {logger} = application.beans.getBean(AppLogger);
     const app = await application.init();
 
-    const server = config.env.TLS_ENABLED
-      ? https.createServer(TlsConfig.serverOptions(config), app)
-      : http.createServer(app);
+    const limits = ServerHardening.CREATE_OPTIONS;
+    const server = ServerHardening.apply(
+      config.env.TLS_ENABLED
+        ? https.createServer(
+            {...TlsConfig.serverOptions(config), ...limits},
+            app,
+          )
+        : http.createServer(limits, app),
+      config,
+    );
 
     await application.startTransports(server);
     server.listen(config.env.PORT, config.env.HOST, () => {

@@ -7,3 +7,43 @@ allowBuilds:
   ssh2: false
   # bullmq dep: optional native msgpack speedup; JS fallback is used
   msgpackr-extract: false
+overrides:
+  # Dev-only (testcontainers > archiver > archiver-utils). Patched for
+  # GHSA-3g3m-2fjr-6pw4 and GHSA-g3hv-75wg-m249. Drop when archiver-utils
+  # moves to glob 14 itself.
+  "archiver-utils>glob": 14.0.3
+# Supply-chain guard: refuse versions published less than 3 days ago
+# (most hijacked releases are caught and pulled within hours).
+minimumReleaseAge: 4320
+minimumReleaseAgeExclude:
+  # Exact versions already in the lockfile when the guard was enabled
+  # (2026-11-05). Each line stops mattering once that version is upgraded.
+  - "@biomejs/biome@2.6.5"
+  - "@biomejs/cli-android-arm64@2.6.5"
+  - "@biomejs/cli-android-x64@2.6.5"
+  - "@biomejs/cli-darwin-arm64@2.6.5"
+  - "@biomejs/cli-darwin-x64@2.6.5"
+  - "@biomejs/cli-linux-arm64-musl@2.6.5"
+  - "@biomejs/cli-linux-arm64@2.6.5"
+  - "@biomejs/cli-linux-x64-musl@2.6.5"
+  - "@biomejs/cli-linux-x64@2.6.5"
+  - "@biomejs/cli-win32-arm64@2.6.5"
+  - "@biomejs/cli-win32-x64@2.6.5"
+  - "@inversifyjs/common@2.0.2"
+  - "@inversifyjs/container@3.1.4"
+  - "@inversifyjs/core@15.0.2"
+  - "@inversifyjs/framework-core@2.2.2"
+  - "@inversifyjs/http-core@5.9.2"
+  - "@inversifyjs/http-express@5.9.2"
+  - "@inversifyjs/http-instrumentation-core@5.9.2"
+  - "@inversifyjs/http-open-api@5.9.2"
+  - "@inversifyjs/json-schema-pointer@2.0.1"
+  - "@inversifyjs/logger@2.0.1"
+  - "@inversifyjs/open-api-types@2.0.1"
+  - "@inversifyjs/plugin@0.3.2"
+  - "@inversifyjs/prototype-utils@0.2.2"
+  - "@inversifyjs/reflect-metadata-utils@1.5.1"
+  - "bare-url@2.5.6"
+  - "bullmq@6.7.0"
+  - "inversify@8.2.4"
+  - "rimraf@6.1.4"

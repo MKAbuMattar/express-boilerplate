@@ -52,6 +52,25 @@ export class RedisCacheStore extends CacheStore {
     return reply !== null;
   }
 
+  async increment(
+    key: string,
+    ttlSeconds: number,
+  ): Promise<{count: number; resetSeconds: number}> {
+    // One atomic round trip. EXPIRE NX sets the TTL only when the key has
+    // none, so the window does not slide and a crash between commands can
+    // never leave a counter that never expires.
+    const [count, , ttl] = (await this.connection
+      .multi()
+      .incr(key)
+      .expire(key, ttlSeconds, 'NX')
+      .ttl(key)
+      .exec()) as unknown as [number, number, number];
+    return {
+      count: Number(count),
+      resetSeconds: Number(ttl) > 0 ? Number(ttl) : ttlSeconds,
+    };
+  }
+
   async delete(...keys: string[]): Promise<void> {
     // One DEL per key: a multi-key DEL fails across cluster hash slots.
     await Promise.all(keys.map((key) => this.connection.del(key)));

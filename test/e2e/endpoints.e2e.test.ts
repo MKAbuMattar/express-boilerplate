@@ -2,6 +2,7 @@ import {type ChildProcess, spawn} from 'node:child_process';
 import {createHmac, randomBytes} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
+import tls from 'node:tls';
 import {SignJWT} from 'jose';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {WebSocket} from 'ws';
@@ -28,34 +29,38 @@ describe('E2E: real HTTPS server', () => {
     idp = await new MockIdentityProvider(certs).start();
     const port = await HttpsClient.freePort();
     client = new HttpsClient(certs, port);
-    server = spawn(process.execPath, ['--import', 'tsx', 'src/main.ts'], {
-      env: {
-        ...process.env,
-        NODE_ENV: 'development',
-        NODE_EXTRA_CA_CERTS: join(certs, 'ca.crt'),
-        HOST: '127.0.0.1',
-        PORT: String(port),
-        PUBLIC_URL: `https://localhost:${port}`,
-        TLS_KEY_FILE: join(certs, 'server.key'),
-        TLS_CERT_FILE: join(certs, 'server.crt'),
-        TLS_CA_FILE: join(certs, 'ca.crt'),
-        DB_TYPE: 'sqljs',
-        DB_URL: '',
-        CACHE_TYPE: 'memory',
-        JWT_SECRET,
-        HMAC_CLIENTS: `e2e-partner:${HMAC_SECRET}`,
-        OAUTH2_ISSUER: idp.issuer,
-        OAUTH2_AUDIENCE: MockIdentityProvider.API_AUDIENCE,
-        OAUTH2_JWKS_URI: idp.jwksUri,
-        OIDC_ISSUER: idp.issuer,
-        OIDC_CLIENT_ID: MockIdentityProvider.CLIENT_ID,
-        OIDC_CLIENT_SECRET: 'e2e-secret',
-        SAML_ENTRY_POINT: `${idp.issuer}/saml`,
-        SAML_ISSUER: 'express-boilerplate-e2e',
-        SAML_IDP_CERT: readFileSync(join(certs, 'ca.crt'), 'utf8'),
+    server = spawn(
+      process.execPath,
+      ['--disable-proto=delete', '--import', 'tsx', 'src/main.ts'],
+      {
+        env: {
+          ...process.env,
+          NODE_ENV: 'development',
+          NODE_EXTRA_CA_CERTS: join(certs, 'ca.crt'),
+          HOST: '127.0.0.1',
+          PORT: String(port),
+          PUBLIC_URL: `https://localhost:${port}`,
+          TLS_KEY_FILE: join(certs, 'server.key'),
+          TLS_CERT_FILE: join(certs, 'server.crt'),
+          TLS_CA_FILE: join(certs, 'ca.crt'),
+          DB_TYPE: 'sqljs',
+          DB_URL: '',
+          CACHE_TYPE: 'memory',
+          JWT_SECRET,
+          HMAC_CLIENTS: `e2e-partner:${HMAC_SECRET}`,
+          OAUTH2_ISSUER: idp.issuer,
+          OAUTH2_AUDIENCE: MockIdentityProvider.API_AUDIENCE,
+          OAUTH2_JWKS_URI: idp.jwksUri,
+          OIDC_ISSUER: idp.issuer,
+          OIDC_CLIENT_ID: MockIdentityProvider.CLIENT_ID,
+          OIDC_CLIENT_SECRET: 'e2e-secret',
+          SAML_ENTRY_POINT: `${idp.issuer}/saml`,
+          SAML_ISSUER: 'express-boilerplate-e2e',
+          SAML_IDP_CERT: readFileSync(join(certs, 'ca.crt'), 'utf8'),
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
       },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    });
+    );
     server.stdout?.on('data', (chunk) => (output += chunk));
     server.stderr?.on('data', (chunk) => (output += chunk));
     for (let i = 0; i < 100; i++) {
@@ -278,6 +283,43 @@ describe('E2E: real HTTPS server', () => {
     const problem = await client.request('DELETE', `/api/v2/users/${id}`);
     expect(problem.status).toBe(401);
     expect(String(problem.headers['content-type'])).toMatch(/problem\+json/);
+  });
+
+  it('TLS: strong ECDHE suites only, nothing below TLS 1.2', async () => {
+    const handshake = (options: tls.ConnectionOptions) =>
+      new Promise<string>((resolve) => {
+        const socket = tls.connect(
+          {
+            host: 'localhost',
+            port: client.port,
+            ca: readFileSync(join(certs, 'ca.crt')),
+            ...options,
+          },
+          () => {
+            const cipher = socket.getCipher().name;
+            socket.end();
+            resolve(cipher);
+          },
+        );
+        socket.on('error', (error) => resolve(`rejected: ${error.message}`));
+      });
+    expect(
+      await handshake({
+        maxVersion: 'TLSv1.2',
+        ciphers: 'ECDHE-RSA-AES128-GCM-SHA256',
+      }),
+    ).toBe('ECDHE-RSA-AES128-GCM-SHA256');
+    // Static RSA key exchange: no forward secrecy, so the server refuses it.
+    expect(
+      await handshake({maxVersion: 'TLSv1.2', ciphers: 'AES128-GCM-SHA256'}),
+    ).toMatch(/^rejected/);
+    expect(
+      await handshake({
+        minVersion: 'TLSv1',
+        maxVersion: 'TLSv1.1',
+        ciphers: 'DEFAULT@SECLEVEL=0',
+      }),
+    ).toMatch(/^rejected/);
   });
 
   it('A/B: a visitor keeps the variant', async () => {

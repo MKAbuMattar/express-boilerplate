@@ -38,7 +38,8 @@ Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/d
 | `pnpm build` | Compile with TypeScript 7 to `dist/` |
 | `pnpm start` | Run `dist/main.js` |
 | `pnpm test` | Every test type (see Testing) |
-| `pnpm test:<type>` | One type: `unit`, `integration`, `containers`, `e2e`, `monkey`, `chaos` |
+| `pnpm test:<type>` | One type: `unit`, `integration`, `containers`, `e2e`, `security`, `monkey`, `chaos` |
+| `pnpm migration:show` / `:run` / `:revert` / `:create` | Database migrations |
 | `pnpm test:cov` | Coverage for unit and integration |
 | `pnpm lint` / `pnpm lint:fix` | Biome |
 | `pnpm typecheck` | `tsc --noEmit` |
@@ -51,26 +52,30 @@ Layered like a Spring Boot application. Every unit is a class.
 
 ```
 src/
-├── main.ts                  Main: starts the HTTPS (or HTTP) server, graceful shutdown
-├── application.ts           Application: builds the container and the Express app
-├── config/                  AppConfig (env), AppConfiguration (@Bean methods), BeanFactory,
-│   │                        stereotypes, DatabaseConfig, TlsConfig
-│   └── cache/               CacheStore, MemoryCacheStore, RedisCacheStore
-├── constant/                ApiConstants (routes), SecurityConstants, CacheConstants
+├── main.ts                  Main: HTTPS server, socket limits, transports, graceful shutdown
+├── application.ts           Application: container, middleware, routes, lifecycle
+├── config/                  AppConfig (env), AppConfiguration (@Bean), BeanFactory, stereotypes,
+│   │                        DatabaseConfig, TlsConfig, ApiVersioning, HttpSemantics,
+│   │                        RateLimiter, ServerHardening, cli.data-source (migrations CLI)
+│   ├── cache/               CacheStore, MemoryCacheStore, RedisCacheStore
+│   └── queue/               QueueBroker, MemoryQueueBroker, BullMqQueueBroker
+├── constant/                ApiConstants, SecurityConstants, CacheConstants, QueueConstants, ...
 ├── controller/              AuthenticationController (OIDC and SAML login flows)
-├── converter/               UserConverter (entity to DTO)
-├── enumeration/             AuthStrategy, DatabaseType, CacheType
-├── exceptions/              AuthException, GlobalExceptionFilter
-├── model/                   UserEntity (TypeORM)
+├── converter/               UserConverter (entity to v1/v2 DTO, ETag)
+├── enumeration/             AuthStrategy, DatabaseType, CacheType, ExperimentVariant
+├── exceptions/              AuthException, GlobalExceptionFilter, ProblemDetails (RFC 9457)
+├── migration/               Versioned schema changes, one class each
+├── model/                   UserEntity, AppEvent, DeadLetter
 ├── repository/              UserRepository
 ├── rest/
-│   ├── dto/                 ApiResponse, CreateUserDto (validates input), UserDto
-│   └── resources/           HealthV1Resource, UserV1Resource, SecureV1Resource
-├── security/
-│   ├── principal.ts         Principal set on the request by every guard
-│   ├── hmac/  jwt/  mtls/  oauth2/  sso/
-├── service/                 UserService, CacheService (abstract contracts)
-│   └── impl/                UserServiceImpl, CacheServiceImpl
+│   ├── dto/                 ApiResponse, CreateUserDto; v1/ and v2/ request and response shapes
+│   ├── preconditions.ts     If-Match / If-None-Match
+│   └── resources/v1, v2     REST resources per API version
+├── security/                principal.ts, hmac/ jwt/ mtls/ oauth2/ sso/
+├── service/                 Contracts: UserService, CacheService, ExperimentService, NetworkService;
+│   │                        EventBus, JobRegistry
+│   └── impl/                Implementations
+├── transport/               WebSocketGateway, TcpServer, UdpServer
 └── util/                    AppLogger, @Cacheable / @CacheEvict
 ```
 
@@ -112,6 +117,94 @@ Put a guard on a route or a whole controller with `@UseGuard(...)`. Each guard s
 **SSO:** OIDC uses the authorization code flow with PKCE. SAML uses SP-initiated login with an HTTP-POST ACS at `/auth/saml/acs` and metadata at `/auth/saml/metadata`. Both end in the same signed, httpOnly session cookie (8 hours). Use `GET /auth/me` to read it and `POST /auth/logout` to end it.
 
 **mTLS behind a load balancer:** `MtlsGuard` reads the direct TLS socket. If TLS terminates at a proxy, read the client certificate header your proxy forwards.
+
+## REST API
+
+### Versions
+
+Every route lives under a version: `/api/v1/...`, `/api/v2/...`. Unversioned `/api/...` keeps working as an alias of v1, and every API response carries an `API-Version` header. A new version gets its own folder in `rest/resources/` and its own DTOs; older versions keep their shape.
+
+| | v1 | v2 |
+|---|---|---|
+| `GET /users` | array | page: `?page=&size=&search=` returns `{items, page, size, total, pages}` |
+| user fields | id, name, email, age, dates | v1 plus `phone` |
+| writes | POST, DELETE | POST, PUT, PATCH, DELETE, QUERY |
+
+### Methods
+
+v2 users follow RFC 9110 meanings:
+
+| Method | Does | Safe | Idempotent | Success |
+|---|---|---|---|---|
+| GET / HEAD | read | yes | yes | 200, or 304 with `If-None-Match` |
+| QUERY `/search` | search, criteria in the body | yes | yes | 200 |
+| POST | create, server picks the id | no | no | 201 + `Location` |
+| PUT | replace every field, or create at this id | no | yes | 200, or 201 + `Location` |
+| PATCH | change some fields (`application/merge-patch+json`) | no | no | 200 |
+| DELETE | remove | no | yes | 204 (404 if already gone) |
+| OPTIONS | list allowed methods | yes | yes | 204 + `Allow` |
+
+Reads return an `ETag`. Send it back as `If-Match` on PUT, PATCH or DELETE to get `412` if someone changed the resource in between. `If-None-Match: *` on PUT means create only.
+
+### Responses
+
+Success uses the envelope `{success, message, data}`. Every 4xx and 5xx is [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details (`application/problem+json`), and keeps `success`, `message` and `data` so older clients still parse it:
+
+```json
+{"type": "about:blank", "title": "Bad Request", "status": 400, "detail": "Validation failed",
+ "instance": "/api/v2/users", "success": false, "message": "Validation failed", "data": {"age": "must be an integer from 0 to 150"}}
+```
+
+| Status | When | Extra header |
+|---|---|---|
+| 400 | validation failed (`data` lists fields), malformed JSON | |
+| 401 | no or bad credentials | `WWW-Authenticate` |
+| 404 | unknown resource or route | |
+| 405 | known path, wrong method; TRACE always | `Allow` |
+| 409 | email already used | |
+| 412 | `If-Match` stale, or `If-None-Match: *` and it exists | |
+| 415 | body is not JSON | `Accept-Post`, `Accept-Patch` |
+| 429 | rate limit | `Retry-After`, `RateLimit-*` |
+| 500 | bug (logged, never leaks a stack) | |
+| 501 | auth strategy not configured | |
+| 503 | database, cache (for HMAC) or IdP down | `Retry-After` |
+
+## Database migrations
+
+Schema changes are migration classes in `src/migration`, written with TypeORM's schema builder, so one migration runs on Postgres, MySQL, MariaDB, MSSQL and SQLite alike. They run at startup (`DB_MIGRATIONS_RUN=true`) and are recorded in `schema_migrations`. `synchronize` is off. MongoDB is schemaless and skips them.
+
+```sh
+pnpm migration:show                       # applied and pending
+pnpm migration:create src/migration/AddX  # new file; then add it to DatabaseConfig.migrations
+pnpm migration:run / pnpm migration:revert
+pnpm migration:prod                       # in a built image: node dist/...
+```
+
+A test runs every migration and asks TypeORM for the remaining difference to the entities; it must be empty. Never edit a shipped migration; add a new one.
+
+## Realtime and network
+
+| Protocol | Where | Auth | Notes |
+|---|---|---|---|
+| WebSocket | `wss://host/ws` | JWT (`Authorization` or `?access_token=`), or SSO cookie from an allowed Origin | JSON `{type}`: ping, echo, whoami, broadcast; server events pushed as `event`; dead clients dropped by heartbeat |
+| SSE | `GET /api/v1/events` | public, ids only | `new EventSource(...)`; heartbeat every 15 s |
+| TCP | `TCP_PORT` (TLS) | mTLS cert, or `{"type":"auth","token":"<jwt>"}` first | newline-delimited JSON, 64 KB lines, 60 s idle |
+| UDP | `UDP_PORT` | none | JSON ping/echo; never replies bigger than the request (no amplification) |
+| ICMP | `POST /api/v1/network/ping` | JWT | strict host validation, `ping` run without a shell |
+
+Events (`user.created`, `user.updated`, `user.deleted`) come from the in-process `EventBus`. With several instances, back it with Redis pub/sub.
+
+## Queues and dead letters
+
+`QUEUE_TYPE=bullmq` uses BullMQ on Redis/Valkey/ElastiCache; `memory` is for dev and tests. A job is tried `QUEUE_ATTEMPTS` times with exponential backoff; if every try fails it moves to `<queue>.dlq` with its error.
+
+```http
+POST /api/v1/queues/demo/jobs                      {"fail": true}   -> 202 {jobId}
+GET  /api/v1/queues/demo/dead-letters                               -> the failed jobs
+POST /api/v1/queues/demo/dead-letters/{id}/replay                   -> 202, back on the queue
+```
+
+`user.created` enqueues a `welcome-email` job. Add a queue: name it in `QueueConstants`, register its handler in `JobRegistry`.
 
 ## Databases
 
@@ -167,6 +260,7 @@ Vitest runs one project per test type. `pnpm test` runs them all.
 | `integration` | `test/integration/` | The whole app in-process through HTTP, on sql.js and the memory cache |
 | `containers` | `test/containers/` | The same flows on real Postgres, MySQL, MariaDB, MongoDB, Redis and Valkey via Testcontainers. Skipped when Docker is not running. |
 | `e2e` | `test/e2e/` | The real server process over HTTPS with a mock OIDC/OAuth2 provider: every endpoint and auth strategy, including the full OIDC login |
+| `security` | `test/security/` | SQL and command injection payloads at every input; rate limits, prototype pollution, slowloris, oversized headers, security headers |
 | `monkey` | `test/monkey/` | 1500 random methods, paths, headers and bodies (fast-check). No unexpected 5xx, always JSON, still healthy afterwards. |
 | `chaos` | `test/chaos/` | Dependencies fail on purpose: database down (503, then recovers), cache down or hanging (requests still succeed), cache down for HMAC (503, fails closed), IdP down (503), JWKS down (401), a flaky repository, 300 concurrent requests |
 
@@ -176,15 +270,47 @@ What the chaos tests pin down:
 - **The HMAC replay check fails closed** with 503, so a cache outage never lets a replayed request through.
 - **An unreachable database answers 503**, not 500, so load balancers and clients retry.
 
+## Security
+
+### Known CVEs
+
+| Layer | Guard |
+|---|---|
+| npm dependencies | `pnpm audit --prod --audit-level=high` fails CI; also daily, because new CVEs hit unchanged code |
+| Docker image | Trivy scans OS packages and `node_modules` (fails on fixable HIGH/CRITICAL), results in GitHub code scanning, CycloneDX SBOM as an artifact |
+| Dockerfile, compose, Caddyfile | Trivy config scan |
+| updates | Renovate opens CVE fixes at any time; other npm updates wait 3 days |
+| supply chain | pnpm `minimumReleaseAge` refuses versions younger than 3 days (most hijacked releases are pulled within hours); install scripts are off unless listed in `allowBuilds` |
+| code | CodeQL, dependency review on PRs, OpenSSF Scorecard (existing workflows) |
+
+Dev-only advisories are patched with `overrides` in `pnpm-workspace.yaml`; each entry says why and when to drop it.
+
+### Runtime
+
+- Prototype pollution: `--disable-proto=delete` (removes `__proto__`), flat query strings, DTOs copy only known fields.
+- Injection: bound SQL parameters everywhere, LIKE wildcards escaped; `ping` through `execFile` with a validated host. `pnpm test:security` throws SQL and shell payloads at every input.
+- Abuse: rate limit per IP (stricter on `/auth`), shared through Redis; slowloris and header-flood limits at the socket (`HTTP_*_TIMEOUT_MS`, 16 KB headers, checked every second); 1 MB bodies.
+- TLS: 1.2+ with ECDHE AEAD suites only.
+- Headers: Helmet (HSTS, CSP, nosniff, frame options), no `X-Powered-By`, no stack traces in responses.
+- Container: non-root, read-only filesystem, all capabilities dropped, no privilege escalation, npm and yarn removed from the image, OS packages upgraded at build.
+
+## HTTP/3
+
+Express runs on Node's HTTP/1.1 stack, and Node has no stable HTTP/3. So, as with CDNs and cloud load balancers, HTTP/3 ends at an edge proxy: compose puts [Caddy](https://caddyserver.com) on port 443 (TCP for HTTP/1.1 and HTTP/2, UDP for HTTP/3 over QUIC), advertising `Alt-Svc: h3`. Caddy talks HTTPS to the app, which is not published.
+
+mTLS keeps working through the proxy: Caddy forwards the client certificate in `X-Client-Cert`, and `MtlsGuard` trusts that header only on a connection that presents the proxy's own certificate (`edge-proxy`), then verifies the forwarded certificate against the CA. The app trusts one proxy hop (`TRUST_PROXY=1`), so a client cannot fake its IP to dodge the rate limit.
+
+Production: set `SITE_ADDRESS=api.example.com` and follow the comment in `deploy/caddy/Caddyfile` to switch to automatic Let's Encrypt certificates. On AWS, CloudFront or an ALB with HTTP/3 can play the same role.
+
 ## Docker
 
 ```sh
 pnpm certs
-docker compose up --build                                   # app on https://localhost
+docker compose up --build                                   # Caddy (HTTP/3) + app on https://localhost
 docker compose --profile postgres --profile redis up --build
 ```
 
-Profiles: `postgres`, `mysql`, `mariadb`, `mongodb`, `redis`, `valkey`. The image runs as the non-root `node` user on port 8443, published as 443. Certs are mounted read-only at `/app/certs`, and secrets come from the environment, never from build args. To pull the base image from AWS ECR Public:
+Profiles: `postgres`, `mysql`, `mariadb`, `mongodb`, `redis`, `valkey`. The image runs as the non-root `node` user on port 8443, reachable only through Caddy on 443. Certs are mounted read-only at `/app/certs`, and secrets come from the environment, never from build args. To pull the base image from AWS ECR Public:
 
 ```sh
 docker build --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:26-alpine .

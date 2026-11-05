@@ -13,10 +13,11 @@ export class TestApp {
   private static certDir?: string;
 
   static certs(): string {
-    TestApp.certDir ??= new LocalCertificateGenerator(
-      mkdtempSync(join(tmpdir(), 'boilerplate-certs-')),
-      1,
-    ).generate();
+    if (!TestApp.certDir) {
+      const dir = mkdtempSync(join(tmpdir(), 'boilerplate-certs-'));
+      new LocalCertificateGenerator(dir, 1).generate();
+      TestApp.certDir = dir;
+    }
     return TestApp.certDir;
   }
 
@@ -31,6 +32,8 @@ export class TestApp {
         SESSION_SECRET: 'test-session-secret-0123456789abcdef',
         JWT_SECRET: TestApp.JWT_SECRET,
         HMAC_CLIENTS: `partner-a:${TestApp.HMAC_SECRET}`,
+        // Tests fire hundreds of requests from one IP; the limiter has its own test.
+        RATE_LIMIT_ENABLED: 'false',
         ...env,
       }),
     );

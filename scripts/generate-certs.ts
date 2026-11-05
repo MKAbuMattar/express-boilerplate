@@ -13,17 +13,41 @@ export class LocalCertificateGenerator {
     private readonly days = 825,
   ) {}
 
-  generate(): string {
+  /**
+   * Creates whatever is missing and keeps what exists, so a CA you already
+   * trust in your OS stays valid. force: true regenerates everything.
+   */
+  generate(force = false): string[] {
     mkdirSync(this.dir, {recursive: true});
-    this.createCa();
-    this.createSigned('server', 'localhost', [
-      'subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1',
-      'extendedKeyUsage=serverAuth',
-    ]);
-    this.createSigned('client', 'local-client', [
-      'extendedKeyUsage=clientAuth',
-    ]);
-    return this.dir;
+    const created: string[] = [];
+    let regenerate = force;
+    const missing = (name: string) =>
+      regenerate || !existsSync(this.path(`${name}.crt`));
+    if (missing('ca')) {
+      this.createCa();
+      regenerate = true; // a new CA invalidates every certificate it signed
+      created.push('ca');
+    }
+    const leaves: [string, string, string[]][] = [
+      [
+        'server',
+        'localhost',
+        [
+          'subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1',
+          'extendedKeyUsage=serverAuth',
+        ],
+      ],
+      ['client', 'local-client', ['extendedKeyUsage=clientAuth']],
+      // The edge proxy's identity towards the app (HTTP/3 setup, see compose).
+      ['edge-proxy', 'edge-proxy', ['extendedKeyUsage=clientAuth']],
+    ];
+    for (const [name, commonName, extensions] of leaves) {
+      if (missing(name)) {
+        this.createSigned(name, commonName, extensions);
+        created.push(name);
+      }
+    }
+    return created;
   }
 
   private createCa(): void {
@@ -97,16 +121,15 @@ export class LocalCertificateGenerator {
 }
 
 if (import.meta.main) {
-  const dir = process.argv[2] ?? 'certs';
-  if (
-    existsSync(join(dir, 'server.crt')) &&
-    !process.argv.includes('--force')
-  ) {
-    console.log(`${dir}/server.crt exists; pass --force to regenerate`);
-  } else {
-    new LocalCertificateGenerator(dir).generate();
-    console.log(
-      `Wrote ${dir}/{ca,server,client}.{crt,key}. Trust ${dir}/ca.crt in your OS to avoid browser warnings.`,
-    );
-  }
+  const dir = process.argv[2]?.startsWith('--')
+    ? 'certs'
+    : (process.argv[2] ?? 'certs');
+  const created = new LocalCertificateGenerator(dir).generate(
+    process.argv.includes('--force'),
+  );
+  console.log(
+    created.length > 0
+      ? `Wrote ${created.map((name) => `${dir}/${name}.{crt,key}`).join(', ')}. Trust ${dir}/ca.crt in your OS to avoid browser warnings.`
+      : `${dir}/ is complete; pass --force to regenerate everything.`,
+  );
 }

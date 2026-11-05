@@ -11,10 +11,20 @@ export class AppConfig {
   readonly hmacClients: ReadonlyMap<string, string>;
   readonly corsOrigins: string[];
   readonly experiments: ReadonlyMap<string, number>;
+  /** Hops for Express 'trust proxy'; false when not behind a proxy. */
+  readonly trustProxy: number | false;
 
   constructor(source: NodeJS.ProcessEnv = process.env) {
     this.env = AppConfig.read(source);
     this.corsOrigins = AppConfig.list(this.env.CORS_ORIGINS);
+    // A hop count, never `true`: `true` trusts the leftmost X-Forwarded-For,
+    // which the client writes, so anyone could pick their own rate-limit IP.
+    const proxy = this.env.TRUST_PROXY.trim().toLowerCase();
+    const hops = proxy === 'true' ? 1 : proxy === 'false' ? 0 : Number(proxy);
+    if (!Number.isInteger(hops) || hops < 0) {
+      throw new Error('TRUST_PROXY must be false, true or a hop count');
+    }
+    this.trustProxy = hops === 0 ? false : hops;
     this.experiments = new Map(
       AppConfig.list(this.env.EXPERIMENTS).map((pair) => {
         const [name = '', percent = ''] = pair.split(':');
@@ -73,7 +83,18 @@ export class AppConfig {
       HOST: str({default: '0.0.0.0'}),
       PORT: port({default: 443}),
       PUBLIC_URL: url({default: 'https://localhost'}),
-      TRUST_PROXY: bool({default: false}),
+      TRUST_PROXY: str({
+        default: 'false',
+        desc: 'false, or proxy hops in front of the app (true means 1)',
+      }),
+      MTLS_FORWARDED_HEADER: str({
+        default: '',
+        desc: 'Header the edge proxy puts the client cert in (base64 DER)',
+      }),
+      MTLS_TRUSTED_PROXY_CN: str({
+        default: 'edge-proxy',
+        desc: 'CN of the proxy client cert allowed to forward client certs',
+      }),
       CORS_ORIGINS: str({default: '', desc: 'Comma-separated origins'}),
 
       TLS_ENABLED: bool({default: true}),
@@ -130,6 +151,20 @@ export class AppConfig {
         desc: 'Tries before a job is dead-lettered',
       }),
       QUEUE_BACKOFF_MS: num({default: 500, desc: 'Exponential backoff base'}),
+
+      RATE_LIMIT_ENABLED: bool({default: true}),
+      RATE_LIMIT_WINDOW_SECONDS: num({default: 60}),
+      RATE_LIMIT_MAX: num({default: 300, desc: 'Requests per IP per window'}),
+      RATE_LIMIT_AUTH_MAX: num({
+        default: 20,
+        desc: 'Requests per IP per window on /auth (login brute force)',
+      }),
+      HTTP_HEADERS_TIMEOUT_MS: num({
+        default: 10_000,
+        desc: 'Slowloris guard: time allowed to send request headers',
+      }),
+      HTTP_REQUEST_TIMEOUT_MS: num({default: 30_000}),
+      HTTP_KEEP_ALIVE_TIMEOUT_MS: num({default: 5_000}),
 
       EXPERIMENTS: str({
         default: 'new-checkout:50',

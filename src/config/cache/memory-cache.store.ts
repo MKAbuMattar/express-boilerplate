@@ -42,6 +42,23 @@ export class MemoryCacheStore extends CacheStore {
     return true;
   }
 
+  async increment(
+    key: string,
+    ttlSeconds: number,
+  ): Promise<{count: number; resetSeconds: number}> {
+    const now = Date.now();
+    const entry = this.entries.get(key);
+    if (!entry || entry.expiresAt <= now) {
+      this.entries.set(key, {value: '1', expiresAt: now + ttlSeconds * 1000});
+      return {count: 1, resetSeconds: ttlSeconds};
+    }
+    entry.value = String(Number(entry.value) + 1);
+    return {
+      count: Number(entry.value),
+      resetSeconds: Math.ceil((entry.expiresAt - now) / 1000),
+    };
+  }
+
   async delete(...keys: string[]): Promise<void> {
     for (const key of keys) this.entries.delete(key);
   }

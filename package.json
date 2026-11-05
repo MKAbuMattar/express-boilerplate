@@ -18,9 +18,9 @@
     "url": "https://github.com/MKAbuMattar/express-boilerplate/issues"
   },
   "scripts": {
-    "dev": "tsx watch --env-file=.env.development --env-file-if-exists=.env src/main.ts",
+    "dev": "tsx watch --disable-proto=delete --env-file=.env.development --env-file-if-exists=.env src/main.ts",
     "build": "rimraf dist && tsc -p tsconfig.build.json",
-    "start": "node --env-file-if-exists=.env dist/main.js",
+    "start": "node --disable-proto=delete --env-file-if-exists=.env dist/main.js",
     "certs": "tsx scripts/generate-certs.ts",
     "jwt": "tsx --env-file=.env.development --env-file-if-exists=.env scripts/issue-jwt.ts",
     "migration:show": "tsx --env-file=.env.development --env-file-if-exists=.env node_modules/typeorm/cli.js migration:show -d src/config/cli.data-source.ts",

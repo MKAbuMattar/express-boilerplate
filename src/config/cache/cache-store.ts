@@ -12,4 +12,12 @@ export abstract class CacheStore {
     ttlSeconds: number,
   ): Promise<boolean>;
   abstract delete(...keys: string[]): Promise<void>;
+  /**
+   * Atomic counter. The first increment starts a TTL of ttlSeconds; returns
+   * the new count and the seconds left before the counter resets.
+   */
+  abstract increment(
+    key: string,
+    ttlSeconds: number,
+  ): Promise<{count: number; resetSeconds: number}>;
 }

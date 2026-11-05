@@ -25,9 +25,18 @@ RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
     pnpm install --prod --frozen-lockfile
 
 FROM ${NODE_IMAGE} AS runtime
+# Patch OS packages to the latest fixes, then remove tools the app never
+# runs: npm, npx, corepack and yarn ship their own dependency trees, and
+# every CVE in them would otherwise be a CVE in this image.
+RUN apk upgrade --no-cache \
+    && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+              /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+              /opt/yarn* /usr/local/bin/yarn /usr/local/bin/yarnpkg
+# --disable-proto=delete removes the __proto__ accessor: no prototype pollution.
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
-    PORT=8443
+    PORT=8443 \
+    NODE_OPTIONS=--disable-proto=delete
 WORKDIR /app
 COPY --chown=node:node package.json ./
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules

@@ -15,6 +15,7 @@ import {AppConfiguration} from './config/app.configuration.js';
 import {BeanFactory} from './config/bean-factory.js';
 import {CacheStore} from './config/cache/cache-store.js';
 import {HttpSemantics} from './config/http-semantics.js';
+import {RateLimiter} from './config/rate-limiter.js';
 import {AuthenticationController} from './controller/authentication.controller.js';
 import {GlobalErrorFilter} from './exceptions/global-exception.filter.js';
 import {EventV1Resource} from './rest/resources/v1/event.resource.js';
@@ -64,7 +65,9 @@ export class Application {
     const app = express();
     let built: express.Application = app;
     app.disable('x-powered-by');
-    app.set('trust proxy', config.env.TRUST_PROXY);
+    app.set('trust proxy', config.trustProxy);
+    // Flat query strings only: no nested objects, so no qs prototype tricks.
+    app.set('query parser', 'simple');
     // Development: Swagger UI needs inline scripts, and HSTS on localhost
     // makes browsers refuse to click through an untrusted local CA.
     app.use(
@@ -82,6 +85,7 @@ export class Application {
       }),
     );
     app.use(HttpSemantics.problemResponses());
+    app.use(RateLimiter.middleware(config, this.beans.getBean(CacheStore)));
     app.use(HttpSemantics.options(() => built));
     app.use(
       cors({

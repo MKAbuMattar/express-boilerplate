@@ -3,6 +3,19 @@ import type {ServerOptions} from 'node:https';
 import type {AppConfig} from './app.config.js';
 
 export class TlsConfig {
+  /**
+   * Mozilla "intermediate" TLS 1.2 suites (forward secrecy, AEAD only).
+   * TLS 1.3 suites are always on and not affected by this list.
+   */
+  static readonly CIPHERS = [
+    'ECDHE-ECDSA-AES128-GCM-SHA256',
+    'ECDHE-RSA-AES128-GCM-SHA256',
+    'ECDHE-ECDSA-AES256-GCM-SHA384',
+    'ECDHE-RSA-AES256-GCM-SHA384',
+    'ECDHE-ECDSA-CHACHA20-POLY1305',
+    'ECDHE-RSA-CHACHA20-POLY1305',
+  ].join(':');
+
   static serverOptions(config: AppConfig): ServerOptions {
     const {TLS_KEY_FILE, TLS_CERT_FILE, TLS_CA_FILE} = config.env;
     return {
@@ -10,6 +23,8 @@ export class TlsConfig {
       cert: readFileSync(TLS_CERT_FILE),
       ca: readFileSync(TLS_CA_FILE),
       minVersion: 'TLSv1.2',
+      ciphers: TlsConfig.CIPHERS,
+      honorCipherOrder: true,
       // Ask every client for a cert but let the handshake pass without one,
       // so only routes behind MtlsGuard require it.
       requestCert: true,
