@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: app
+    scheme: https
+    metrics_path: /metrics
+    tls_config:
+      ca_file: /certs/ca.crt
+      server_name: localhost
+    static_configs:
+      - targets: ["app:8443"]
+
+  - job_name: apisix
+    metrics_path: /apisix/prometheus/metrics
+    static_configs:
+      - targets: ["apisix:9091"]

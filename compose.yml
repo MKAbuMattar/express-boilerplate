@@ -4,6 +4,16 @@
 # Clients reach only Caddy on 443 (TCP for HTTP/1.1 and HTTP/2, UDP for
 # HTTP/3). The app is internal and trusts exactly one proxy hop.
 #
+# Full local stack (Keycloak, APISIX, Vault, Prometheus/Grafana/Loki/Tempo,
+# Mailpit), app configured for all of it:
+#   APP_ENV_FILE=deploy/full-stack.env docker compose --profile full up --build
+# Or pick profiles: idp, gateway, vault, observability, mail.
+#
+#   https://localhost              app (Caddy, HTTP/3)    http://localhost:9080  app via APISIX
+#   https://keycloak.localhost:8543  Keycloak (admin/admin, user alice/alice)
+#   http://localhost:3000          Grafana (admin/admin)  http://localhost:9090  Prometheus
+#   http://localhost:8025          Mailpit                http://localhost:8200  Vault (dev-root-token)
+#
 # Switch database or cache by setting these in .env (compose reads it):
 #   DB_TYPE=mysql   DB_URL=mysql://app:app@mysql:3306/app          + --profile mysql
 #   DB_TYPE=mariadb DB_URL=mysql://app:app@mariadb:3306/app        + --profile mariadb
@@ -39,7 +49,7 @@ services:
     container_name: express-boilerplate
     restart: unless-stopped
     env_file:
-      - path: .env
+      - path: ${APP_ENV_FILE:-.env}
         required: false
     environment:
       NODE_ENV: ${NODE_ENV:-development}
@@ -75,9 +85,11 @@ services:
       mariadb: {condition: service_healthy, required: false}
       mongodb: {condition: service_healthy, required: false}
       valkey: {condition: service_healthy, required: false}
+      vault-seed: {condition: service_completed_successfully, required: false}
+      keycloak: {condition: service_healthy, required: false}
 
   postgres:
-    image: postgres:18-alpine
+    image: postgres:18-alpine@sha256:eaef288f54a90a909e49f0121d5d047a5e974e922699de4249625cf7cde34f36
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -90,7 +102,7 @@ services:
       retries: 20
 
   redis:
-    image: redis:8-alpine
+    image: redis:8-alpine@sha256:21090af93f8324db2f0f0f4f38a7c60369d47d917e000c3423d89d2ae2883537
     ports: ["6379:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -98,7 +110,7 @@ services:
       retries: 20
 
   mysql:
-    image: mysql:9
+    image: mysql:9@sha256:df90258da46f6e7ff8574ff84f17618aba0765cac749928299c69fd4e7cb8ad8
     profiles: [mysql]
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -113,7 +125,7 @@ services:
       retries: 40
 
   mariadb:
-    image: mariadb:12
+    image: mariadb:12@sha256:d46e102fa8b9b72bfcdeb56f9dd538742092119dc8b11f31fe662605cd234cd9
     profiles: [mariadb]
     environment:
       MARIADB_ROOT_PASSWORD: root
@@ -128,7 +140,7 @@ services:
       retries: 40
 
   mongodb:
-    image: mongo:8
+    image: mongo:8@sha256:e16e606f792ea89d2b4907b54e5e31eb86a7a23e27231dce3a982cc8f2d73cd2
     profiles: [mongodb]
     environment:
       MONGO_INITDB_ROOT_USERNAME: app
@@ -141,13 +153,133 @@ services:
       retries: 40
 
   valkey:
-    image: valkey/valkey:9-alpine
+    image: valkey/valkey:9-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b
     profiles: [valkey]
     ports: ["6380:6379"]
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
       interval: 3s
       retries: 20
+
+  # --- Identity provider ---------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b
+    profiles: [idp, full]
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: https://keycloak.localhost:8543
+      KC_HTTPS_PORT: 8543
+      KC_HTTPS_CERTIFICATE_FILE: /certs/server.crt
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /certs/server.key
+      KC_HTTP_ENABLED: "false"
+    ports: ["8543:8543"]
+    volumes:
+      - ./deploy/keycloak/demo-realm.json:/opt/keycloak/data/import/demo-realm.json:ro
+      - ./certs:/certs:ro
+    networks:
+      default:
+        # The app reaches Keycloak by the same name the browser uses, so the
+        # token issuer matches on both sides.
+        aliases: [keycloak.localhost]
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8543"]
+      interval: 5s
+      retries: 60
+    depends_on:
+      certs: {condition: service_completed_successfully}
+
+  # --- API gateway ---------------------------------------------------------
+  apisix:
+    image: apache/apisix:3.19.0-debian@sha256:9a7e45dc943fbf10ec916d1232bae4cda9302ae28a4696cfb83c2da01d261141
+    profiles: [gateway, full]
+    ports: ["9080:9080"]
+    volumes:
+      - ./deploy/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ./deploy/apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
+    depends_on:
+      app: {condition: service_started}
+
+  # --- Secrets ---------------------------------------------------------------
+  vault:
+    image: hashicorp/vault:2.2.1@sha256:962a92876e168d68eaaa24b0b8b49bbce1cb63024060a67bba95cd158a366fc2
+    profiles: [vault, full]
+    # Dev mode: in-memory, unsealed, KV v2 at secret/. Never for production.
+    command: ["server", "-dev", "-dev-listen-address=0.0.0.0:8200"]
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: dev-root-token
+    ports: ["8200:8200"]
+    cap_add: [IPC_LOCK]
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 3s
+      retries: 20
+
+  vault-seed:
+    image: hashicorp/vault:2.2.1@sha256:962a92876e168d68eaaa24b0b8b49bbce1cb63024060a67bba95cd158a366fc2
+    profiles: [vault, full]
+    environment:
+      VAULT_ADDR: http://vault:8200
+      VAULT_TOKEN: dev-root-token
+    # Random secrets on every start; the app reads them from Vault at boot.
+    entrypoint:
+      - sh
+      - -c
+      - >-
+        vault kv put secret/express-boilerplate
+        SESSION_SECRET="$$(head -c 32 /dev/urandom | base64)"
+        JWT_SECRET="$$(head -c 32 /dev/urandom | base64)"
+        HMAC_CLIENTS="partner-a:$$(head -c 24 /dev/urandom | base64)"
+    depends_on:
+      vault: {condition: service_healthy}
+
+  # --- Observability -------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:v3.16.0@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
+    profiles: [observability, full]
+    ports: ["9090:9090"]
+    volumes:
+      - ./deploy/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./certs:/certs:ro
+
+  loki:
+    image: grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28
+    profiles: [observability, full]
+    command: ["-config.file=/etc/loki/local-config.yaml"]
+
+  tempo:
+    image: grafana/tempo:3.1.1@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044
+    profiles: [observability, full]
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./deploy/observability/tempo.yaml:/etc/tempo.yaml:ro
+
+  alloy:
+    image: grafana/alloy:v1.21.3@sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4
+    profiles: [observability, full]
+    command: ["run", "/etc/alloy/config.alloy"]
+    volumes:
+      - ./deploy/observability/config.alloy:/etc/alloy/config.alloy:ro
+      # Read-only, local dev only: Docker socket access is root-equivalent.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  grafana:
+    image: grafana/grafana:13.3.0@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205
+    profiles: [observability, full]
+    ports: ["3000:3000"]
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./deploy/observability/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - ./deploy/observability/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml:ro
+      - ./deploy/observability/grafana/api-overview.json:/etc/grafana/provisioning/dashboards/api-overview.json:ro
+
+  # --- Mail ------------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
+    profiles: [mail, full]
+    ports: ["8025:8025"]
 
 volumes:
   caddy-data:

@@ -1,0 +1,14 @@
+# APISIX in standalone mode: routes come from apisix.yaml, no etcd needed.
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: yaml
+
+apisix:
+  node_listen: 9080
+
+plugin_attr:
+  prometheus:
+    export_addr:
+      ip: 0.0.0.0
+      port: 9091

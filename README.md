@@ -346,6 +346,33 @@ Profiles: `postgres`, `mysql`, `mariadb`, `mongodb`, `redis`, `valkey`. The imag
 docker build --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:26-alpine .
 ```
 
+### Full local stack
+
+One command runs the app with a real identity provider, a gateway, a secrets store, observability and a mail catcher:
+
+```sh
+pnpm certs
+APP_ENV_FILE=deploy/full-stack.env docker compose --profile full up --build
+```
+
+| Profile | Service | Open | What it shows |
+|---|---|---|---|
+| default | Caddy, app, Postgres, Redis | https://localhost | HTTP/3, the API, Swagger at `/docs` |
+| `idp` | Keycloak 26 | https://keycloak.localhost:8543 (admin/admin) | realm `demo`: browser login as alice/alice through OIDC; `api-client` gets tokens with `users:write` by client credentials, checked by `OAuth2Guard` and scopes |
+| `gateway` | APISIX 3 | http://localhost:9080 | the same API behind a gateway: request id, edge rate limit, body limit, metrics |
+| `vault` | Vault | http://localhost:8200 (dev-root-token) | `vault-seed` writes random `SESSION_SECRET`, `JWT_SECRET`, `HMAC_CLIENTS`; the app loads them at boot |
+| `observability` | Prometheus, Grafana, Loki, Tempo, Alloy | http://localhost:3000 (admin/admin) | dashboard "API overview": rate, p95 latency, status classes, event-loop lag, logs; traces in Tempo |
+| `mail` | Mailpit | http://localhost:8025 | the welcome email sent when a user is created |
+
+Try OAuth2 machine-to-machine:
+
+```sh
+TOKEN=$(curl -s --cacert certs/ca.crt https://keycloak.localhost:8543/realms/demo/protocol/openid-connect/token   -d grant_type=client_credentials -d client_id=api-client -d client_secret=dev-api-secret-change-me | jq -r .access_token)
+curl --cacert certs/ca.crt -H "Authorization: Bearer $TOKEN" https://localhost/api/v1/secure/oauth2
+```
+
+Everything in `deploy/` is development configuration: fixed demo passwords, Vault in dev mode, and Alloy reading the Docker socket. Keep the shape, replace the secrets.
+
 ### From GitHub Container Registry
 
 ```sh

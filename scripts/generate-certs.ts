@@ -33,7 +33,7 @@ export class LocalCertificateGenerator {
         'server',
         'localhost',
         [
-          'subjectAltName=DNS:localhost,IP:127.0.0.1,IP:::1',
+          'subjectAltName=DNS:localhost,DNS:keycloak.localhost,IP:127.0.0.1,IP:::1',
           'extendedKeyUsage=serverAuth',
         ],
       ],
