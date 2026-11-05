@@ -1,4 +1,3 @@
-import http from 'node:http';
 import https from 'node:https';
 import {Application} from './application.js';
 import {Tracing} from './config/observability/tracing.js';
@@ -22,23 +21,17 @@ export class Main {
 
     const limits = ServerHardening.CREATE_OPTIONS;
     const server = ServerHardening.apply(
-      config.env.TLS_ENABLED
-        ? https.createServer(
-            {...TlsConfig.serverOptions(config), ...limits},
-            app,
-          )
-        : http.createServer(limits, app),
+      https.createServer({...TlsConfig.serverOptions(config), ...limits}, app),
       config,
     );
 
-    await application.startTransports(server);
+    application.startTransports(server);
     if (fromVault.length > 0) {
       logger.info({keys: fromVault}, 'Secrets loaded from Vault');
     }
     server.listen(config.env.PORT, config.env.HOST, () => {
-      const scheme = config.env.TLS_ENABLED ? 'https' : 'http';
       logger.info(
-        `Server (${config.env.NODE_ENV}) on ${scheme}://${config.env.HOST}:${config.env.PORT}` +
+        `Server (${config.env.NODE_ENV}) on https://${config.env.HOST}:${config.env.PORT}` +
           (config.isDevelopment ? ` docs: ${config.env.PUBLIC_URL}/docs` : ''),
       );
     });

@@ -1,13 +1,11 @@
-import dgram from 'node:dgram';
-import http from 'node:http';
-import net from 'node:net';
+import https from 'node:https';
+import tls from 'node:tls';
 import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {WebSocket} from 'ws';
 import type {Application} from '../../src/application.js';
-import {TcpServer} from '../../src/config/transport/tcp.server.js';
-import {UdpServer} from '../../src/config/transport/udp.server.js';
+import {TlsConfig} from '../../src/config/tls.config.js';
 import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
 import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {Principal} from '../../src/security/principal.js';
@@ -15,7 +13,7 @@ import {SessionService} from '../../src/security/sso/session.service.js';
 import {RawHttp} from '../support/raw-http.js';
 import {TestApp} from '../support/test-app.js';
 
-describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
+describe('Realtime transports on one TLS port: SSE, WebSocket, TCP', () => {
   let application: Application;
   let app: express.Application;
   let raw: RawHttp;
@@ -24,18 +22,10 @@ describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
   beforeAll(async () => {
     ({application, app} = await TestApp.create({
       TCP_ENABLED: 'true',
-      UDP_ENABLED: 'true',
       PUBLIC_URL: 'https://app.example',
     }));
     raw = await RawHttp.listen(app);
-    application.beans
-      .getBean(
-        (await import('../../src/config/transport/websocket.gateway.js'))
-          .WebSocketGateway,
-      )
-      .attach(raw.server);
-    await application.beans.getBean(TcpServer).start(0);
-    await application.beans.getBean(UdpServer).start(0);
+    application.startTransports(raw.server);
     token = await application.beans
       .getBean(TokenProvider)
       .createToken('rt-user', TestApp.ALL_SCOPES);
@@ -54,9 +44,10 @@ describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
   describe('SSE', () => {
     it('streams user.created to subscribers', async () => {
       const received = new Promise<string>((resolve, reject) => {
-        const req = http.get(
+        const req = https.get(
           {
             host: '127.0.0.1',
+            ca: raw.ca,
             port: raw.port,
             path: '/api/v1/events',
             headers: {accept: 'text/event-stream'},
@@ -94,8 +85,9 @@ describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
   describe('WebSocket', () => {
     const open = (path: string, headers: Record<string, string> = {}) =>
       new Promise<{ws: WebSocket; messages: any[]}>((resolve, reject) => {
-        const ws = new WebSocket(`ws://127.0.0.1:${raw.port}${path}`, {
+        const ws = new WebSocket(`wss://127.0.0.1:${raw.port}${path}`, {
           headers,
+          ca: raw.ca,
         });
         const messages: any[] = [];
         ws.on('message', (data) => messages.push(JSON.parse(String(data))));
@@ -174,10 +166,14 @@ describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
     });
   });
 
-  describe('TCP (newline-delimited JSON)', () => {
+  describe('TCP (newline-delimited JSON over TLS, ALPN ndjson/1)', () => {
     const session = () => {
-      const port = application.beans.getBean(TcpServer).port!;
-      const socket = net.connect(port, '127.0.0.1');
+      const socket = tls.connect({
+        host: '127.0.0.1',
+        port: raw.port,
+        ca: raw.ca,
+        ALPNProtocols: [TlsConfig.LINE_PROTOCOL],
+      });
       socket.setEncoding('utf8');
       const lines: any[] = [];
       let buffer = '';
@@ -228,47 +224,6 @@ describe('Realtime transports: SSE, WebSocket, TCP, UDP', () => {
       const closed = new Promise((r) => socket.on('close', r));
       socket.write('x'.repeat(70 * 1024));
       await closed;
-    });
-  });
-
-  describe('UDP (JSON datagrams)', () => {
-    const exchange = (payload: string) =>
-      new Promise<string | null>((resolve) => {
-        const client = dgram.createSocket('udp4');
-        const timer = setTimeout(() => {
-          client.close();
-          resolve(null);
-        }, 300);
-        client.on('message', (msg) => {
-          clearTimeout(timer);
-          client.close();
-          resolve(String(msg));
-        });
-        client.send(
-          payload,
-          application.beans.getBean(UdpServer).port!,
-          '127.0.0.1',
-        );
-      });
-
-    it('answers ping with pong and the same id', async () => {
-      const reply = await exchange(
-        JSON.stringify({type: 'ping', id: 7, pad: '....'}),
-      );
-      expect(JSON.parse(reply!)).toEqual({type: 'pong', id: 7});
-    });
-
-    it('never amplifies: no reply larger than the request, none for junk', async () => {
-      // {"type":"ping"} is 15 bytes; its pong would be 25, so nothing is sent.
-      expect(await exchange('{"type":"ping"}')).toBeNull();
-      // Same size is fine (amplification factor 1).
-      expect(await exchange('{"type":"ping","id":12345}')).toBe(
-        '{"type":"pong","id":12345}',
-      );
-      expect(await exchange('garbage')).toBeNull();
-      expect(
-        await exchange(JSON.stringify({type: 'ping', pad: 'x'.repeat(2000)})),
-      ).toBeNull();
     });
   });
 });

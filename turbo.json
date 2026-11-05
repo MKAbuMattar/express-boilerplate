@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  // Tasks get the whole shell environment; certs and .env are untracked, so
+  // they are listed as inputs to keep the cache honest.
+  "envMode": "loose",
+  "tasks": {
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", "!test/**"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {},
+    "test": {"inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
+    "test:unit": {"outputs": []},
+    "test:integration": {"inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
+    "test:security": {"inputs": ["$TURBO_DEFAULT$", ".env*"], "outputs": []},
+    // Depend on Docker, timing or random input: never cached.
+    "test:containers": {"cache": false},
+    "test:e2e": {"cache": false},
+    "test:monkey": {"cache": false},
+    "test:chaos": {"cache": false},
+    "test:cov": {"outputs": ["coverage/**"]},
+    "dev": {"cache": false, "persistent": true},
+    "start": {"cache": false, "persistent": true, "dependsOn": ["build"]}
+  }
+}

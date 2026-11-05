@@ -29,7 +29,6 @@ export class TestApp {
     const application = new Application(
       new AppConfig({
         NODE_ENV: 'test',
-        TLS_ENABLED: 'false',
         DB_TYPE: 'sqljs',
         SESSION_SECRET: 'test-session-secret-0123456789abcdef',
         JWT_SECRET: TestApp.JWT_SECRET,

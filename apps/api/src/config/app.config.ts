@@ -29,6 +29,9 @@ export class AppConfig {
       throw new Error('TRUST_PROXY must be false, true or a hop count');
     }
     this.trustProxy = hops === 0 ? false : hops;
+    if (this.env.NODE_ENV === 'production' || this.env.NODE_ENV === 'staging') {
+      AppConfig.requireEncryptedTransit(this.env);
+    }
     this.experiments = new Map(
       AppConfig.list(this.env.EXPERIMENTS).map((pair) => {
         const [name = '', percent = ''] = pair.split(':');
@@ -58,6 +61,37 @@ export class AppConfig {
 
   get isProduction(): boolean {
     return this.env.NODE_ENV === 'production';
+  }
+
+  /**
+   * Every connection the app makes leaves over TLS. Fails startup with the
+   * full list of plaintext settings; sql.js is in-process, so it has none.
+   */
+  static requireEncryptedTransit(env: Env): void {
+    const plain: string[] = [];
+    const scheme = (name: keyof Env, value: string, allowed: string[]) => {
+      if (value && !allowed.some((s) => value.startsWith(s))) {
+        plain.push(`${String(name)} must use ${allowed.join(' or ')}`);
+      }
+    };
+    if (!env.PUBLIC_URL.startsWith('https://')) {
+      plain.push('PUBLIC_URL must use https://');
+    }
+    if (env.DB_TYPE !== DatabaseType.Sqljs && !env.DB_TLS) {
+      plain.push('DB_TLS must be true');
+    }
+    scheme('CACHE_URL', env.CACHE_URL, ['rediss://']);
+    scheme('QUEUE_URL', env.QUEUE_URL, ['rediss://']);
+    scheme('SMTP_URL', env.SMTP_URL, ['smtps://']);
+    scheme('VAULT_ADDR', env.VAULT_ADDR, ['https://']);
+    scheme('OTEL_EXPORTER_OTLP_ENDPOINT', env.OTEL_EXPORTER_OTLP_ENDPOINT, [
+      'https://',
+    ]);
+    scheme('OAUTH2_ISSUER', env.OAUTH2_ISSUER, ['https://']);
+    scheme('OIDC_ISSUER', env.OIDC_ISSUER, ['https://']);
+    if (plain.length > 0) {
+      throw new Error(`Encrypted transit required: ${plain.join('; ')}`);
+    }
   }
 
   private static readonly secret = makeValidator<string>((value) => {
@@ -101,7 +135,6 @@ export class AppConfig {
       }),
       CORS_ORIGINS: str({default: '', desc: 'Comma-separated origins'}),
 
-      TLS_ENABLED: bool({default: true}),
       TLS_KEY_FILE: str({default: 'certs/server.key'}),
       TLS_CERT_FILE: str({default: 'certs/server.crt'}),
       TLS_CA_FILE: str({default: 'certs/ca.crt', desc: 'CA for mTLS clients'}),
@@ -113,6 +146,14 @@ export class AppConfig {
       DB_URL: str({
         default: '',
         desc: 'Connection URL, or file path for sqljs',
+      }),
+      DB_TLS: bool({
+        default: false,
+        desc: 'Verified TLS to the database (required outside development/test)',
+      }),
+      DB_TLS_CA_FILE: str({
+        default: '',
+        desc: 'CA for the database server cert; empty uses the system CAs',
       }),
       DB_SYNCHRONIZE: bool({
         default: false,
@@ -142,10 +183,10 @@ export class AppConfig {
       WS_ENABLED: bool({default: true, desc: 'WebSocket on the HTTP(S) port'}),
       WS_PATH: str({default: '/ws'}),
       WS_MAX_PAYLOAD_BYTES: num({default: 64 * 1024}),
-      TCP_ENABLED: bool({default: false}),
-      TCP_PORT: port({default: 9443, desc: 'TLS when TLS_ENABLED'}),
-      UDP_ENABLED: bool({default: false}),
-      UDP_PORT: port({default: 9444}),
+      TCP_ENABLED: bool({
+        default: false,
+        desc: 'Line protocol on the HTTPS port, ALPN ndjson/1',
+      }),
       PING_TIMEOUT_MS: num({default: 2000}),
 
       QUEUE_TYPE: str({choices: ['memory', 'bullmq'], default: 'memory'}),

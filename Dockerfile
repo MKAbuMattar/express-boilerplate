@@ -1,28 +1,35 @@
+# Build context is the repo root (pnpm workspace):
+#   docker build -t express-boilerplate .
 # Docker Hub by default. For AWS ECR Public (no Docker Hub rate limits):
 #   docker build --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:26-alpine .
 ARG NODE_IMAGE=node:26-alpine@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94
+ARG APP=@express-boilerplate/api
 
 FROM ${NODE_IMAGE} AS base
+ARG APP
+ENV APP=${APP}
 RUN npm install -g pnpm@12.16.1
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY apps/api/package.json ./apps/api/
 
 FROM base AS build
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --frozen-lockfile
-COPY tsconfig.json tsconfig.build.json ./
-COPY src ./src
-RUN pnpm build
+    pnpm install --frozen-lockfile --filter "${APP}..."
+COPY apps/api/tsconfig.json apps/api/tsconfig.build.json ./apps/api/
+COPY apps/api/src ./apps/api/src
+RUN pnpm --filter "${APP}" build
 
 # One-shot local cert generator used by compose (see compose.yml `certs`).
 FROM build AS certs
 RUN apk add --no-cache openssl
-COPY scripts ./scripts
+COPY apps/api/scripts ./apps/api/scripts
+WORKDIR /app/apps/api
 ENTRYPOINT ["sh", "-c", "node_modules/.bin/tsx scripts/generate-certs.ts /certs && chown -R node:node /certs"]
 
 FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
-    pnpm install --prod --frozen-lockfile
+    pnpm install --prod --frozen-lockfile --filter "${APP}"
 
 FROM ${NODE_IMAGE} AS runtime
 # Patch OS packages to the latest fixes, then remove tools the app never
@@ -35,15 +42,19 @@ RUN apk upgrade --no-cache \
 # --disable-proto=delete removes the __proto__ accessor: no prototype pollution.
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
-    PORT=8443 \
+    PORT=443 \
     NODE_OPTIONS=--disable-proto=delete
-WORKDIR /app
-COPY --chown=node:node package.json ./
-COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/dist ./dist
-# Non-root cannot bind 443 inside the container; publish 443 -> 8443 instead.
-# Secrets come from the runtime environment and TLS files from a mount at
-# /app/certs, never from build args.
+# pnpm links apps/api/node_modules into /app/node_modules/.pnpm, so both
+# keep their paths.
+COPY --from=prod-deps --chown=node:node /app/node_modules /app/node_modules
+COPY --from=prod-deps --chown=node:node /app/apps/api/node_modules /app/apps/api/node_modules
+COPY --chown=node:node apps/api/package.json /app/apps/api/
+COPY --from=build --chown=node:node /app/apps/api/dist /app/apps/api/dist
+WORKDIR /app/apps/api
+# TLS only, on 443. The process stays non-root: the runtime lowers
+# net.ipv4.ip_unprivileged_port_start to 443 (compose `sysctls`, Helm pod
+# securityContext). Secrets come from the runtime environment and TLS files
+# from a mount at /app/apps/api/certs, never from build args.
 USER node
-EXPOSE 8443
+EXPOSE 443
 CMD ["node", "dist/main.js"]

@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import type {Server} from 'node:http';
+import type https from 'node:https';
 import {InversifyExpressHttpAdapter} from '@inversifyjs/http-express';
 import {SwaggerUiProvider} from '@inversifyjs/http-open-api';
 import compression from 'compression';
@@ -16,7 +16,6 @@ import {CacheStore} from './config/cache/cache-store.js';
 import {Metrics} from './config/observability/metrics.js';
 import {OpenApiConfig} from './config/openapi.config.js';
 import {TcpServer} from './config/transport/tcp.server.js';
-import {UdpServer} from './config/transport/udp.server.js';
 import {WebSocketGateway} from './config/transport/websocket.gateway.js';
 import {ApiVersioning} from './config/web/api-versioning.js';
 import {HttpSemantics} from './config/web/http-semantics.js';
@@ -173,17 +172,15 @@ export class Application {
     return built;
   }
 
-  /** WebSocket shares the HTTP(S) server; TCP and UDP get their own ports. */
-  async startTransports(server: Server): Promise<void> {
+  /** Everything shares the one TLS server: HTTPS, WebSocket and TCP (ALPN). */
+  startTransports(server: https.Server): void {
     this.beans.getBean(WebSocketGateway).attach(server);
-    await this.beans.getBean(TcpServer).start();
-    await this.beans.getBean(UdpServer).start();
+    this.beans.getBean(TcpServer).attach(server);
   }
 
-  async close(server?: Server): Promise<void> {
+  async close(server?: https.Server): Promise<void> {
     await this.beans.getBean(WebSocketGateway).close();
-    await this.beans.getBean(TcpServer).close();
-    await this.beans.getBean(UdpServer).close();
+    this.beans.getBean(TcpServer).close();
     server?.closeAllConnections?.();
     await new Promise<void>((resolve) =>
       server ? server.close(() => resolve()) : resolve(),

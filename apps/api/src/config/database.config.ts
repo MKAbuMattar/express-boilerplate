@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs';
 import {DataSource, type DataSourceOptions} from 'typeorm';
 import {DatabaseType} from '../enumeration/database-type.enum.js';
 import {UserEntity} from '../model/user.entity.js';
@@ -18,7 +19,11 @@ export class DatabaseConfig {
   }
 
   static options(config: AppConfig): DataSourceOptions {
-    const {DB_TYPE, DB_URL, DB_SYNCHRONIZE, DB_MIGRATIONS_RUN} = config.env;
+    const {DB_TYPE, DB_URL, DB_SYNCHRONIZE, DB_MIGRATIONS_RUN, DB_TLS} =
+      config.env;
+    const ca = config.env.DB_TLS_CA_FILE
+      ? readFileSync(config.env.DB_TLS_CA_FILE)
+      : undefined;
     const isMongo = DB_TYPE === DatabaseType.Mongodb;
     const common = {
       entities: DatabaseConfig.entities,
@@ -36,11 +41,32 @@ export class DatabaseConfig {
           ? {...common, type: 'sqljs', location: DB_URL, autoSave: true}
           : {...common, type: 'sqljs'};
       case DatabaseType.Mssql:
-        return {...common, type: 'mssql', url: DatabaseConfig.url(DB_URL)};
+        return {
+          ...common,
+          type: 'mssql',
+          url: DatabaseConfig.url(DB_URL),
+          ...(DB_TLS && {
+            options: {encrypt: true, trustServerCertificate: false},
+          }),
+        };
       case DatabaseType.Mongodb:
-        return {...common, type: 'mongodb', url: DatabaseConfig.url(DB_URL)};
+        return {
+          ...common,
+          type: 'mongodb',
+          url: DatabaseConfig.url(DB_URL),
+          ...(DB_TLS && {
+            tls: true,
+            tlsCAFile: config.env.DB_TLS_CA_FILE || undefined,
+          }),
+        };
       default:
-        return {...common, type: DB_TYPE, url: DatabaseConfig.url(DB_URL)};
+        // Verified TLS: the server cert must chain to a trusted CA.
+        return {
+          ...common,
+          type: DB_TYPE,
+          url: DatabaseConfig.url(DB_URL),
+          ...(DB_TLS && {ssl: {rejectUnauthorized: true, ca}}),
+        };
     }
   }
 

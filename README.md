@@ -216,12 +216,17 @@ A test runs every migration and asks TypeORM for the remaining difference to the
 
 ## Realtime and network
 
+Everything runs on one TLS listener on port 443. There is no plaintext listener and no second port. UDP was removed because Node has no DTLS; HTTP/3 (QUIC, encrypted) is served on UDP 443 by the edge proxy.
+
+```sh
+openssl s_client -connect localhost:443 -alpn ndjson/1 -CAfile apps/api/certs/ca.crt
+```
+
 | Protocol | Where | Auth | Notes |
 |---|---|---|---|
 | WebSocket | `wss://host/ws` | JWT (`Authorization` or `?access_token=`), or SSO cookie from an allowed Origin | JSON `{type}`: ping, echo, whoami, broadcast; server events pushed as `event`; dead clients dropped by heartbeat |
 | SSE | `GET /api/v1/events` | public, ids only | `new EventSource(...)`; heartbeat every 15 s |
-| TCP | `TCP_PORT` (TLS) | mTLS cert, or `{"type":"auth","token":"<jwt>"}` first | newline-delimited JSON, 64 KB lines, 60 s idle |
-| UDP | `UDP_PORT` | none | JSON ping/echo; never replies bigger than the request (no amplification) |
+| TCP | port 443, TLS with ALPN `ndjson/1` | mTLS cert, or `{"type":"auth","token":"<jwt>"}` first | newline-delimited JSON, 64 KB lines, 60 s idle |
 | ICMP | `POST /api/v1/network/ping` | JWT | strict host validation, `ping` run without a shell |
 
 Events (`user.created`, `user.updated`, `user.deleted`) come from the in-process `EventBus`. With several instances, back it with Redis pub/sub.

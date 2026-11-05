@@ -112,7 +112,9 @@ fabric.properties
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
+
 
 # Thumbnails
 ._*
@@ -326,15 +328,22 @@ $RECYCLE.BIN/
 # <<< igntui <<<
 
 # >>> Start of custom patterns (edit freely; igntui preserves this block) <<<
+
 ### Project ###
 # Local TLS material from `pnpm certs`. Never commit keys.
 certs/
 *.pem
 *.key
+
 # sql.js file databases (DB_TYPE=sqljs with DB_URL=<file>)
 *.sqlite
 *.sqlite3
 *.db
+
 # Keep the example env tracked
 !.env.example
+
+# Turborepo cache
+.turbo
+
 # >>> End of custom patterns (edit freely; igntui preserves this block) <<<

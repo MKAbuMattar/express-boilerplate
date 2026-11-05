@@ -1,6 +1,12 @@
-import http from 'node:http';
+import {readFileSync} from 'node:fs';
+import type http from 'node:http';
+import https from 'node:https';
 import type {AddressInfo} from 'node:net';
+import {join} from 'node:path';
 import type express from 'express';
+import {AppConfig} from '../../src/config/app.config.js';
+import {TlsConfig} from '../../src/config/tls.config.js';
+import {TestApp} from './test-app.js';
 
 export class RawResult {
   constructor(
@@ -19,14 +25,29 @@ export class RawResult {
 }
 
 /**
- * Plain-HTTP server around the app for methods supertest cannot send (QUERY)
- * and for transports that need a real socket (WebSocket upgrades, SSE).
+ * HTTPS server around the app, built with the production TLS options, for
+ * methods supertest cannot send (QUERY) and for transports that need a real
+ * socket (WebSocket upgrades, SSE, TCP over ALPN).
  */
 export class RawHttp {
-  private constructor(readonly server: http.Server) {}
+  /** CA that signed the server cert; clients pass it to trust the server. */
+  readonly ca: Buffer;
+
+  private constructor(readonly server: https.Server) {
+    this.ca = readFileSync(join(TestApp.certs(), 'ca.crt'));
+  }
 
   static async listen(app: express.Application): Promise<RawHttp> {
-    const server = http.createServer(app);
+    const dir = TestApp.certs();
+    const tls = TlsConfig.serverOptions(
+      new AppConfig({
+        NODE_ENV: 'test',
+        TLS_KEY_FILE: join(dir, 'server.key'),
+        TLS_CERT_FILE: join(dir, 'server.crt'),
+        TLS_CA_FILE: join(dir, 'ca.crt'),
+      }),
+    );
+    const server = https.createServer(tls, app);
     await new Promise<void>((resolve) =>
       server.listen(0, '127.0.0.1', resolve),
     );
@@ -44,9 +65,10 @@ export class RawHttp {
     headers: Record<string, string> = {},
   ): Promise<RawResult> {
     return new Promise((resolve, reject) => {
-      const request = http.request(
+      const request = https.request(
         {
           host: '127.0.0.1',
+          ca: this.ca,
           port: this.port,
           method,
           path,

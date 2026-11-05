@@ -1,5 +1,5 @@
-import net, {type AddressInfo, type Socket} from 'node:net';
-import tls, {TLSSocket} from 'node:tls';
+import type tls from 'node:tls';
+import type {TLSSocket} from 'node:tls';
 import {inject} from 'inversify';
 import {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
 import {TokenProvider} from '../../security/jwt/token.provider.js';
@@ -11,7 +11,8 @@ import {TlsConfig} from '../tls.config.js';
 import {TransportMessage} from './transport-message.js';
 
 /**
- * Raw TCP (TLS when TLS_ENABLED) speaking newline-delimited JSON.
+ * Newline-delimited JSON over TLS on the HTTPS port. A client selects it with
+ * ALPN "ndjson/1" (TlsConfig.LINE_PROTOCOL); every other connection is HTTP.
  * A client is authenticated by a valid mTLS client certificate, or by
  * sending {"type":"auth","token":"<jwt>"} first. Before that only ping works.
  * Lines over 64 KB and idle connections (60 s) are dropped.
@@ -20,8 +21,7 @@ import {TransportMessage} from './transport-message.js';
 export class TcpServer {
   static readonly IDLE_TIMEOUT_MS = 60_000;
 
-  private server?: net.Server;
-  private readonly sockets = new Set<Socket>();
+  private readonly sockets = new Set<TLSSocket>();
 
   constructor(
     @inject(AppConfig) private readonly config: AppConfig,
@@ -29,30 +29,27 @@ export class TcpServer {
     @inject(AppLogger) private readonly appLogger: AppLogger,
   ) {}
 
-  async start(port: number = this.config.env.TCP_PORT): Promise<void> {
+  /** Takes the ALPN ndjson/1 connections off the HTTPS server. */
+  attach(server: tls.Server): void {
     if (!this.config.env.TCP_ENABLED) return;
-    const onSocket = (socket: Socket) => this.onSocket(socket);
-    this.server = this.config.env.TLS_ENABLED
-      ? tls.createServer(TlsConfig.serverOptions(this.config), onSocket)
-      : net.createServer(onSocket);
-    await new Promise<void>((resolve, reject) => {
-      this.server!.once('error', reject);
-      this.server!.listen(port, this.config.env.HOST, resolve);
+    // https.Server handles 'secureConnection' as HTTP; put a dispatcher in
+    // front of it so the line protocol never reaches the HTTP parser.
+    const http = server.listeners('secureConnection') as ((
+      socket: TLSSocket,
+    ) => void)[];
+    server.removeAllListeners('secureConnection');
+    server.on('secureConnection', (socket: TLSSocket) => {
+      if (socket.alpnProtocol === TlsConfig.LINE_PROTOCOL)
+        this.onSocket(socket);
+      else for (const listener of http) listener.call(server, socket);
     });
   }
 
-  get port(): number | undefined {
-    return (this.server?.address() as AddressInfo | null)?.port;
-  }
-
-  async close(): Promise<void> {
+  close(): void {
     for (const socket of this.sockets) socket.destroy();
-    await new Promise<void>((resolve) =>
-      this.server ? this.server.close(() => resolve()) : resolve(),
-    );
   }
 
-  private onSocket(socket: Socket): void {
+  private onSocket(socket: TLSSocket): void {
     this.sockets.add(socket);
     socket.on('close', () => this.sockets.delete(socket));
     socket.on('error', (error) =>
@@ -62,7 +59,7 @@ export class TcpServer {
     socket.setEncoding('utf8');
 
     let principal: Principal | null = null;
-    if (socket instanceof TLSSocket && socket.authorized) {
+    if (socket.authorized) {
       principal = new Principal(
         AuthStrategy.Mtls,
         String(socket.getPeerCertificate().subject.CN),

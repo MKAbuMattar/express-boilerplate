@@ -16,6 +16,9 @@ export class TlsConfig {
     'ECDHE-RSA-CHACHA20-POLY1305',
   ].join(':');
 
+  /** ALPN id of the newline-delimited JSON protocol (TcpServer) on 443. */
+  static readonly LINE_PROTOCOL = 'ndjson/1';
+
   static serverOptions(config: AppConfig): ServerOptions {
     const {TLS_KEY_FILE, TLS_CERT_FILE, TLS_CA_FILE} = config.env;
     return {
@@ -25,6 +28,8 @@ export class TlsConfig {
       minVersion: 'TLSv1.2',
       ciphers: TlsConfig.CIPHERS,
       honorCipherOrder: true,
+      // One port: HTTP/1.1 (and WebSocket upgrades) or the TCP line protocol.
+      ALPNProtocols: ['http/1.1', TlsConfig.LINE_PROTOCOL],
       // Ask every client for a cert but let the handshake pass without one,
       // so only routes behind MtlsGuard require it.
       requestCert: true,

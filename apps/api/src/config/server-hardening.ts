@@ -22,7 +22,7 @@ export class ServerHardening {
     connectionsCheckingInterval: ServerHardening.CONNECTIONS_CHECK_MS,
   };
 
-  static apply(server: Server, config: AppConfig): Server {
+  static apply<T extends Server>(server: T, config: AppConfig): T {
     const {
       HTTP_HEADERS_TIMEOUT_MS,
       HTTP_REQUEST_TIMEOUT_MS,

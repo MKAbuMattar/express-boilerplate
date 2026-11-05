@@ -1,9 +1,7 @@
 import {describe, expect, it} from 'vitest';
 import {MemoryQueueBroker} from '../../src/config/queue/memory-queue.broker.js';
 import {TransportMessage} from '../../src/config/transport/transport-message.js';
-import {UdpServer} from '../../src/config/transport/udp.server.js';
 import {PingRequestDto} from '../../src/rest/dto/v1/ping-request.dto.js';
-import {UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('TransportMessage', () => {
   it.each(['{"type":"ping"}', '{"type":"echo","a":1}'])('parses %s', (raw) => {
@@ -19,22 +17,6 @@ describe('TransportMessage', () => {
     expect(TransportMessage.parse('{"type":"echo","x":1}')?.payload).toEqual({
       x: 1,
     });
-  });
-});
-
-describe('UdpServer.reply (anti-amplification)', () => {
-  const server = new UdpServer(UnitFixtures.config());
-  it('answers when the reply fits in the request size', () => {
-    const request = Buffer.from('{"type":"ping","id":"abcdef"}');
-    expect(String(server.reply(request))).toBe('{"type":"pong","id":"abcdef"}');
-  });
-  it('stays silent for a bigger reply, oversize input, junk or unknown types', () => {
-    expect(server.reply(Buffer.from('{"type":"ping"}'))).toBeNull();
-    expect(server.reply(Buffer.alloc(2000, 32))).toBeNull();
-    expect(server.reply(Buffer.from('{oops'))).toBeNull();
-    expect(
-      server.reply(Buffer.from('{"type":"shutdown","pad":"xxxxxxxxxx"}')),
-    ).toBeNull();
   });
 });
 

@@ -92,7 +92,7 @@ describe('Actuator health', () => {
 
   it('info: app version and runtime', async () => {
     const body = JSON.parse((await request(app).get('/actuator/info')).text);
-    expect(body.app.name).toBe('@mkabumattar/express-boilerplate');
+    expect(body.app.name).toBe('@express-boilerplate/api');
     expect(body.runtime.node).toBe(process.version);
     expect(typeof body.uptimeSeconds).toBe('number');
   });

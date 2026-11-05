@@ -1,4 +1,4 @@
-/** JSON message shape shared by WebSocket, TCP and UDP. */
+/** JSON message shape shared by WebSocket and TCP. */
 export class TransportMessage {
   static readonly MAX_LINE_BYTES = 64 * 1024;
 
