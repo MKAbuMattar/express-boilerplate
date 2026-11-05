@@ -19,7 +19,7 @@ imagePullSecrets: []
 replicaCount: 2
 
 # Non-secret settings, passed as environment variables (see .env.example).
-# The chart sets NODE_ENV, HOST, PORT, TLS_* , TRUST_PROXY and
+# The chart sets NODE_ENV, HOST, PORT, TLS_*, DB_TLS, TRUST_PROXY and
 # DB_MIGRATIONS_RUN itself; any key here overrides them.
 config:
   PUBLIC_URL: https://api.example.com
@@ -60,12 +60,18 @@ migrations:
     requests: {cpu: 50m, memory: 128Mi}
     limits: {memory: 256Mi}
 
-# TLS inside the pod (needed for mTLS end to end). Off: TLS ends at the
-# ingress or gateway, which is the usual setup.
+# TLS is not optional: the pod serves HTTPS on 443 only, and the ingress or
+# gateway re-encrypts to it. Encrypted in transit on every hop.
 tls:
-  enabled: false
-  # Secret with tls.crt, tls.key and ca.crt (cert-manager Certificate).
+  # Existing Secret with tls.crt, tls.key and ca.crt. Empty: the chart creates
+  # a cert-manager Certificate (<fullname>-tls) for the Service DNS names.
   secretName: ""
+  certManager:
+    issuerRef:
+      kind: ClusterIssuer
+      name: internal-ca
+    duration: 2160h
+    renewBefore: 360h
 
 serviceAccount:
   create: true
@@ -76,6 +82,11 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext:
+  # Lets the non-root app bind 443. Namespaced and in the Kubernetes "safe"
+  # sysctl set since 1.22, so no node or PSA change is needed.
+  sysctls:
+    - name: net.ipv4.ip_unprivileged_port_start
+      value: "443"
   runAsNonRoot: true
   runAsUser: 1000
   runAsGroup: 1000
@@ -92,17 +103,21 @@ securityContext:
 
 service:
   type: ClusterIP
-  port: 80
   annotations: {}
 
 ingress:
   enabled: false
   className: ""
-  annotations: {}
+  # Re-encrypt to the pod. These are ingress-nginx keys; other controllers
+  # have their own.
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts: []
   tls: []
 
-# Gateway API alternative to Ingress.
+# Gateway API alternative to Ingress. A BackendTLSPolicy makes the gateway
+# speak verified TLS to the pods. Its listener must be HTTPS.
 httpRoute:
   enabled: false
   annotations: {}
@@ -143,7 +158,6 @@ serviceMonitor:
   enabled: false
   interval: 30s
   labels: {}
-  insecureSkipVerify: true
 
 terminationGracePeriodSeconds: 30
 priorityClassName: ""

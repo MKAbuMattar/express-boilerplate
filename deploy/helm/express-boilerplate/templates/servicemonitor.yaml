@@ -15,12 +15,15 @@ spec:
     matchLabels:
       {{- include "eb.selectorLabels" . | nindent 6 }}
   endpoints:
-    - port: http
+    - port: https
       path: /metrics
       interval: {{ .Values.serviceMonitor.interval }}
-      scheme: {{ include "eb.scheme" . | lower }}
-      {{- if .Values.tls.enabled }}
+      scheme: https
+      # Verified TLS: the pod cert is issued for the Service name.
       tlsConfig:
-        insecureSkipVerify: {{ .Values.serviceMonitor.insecureSkipVerify }}
-      {{- end }}
+        serverName: {{ include "eb.fullname" . }}.{{ .Release.Namespace }}.svc
+        ca:
+          secret:
+            name: {{ include "eb.tlsSecretName" . }}
+            key: ca.crt
 {{- end }}

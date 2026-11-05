@@ -20,6 +20,8 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts: [api.example.com]
   tls:
     - secretName: express-boilerplate-production-tls

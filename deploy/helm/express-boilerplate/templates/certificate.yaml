@@ -1,0 +1,25 @@
+{{- if not .Values.tls.secretName }}
+# Pod certificate for the Service DNS names (cert-manager). The ingress or
+# gateway and Prometheus verify it with ca.crt from the same Secret.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "eb.fullname" . }}
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+spec:
+  secretName: {{ include "eb.tlsSecretName" . }}
+  issuerRef:
+    {{- toYaml .Values.tls.certManager.issuerRef | nindent 4 }}
+  duration: {{ .Values.tls.certManager.duration }}
+  renewBefore: {{ .Values.tls.certManager.renewBefore }}
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    rotationPolicy: Always
+  usages: [server auth, digital signature]
+  dnsNames:
+    - {{ include "eb.fullname" . }}
+    - {{ include "eb.fullname" . }}.{{ .Release.Namespace }}.svc
+    - {{ include "eb.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+{{- end }}

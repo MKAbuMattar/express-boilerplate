@@ -53,13 +53,9 @@ app.kubernetes.io/part-of: express-boilerplate
 {{- end -}}
 {{- end -}}
 
-{{/* Container port: 8443 with in-pod TLS, else 8080 (non-root cannot bind < 1024). */}}
-{{- define "eb.port" -}}
-{{- if .Values.tls.enabled -}}8443{{- else -}}8080{{- end -}}
-{{- end -}}
-
-{{- define "eb.scheme" -}}
-{{- if .Values.tls.enabled -}}HTTPS{{- else -}}HTTP{{- end -}}
+{{/* Secret with tls.crt, tls.key and ca.crt: an existing one, or the chart's Certificate. */}}
+{{- define "eb.tlsSecretName" -}}
+{{- default (printf "%s-tls" (include "eb.fullname" .)) .Values.tls.secretName -}}
 {{- end -}}
 
 {{/* Secret holding the app secrets: an existing one, or the ExternalSecret target. */}}
@@ -84,16 +80,14 @@ migration Job (which may run before the ConfigMap exists).
 {{- $base := dict
   "NODE_ENV" "production"
   "HOST" "0.0.0.0"
-  "PORT" (include "eb.port" .)
-  "TLS_ENABLED" (ternary "true" "false" .Values.tls.enabled)
+  "PORT" "443"
+  "TLS_CERT_FILE" "/etc/tls/tls.crt"
+  "TLS_KEY_FILE" "/etc/tls/tls.key"
+  "TLS_CA_FILE" "/etc/tls/ca.crt"
+  "DB_TLS" "true"
   "TRUST_PROXY" (toString .Values.trustProxyHops)
   "DB_MIGRATIONS_RUN" (ternary "false" "true" .Values.migrations.enabled)
 -}}
-{{- if .Values.tls.enabled -}}
-{{- $_ := set $base "TLS_CERT_FILE" "/etc/tls/tls.crt" -}}
-{{- $_ := set $base "TLS_KEY_FILE" "/etc/tls/tls.key" -}}
-{{- $_ := set $base "TLS_CA_FILE" "/etc/tls/ca.crt" -}}
-{{- end -}}
 {{- $env := merge (deepCopy (default (dict) .Values.config)) $base -}}
 {{- range $key := keys $env | sortAlpha }}
 {{ $key }}: {{ get $env $key | toString | quote }}

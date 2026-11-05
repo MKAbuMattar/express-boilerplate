@@ -71,8 +71,8 @@ spec:
           image: {{ include "eb.image" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ include "eb.port" . }}
+            - name: https
+              containerPort: 443
               protocol: TCP
           envFrom:
             - configMapRef:
@@ -89,16 +89,16 @@ spec:
           startupProbe:
             httpGet:
               path: /livez
-              port: http
-              scheme: {{ include "eb.scheme" . }}
+              port: https
+              scheme: HTTPS
             periodSeconds: 5
             failureThreshold: 30
           # Process alive. No dependency checks: a DB outage must not restart pods.
           livenessProbe:
             httpGet:
               path: /livez
-              port: http
-              scheme: {{ include "eb.scheme" . }}
+              port: https
+              scheme: HTTPS
             periodSeconds: 10
             timeoutSeconds: 2
             failureThreshold: 3
@@ -106,8 +106,8 @@ spec:
           readinessProbe:
             httpGet:
               path: /readyz
-              port: http
-              scheme: {{ include "eb.scheme" . }}
+              port: https
+              scheme: HTTPS
             periodSeconds: 5
             timeoutSeconds: 3
             failureThreshold: 2
@@ -123,21 +123,17 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
-            {{- if .Values.tls.enabled }}
             - name: tls
               mountPath: /etc/tls
               readOnly: true
-            {{- end }}
       volumes:
         # Read-only root filesystem: /tmp is the only writable path.
         - name: tmp
           emptyDir:
             sizeLimit: 64Mi
-        {{- if .Values.tls.enabled }}
         - name: tls
           secret:
-            secretName: {{ required "tls.secretName is required when tls.enabled" .Values.tls.secretName }}
-        {{- end }}
+            secretName: {{ include "eb.tlsSecretName" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

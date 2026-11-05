@@ -6,8 +6,8 @@ URL: https://{{ first .Values.ingress.hosts }}
 Hostnames: {{ join ", " .Values.httpRoute.hostnames }}
 {{- else }}
 Port-forward:
-  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "eb.fullname" . }} 8080:{{ .Values.service.port }}
-  curl {{ include "eb.scheme" . | lower }}://localhost:8080/api/v1/health
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "eb.fullname" . }} 8443:443
+  curl --cacert ca.crt https://localhost:8443/livez
 {{- end }}
 
 {{- if not (include "eb.hasSecret" .) }}

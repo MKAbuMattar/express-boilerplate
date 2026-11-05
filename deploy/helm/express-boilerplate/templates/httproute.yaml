@@ -25,5 +25,5 @@ spec:
             value: /
       backendRefs:
         - name: {{ include "eb.fullname" . }}
-          port: {{ .Values.service.port }}
+          port: 443
 {{- end }}

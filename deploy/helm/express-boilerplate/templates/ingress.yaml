@@ -13,10 +13,8 @@ spec:
   {{- with .Values.ingress.className }}
   ingressClassName: {{ . }}
   {{- end }}
-  {{- with .Values.ingress.tls }}
   tls:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- required "ingress.tls is required: no plaintext host" .Values.ingress.tls | toYaml | nindent 4 }}
   rules:
     {{- range .Values.ingress.hosts }}
     - host: {{ . | quote }}
@@ -28,6 +26,6 @@ spec:
               service:
                 name: {{ include "eb.fullname" $ }}
                 port:
-                  name: http
+                  name: https
     {{- end }}
 {{- end }}

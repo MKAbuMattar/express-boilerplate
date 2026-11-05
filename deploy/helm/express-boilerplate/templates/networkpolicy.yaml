@@ -26,7 +26,7 @@ spec:
               kubernetes.io/metadata.name: {{ . }}
         {{- end }}
       ports:
-        - port: http
+        - port: https
           protocol: TCP
   {{- with .Values.networkPolicy.egress }}
   egress:

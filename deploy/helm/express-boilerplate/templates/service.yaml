@@ -14,12 +14,9 @@ spec:
     {{- include "eb.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: api
   ports:
-    - name: http
-      port: {{ .Values.service.port }}
-      targetPort: http
+    # TLS only: the pod serves HTTPS on 443 and nothing else.
+    - name: https
+      port: 443
+      targetPort: https
       protocol: TCP
-      {{- if .Values.tls.enabled }}
       appProtocol: https
-      {{- else }}
-      appProtocol: http
-      {{- end }}

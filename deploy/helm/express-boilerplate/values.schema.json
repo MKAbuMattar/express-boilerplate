@@ -63,9 +63,10 @@
     },
     "tls": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "enabled": {"type": "boolean"},
-        "secretName": {"type": "string"}
+        "secretName": {"type": "string"},
+        "certManager": {"type": "object"}
       }
     },
     "securityContext": {

@@ -63,7 +63,7 @@ jobs:
         run: |
           helm template express-boilerplate "$CHART" \
             --set secrets.existingSecret=app-secrets \
-            --set tls.enabled=true --set tls.secretName=app-tls \
+            --set tls.secretName=app-tls \
             --set autoscaling.enabled=true \
             --set networkPolicy.enabled=true \
             --set serviceMonitor.enabled=true \

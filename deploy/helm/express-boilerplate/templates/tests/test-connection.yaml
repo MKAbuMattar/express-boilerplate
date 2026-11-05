@@ -19,19 +19,27 @@ spec:
     - name: livez
       image: {{ include "eb.image" . }}
       env:
-        {{- if .Values.tls.enabled }}
-        # In-cluster self check only: the service cert is for the public name.
-        - name: NODE_TLS_REJECT_UNAUTHORIZED
-          value: "0"
-        {{- end }}
+        # Trust the pod CA; the cert names the Service, so it verifies.
+        - name: NODE_EXTRA_CA_CERTS
+          value: /etc/tls/ca.crt
       command:
         - node
         - -e
         - >-
-          fetch('{{ include "eb.scheme" . | lower }}://{{ include "eb.fullname" . }}:{{ .Values.service.port }}/livez')
+          fetch('https://{{ include "eb.fullname" . }}/livez')
           .then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))
       resources:
         requests: {cpu: 10m, memory: 32Mi}
         limits: {memory: 128Mi}
       securityContext:
         {{- include "eb.containerSecurityContext" . | nindent 8 }}
+      volumeMounts:
+        - name: tls
+          mountPath: /etc/tls
+          readOnly: true
+  volumes:
+    - name: tls
+      secret:
+        secretName: {{ include "eb.tlsSecretName" . }}
+        items:
+          - {key: ca.crt, path: ca.crt}
