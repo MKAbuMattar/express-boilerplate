@@ -9,7 +9,12 @@ import {
   Response,
   UseGuard,
 } from '@inversifyjs/http-core';
-import {OasResponse, OasSecurity, OasSummary} from '@inversifyjs/http-open-api';
+import {
+  OasResponse,
+  OasSecurity,
+  OasSummary,
+  OasTag,
+} from '@inversifyjs/http-open-api';
 import type {
   Request as ExpressRequest,
   Response as ExpressResponse,
@@ -37,11 +42,13 @@ export class AuthenticationController {
     @inject(TokenProvider) private readonly tokenProvider: TokenProvider,
   ) {}
 
+  @OasTag('Authentication')
+
   @OasSummary('Start OIDC login (redirects to the IdP)')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
     HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.json('OIDC not configured'),
+    OpenApiConstants.problem('OIDC not configured'),
   )
   @Get(ApiConstants.AUTH_OIDC_LOGIN)
   async oidcLogin(@Response() response: ExpressResponse): Promise<void> {
@@ -58,11 +65,13 @@ export class AuthenticationController {
     response.redirect(url.href);
   }
 
+  @OasTag('Authentication')
+
   @OasSummary('OIDC redirect URI')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
     HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.json('Login failed'),
+    OpenApiConstants.problem('Login failed'),
   )
   @Get(ApiConstants.AUTH_OIDC_CALLBACK)
   async oidcCallback(
@@ -91,22 +100,26 @@ export class AuthenticationController {
     response.redirect(ApiConstants.AUTH + ApiConstants.AUTH_ME);
   }
 
+  @OasTag('Authentication')
+
   @OasSummary('Start SAML login (redirects to the IdP)')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
     HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.json('SAML not configured'),
+    OpenApiConstants.problem('SAML not configured'),
   )
   @Get(ApiConstants.AUTH_SAML_LOGIN)
   async samlLogin(@Response() response: ExpressResponse): Promise<void> {
     response.redirect(await this.samlService.createLoginUrl());
   }
 
+  @OasTag('Authentication')
+
   @OasSummary('SAML assertion consumer service (HTTP-POST)')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
     HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.json('Invalid assertion'),
+    OpenApiConstants.problem('Invalid assertion'),
   )
   @Post(ApiConstants.AUTH_SAML_ACS)
   async samlAcs(
@@ -118,28 +131,40 @@ export class AuthenticationController {
     response.redirect(ApiConstants.AUTH + ApiConstants.AUTH_ME);
   }
 
+  @OasTag('Authentication')
+
   @OasSummary('SAML service provider metadata')
   @OasResponse(HttpStatusCode.OK, OpenApiConstants.XML)
   @OasResponse(
     HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.json('SAML not configured'),
+    OpenApiConstants.problem('SAML not configured'),
   )
   @Get(ApiConstants.AUTH_SAML_METADATA)
   samlMetadata(@Response() response: ExpressResponse): void {
     response.type('application/xml').send(this.samlService.metadata());
   }
 
+  @OasTag('Authentication')
+
   @OasSummary('Current SSO session (OIDC or SAML)')
   @OasResponse(
     HttpStatusCode.OK,
-    OpenApiConstants.json('Authenticated principal'),
+    OpenApiConstants.json(
+      'Authenticated principal',
+      OpenApiConstants.ref('Principal'),
+    ),
   )
-  @OasResponse(HttpStatusCode.UNAUTHORIZED, OpenApiConstants.json('No session'))
+  @OasResponse(
+    HttpStatusCode.UNAUTHORIZED,
+    OpenApiConstants.problem('No session'),
+  )
   @UseGuard(SsoGuard)
   @Get(ApiConstants.AUTH_ME)
   me(@Request() request: ExpressRequest): ApiResponse<Principal> {
     return ApiResponse.ok('Authenticated', request.principal!);
   }
+
+  @OasTag('Authentication')
 
   @OasSummary('End the SSO session')
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
@@ -152,12 +177,14 @@ export class AuthenticationController {
     response.status(204).end();
   }
 
+  @OasTag('Authentication')
+
   @OasSummary('Revoke the bearer JWT used for this call (API logout)')
   @OasSecurity({bearerAuth: []})
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
   @OasResponse(
     HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.json('Missing or invalid JWT'),
+    OpenApiConstants.problem('Missing or invalid JWT'),
   )
   @UseGuard(JwtGuard)
   @Post(ApiConstants.AUTH_TOKEN_REVOKE)

@@ -15,6 +15,7 @@ import {
   OasResponse,
   OasSecurity,
   OasSummary,
+  OasTag,
 } from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
 import {QueueBroker} from '../../../config/queue/queue-broker.js';
@@ -33,13 +34,23 @@ import {ApiResponse} from '../../dto/api-response.dto.js';
 export class QueueV1Resource {
   constructor(@inject(QueueBroker) private readonly broker: QueueBroker) {}
 
+  @OasTag('Queues')
+
   @OasSummary('List queues (JWT)')
   @OasSecurity({bearerAuth: []})
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Queue names'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('Queue names', {
+      type: 'array',
+      items: {type: 'string'},
+    }),
+  )
   @Get()
   list(): ApiResponse<readonly string[]> {
     return ApiResponse.ok('Queues', QueueConstants.NAMES);
   }
+
+  @OasTag('Queues')
 
   @OasSummary('Enqueue a job (JWT); 202, processed in the background')
   @OasSecurity({bearerAuth: []})
@@ -51,8 +62,14 @@ export class QueueV1Resource {
       },
     },
   })
-  @OasResponse(HttpStatusCode.ACCEPTED, OpenApiConstants.json('Job accepted'))
-  @OasResponse(HttpStatusCode.NOT_FOUND, OpenApiConstants.json('Unknown queue'))
+  @OasResponse(
+    HttpStatusCode.ACCEPTED,
+    OpenApiConstants.json('Job accepted', OpenApiConstants.ref('JobAccepted')),
+  )
+  @OasResponse(
+    HttpStatusCode.NOT_FOUND,
+    OpenApiConstants.problem('Unknown queue'),
+  )
   @Post('/:name/jobs')
   async enqueue(
     @Params({name: 'name'}) name: string,
@@ -67,10 +84,15 @@ export class QueueV1Resource {
     return new AcceptedHttpResponse(ApiResponse.ok('Job accepted', {jobId}));
   }
 
+  @OasTag('Queues')
+
   @OasSummary('Dead letters of a queue (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.QUEUE_PATH_PARAM)
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Dead letters'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('Dead letters', OpenApiConstants.list('DeadLetter')),
+  )
   @Get('/:name/dead-letters')
   async deadLetters(
     @Params({name: 'name'}) name: string,
@@ -79,14 +101,19 @@ export class QueueV1Resource {
     return ApiResponse.ok('Dead letters', await this.broker.deadLetters(name));
   }
 
+  @OasTag('Queues')
+
   @OasSummary('Replay a dead letter (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.QUEUE_PATH_PARAM)
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
-  @OasResponse(HttpStatusCode.ACCEPTED, OpenApiConstants.json('Job re-queued'))
+  @OasResponse(
+    HttpStatusCode.ACCEPTED,
+    OpenApiConstants.json('Job re-queued', OpenApiConstants.ref('JobAccepted')),
+  )
   @OasResponse(
     HttpStatusCode.NOT_FOUND,
-    OpenApiConstants.json('Unknown dead letter'),
+    OpenApiConstants.problem('Unknown dead letter'),
   )
   @Post('/:name/dead-letters/:id/replay')
   async replay(

@@ -24,6 +24,7 @@ import {
   OasResponse,
   OasSecurity,
   OasSummary,
+  OasTag,
 } from '@inversifyjs/http-open-api';
 import type {Request as ExpressRequest} from 'express';
 import {inject} from 'inversify';
@@ -60,6 +61,8 @@ import {Preconditions} from '../../preconditions.js';
 export class UserV2Resource {
   constructor(@inject(UserService) private readonly userService: UserService) {}
 
+  @OasTag('Users v2')
+
   @OasSummary('List users, paged and searchable (public)')
   @OasParameter({
     name: 'page',
@@ -77,10 +80,13 @@ export class UserV2Resource {
     description: 'Substring of name or email',
     schema: {type: 'string', maxLength: 100},
   })
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('A page of users'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('A page of users', OpenApiConstants.ref('UserPage')),
+  )
   @OasResponse(
     HttpStatusCode.BAD_REQUEST,
-    OpenApiConstants.json('Invalid paging'),
+    OpenApiConstants.problem('Invalid paging'),
   )
   @Get()
   async getUsers(
@@ -103,6 +109,8 @@ export class UserV2Resource {
     );
   }
 
+  @OasTag('Users v2')
+
   @OasSummary('QUERY: search with criteria in the body (safe, idempotent)')
   @OasRequestBody({
     content: {
@@ -118,7 +126,10 @@ export class UserV2Resource {
       },
     },
   })
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('A page of users'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('A page of users', OpenApiConstants.ref('UserPage')),
+  )
   @All('/search')
   async query(
     @Request() request: ExpressRequest,
@@ -140,12 +151,17 @@ export class UserV2Resource {
     return this.getUsers(criteria);
   }
 
+  @OasTag('Users v2')
+
   @OasSummary('Get a user by id (public)')
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('User found'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('User found', OpenApiConstants.ref('UserV2')),
+  )
   @OasResponse(
     HttpStatusCode.NOT_FOUND,
-    OpenApiConstants.json('User not found'),
+    OpenApiConstants.problem('User not found'),
   )
   @Get('/:id')
   async getUser(@Params({name: 'id'}) id: string): Promise<OkHttpResponse> {
@@ -157,21 +173,26 @@ export class UserV2Resource {
     );
   }
 
+  @OasTag('Users v2')
+
   @OasSummary('Create a user with an optional phone (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasRequestBody(OpenApiConstants.CREATE_USER_V2_BODY)
-  @OasResponse(HttpStatusCode.CREATED, OpenApiConstants.json('User created'))
+  @OasResponse(
+    HttpStatusCode.CREATED,
+    OpenApiConstants.json('User created', OpenApiConstants.ref('UserV2')),
+  )
   @OasResponse(
     HttpStatusCode.BAD_REQUEST,
-    OpenApiConstants.json('Validation failed'),
+    OpenApiConstants.problem('Validation failed'),
   )
   @OasResponse(
     HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.json('Missing or invalid JWT'),
+    OpenApiConstants.problem('Missing or invalid JWT'),
   )
   @OasResponse(
     HttpStatusCode.CONFLICT,
-    OpenApiConstants.json('Email already in use'),
+    OpenApiConstants.problem('Email already in use'),
   )
   @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Post()
@@ -182,15 +203,23 @@ export class UserV2Resource {
     );
   }
 
+  @OasTag('Users v2')
+
   @OasSummary('Replace a user, or create it at this id (JWT, idempotent)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasRequestBody(OpenApiConstants.CREATE_USER_V2_BODY)
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('User replaced'))
-  @OasResponse(HttpStatusCode.CREATED, OpenApiConstants.json('User created'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('User replaced', OpenApiConstants.ref('UserV2')),
+  )
+  @OasResponse(
+    HttpStatusCode.CREATED,
+    OpenApiConstants.json('User created', OpenApiConstants.ref('UserV2')),
+  )
   @OasResponse(
     HttpStatusCode.PRECONDITION_FAILED,
-    OpenApiConstants.json('ETag mismatch'),
+    OpenApiConstants.problem('ETag mismatch'),
   )
   @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Put('/:id')
@@ -216,6 +245,8 @@ export class UserV2Resource {
       : new OkHttpResponse(payload, {ETag: etag});
   }
 
+  @OasTag('Users v2')
+
   @OasSummary('Change some fields of a user (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
@@ -226,14 +257,17 @@ export class UserV2Resource {
       },
     },
   })
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('User updated'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('User updated', OpenApiConstants.ref('UserV2')),
+  )
   @OasResponse(
     HttpStatusCode.NOT_FOUND,
-    OpenApiConstants.json('User not found'),
+    OpenApiConstants.problem('User not found'),
   )
   @OasResponse(
     HttpStatusCode.PRECONDITION_FAILED,
-    OpenApiConstants.json('ETag mismatch'),
+    OpenApiConstants.problem('ETag mismatch'),
   )
   @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Patch('/:id')
@@ -251,13 +285,15 @@ export class UserV2Resource {
     );
   }
 
+  @OasTag('Users v2')
+
   @OasSummary('Delete a user (JWT, idempotent)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
   @OasResponse(
     HttpStatusCode.NOT_FOUND,
-    OpenApiConstants.json('User not found'),
+    OpenApiConstants.problem('User not found'),
   )
   @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
   @Delete('/:id')

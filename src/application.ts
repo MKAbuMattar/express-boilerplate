@@ -14,6 +14,7 @@ import {AppConfiguration} from './config/app.configuration.js';
 import {BeanFactory} from './config/bean-factory.js';
 import {CacheStore} from './config/cache/cache-store.js';
 import {Metrics} from './config/observability/metrics.js';
+import {OpenApiConfig} from './config/openapi.config.js';
 import {TcpServer} from './config/transport/tcp.server.js';
 import {UdpServer} from './config/transport/udp.server.js';
 import {WebSocketGateway} from './config/transport/websocket.gateway.js';
@@ -193,22 +194,10 @@ export class Application {
     await this.beans.getBean(CacheStore).close();
   }
 
+  /** Swagger UI at /docs, development only; the document is OpenApiConfig. */
   private registerSwagger(): void {
     new SwaggerUiProvider({
-      api: {
-        path: '/docs',
-        openApiObject: {
-          openapi: '3.1.1',
-          info: {title: 'Express Boilerplate', version: '1.0.0'},
-          components: {
-            securitySchemes: {
-              bearerAuth: {type: 'http', scheme: 'bearer', bearerFormat: 'JWT'},
-              oauth2: {type: 'http', scheme: 'bearer', bearerFormat: 'JWT'},
-              hmac: {type: 'apiKey', in: 'header', name: 'X-Signature'},
-            },
-          },
-        },
-      },
+      api: {path: '/docs', openApiObject: OpenApiConfig.document(this.config)},
       ui: {title: 'Express Boilerplate API'},
     }).provide(this.beans.container);
   }

@@ -11,6 +11,7 @@ import {
   OasParameter,
   OasResponse,
   OasSummary,
+  OasTag,
 } from '@inversifyjs/http-open-api';
 import type {
   Request as ExpressRequest,
@@ -32,12 +33,22 @@ export class ExperimentV1Resource {
     @inject(SessionService) private readonly sessionService: SessionService,
   ) {}
 
+  @OasTag('Experiments')
+
   @OasSummary('List A/B experiments')
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Experiment names'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('Experiment names', {
+      type: 'array',
+      items: {type: 'string'},
+    }),
+  )
   @Get()
   list(): ApiResponse<string[]> {
     return ApiResponse.ok('Experiments', this.experimentService.names());
   }
+
+  @OasTag('Experiments')
 
   @OasSummary('Variant for the caller (SSO subject, else an ab_id cookie)')
   @OasParameter({
@@ -46,10 +57,13 @@ export class ExperimentV1Resource {
     required: true,
     schema: {type: 'string', example: 'new-checkout'},
   })
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Assigned variant'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('Assigned variant', OpenApiConstants.ref('Variant')),
+  )
   @OasResponse(
     HttpStatusCode.NOT_FOUND,
-    OpenApiConstants.json('Unknown experiment'),
+    OpenApiConstants.problem('Unknown experiment'),
   )
   @Get('/:name')
   async variant(

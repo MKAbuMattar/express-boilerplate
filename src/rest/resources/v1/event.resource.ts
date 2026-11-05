@@ -1,11 +1,18 @@
-import {Controller, Get, Request, Response} from '@inversifyjs/http-core';
-import {OasSummary} from '@inversifyjs/http-open-api';
+import {
+  Controller,
+  Get,
+  HttpStatusCode,
+  Request,
+  Response,
+} from '@inversifyjs/http-core';
+import {OasResponse, OasSummary, OasTag} from '@inversifyjs/http-open-api';
 import type {
   Request as ExpressRequest,
   Response as ExpressResponse,
 } from 'express';
 import {inject} from 'inversify';
 import {ApiConstants} from '../../../constant/api.constants.js';
+import {OpenApiConstants} from '../../../constant/openapi.constants.js';
 import type {AppEvent} from '../../../model/app-event.js';
 import {EventBus} from '../../../service/event-bus.service.js';
 
@@ -20,7 +27,21 @@ export class EventV1Resource {
 
   constructor(@inject(EventBus) private readonly eventBus: EventBus) {}
 
+  @OasTag('Events')
+
   @OasSummary('Live event stream (text/event-stream)')
+
+  @OasResponse(
+    HttpStatusCode.OK,
+
+    OpenApiConstants.raw(
+      'One event per message: id, event (user.created...), data (JSON)',
+
+      'text/event-stream',
+
+      {type: 'string'},
+    ),
+  )
   @Get()
   stream(
     @Request() request: ExpressRequest,

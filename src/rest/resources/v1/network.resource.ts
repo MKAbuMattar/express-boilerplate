@@ -10,6 +10,7 @@ import {
   OasResponse,
   OasSecurity,
   OasSummary,
+  OasTag,
 } from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
 import {ApiConstants} from '../../../constant/api.constants.js';
@@ -31,6 +32,8 @@ export class NetworkV1Resource {
     @inject(NetworkService) private readonly networkService: NetworkService,
   ) {}
 
+  @OasTag('Network')
+
   @OasSummary('ICMP ping a host (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasRequestBody({
@@ -45,14 +48,17 @@ export class NetworkV1Resource {
       },
     },
   })
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Ping result'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('Ping result', OpenApiConstants.ref('PingResult')),
+  )
   @OasResponse(
     HttpStatusCode.BAD_REQUEST,
-    OpenApiConstants.json('Invalid host'),
+    OpenApiConstants.problem('Invalid host'),
   )
   @OasResponse(
     HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.json('Missing or invalid JWT'),
+    OpenApiConstants.problem('Missing or invalid JWT'),
   )
   @UseGuard(JwtGuard, Scopes.require(ScopeConstants.OPS_NETWORK))
   @Post('/ping')

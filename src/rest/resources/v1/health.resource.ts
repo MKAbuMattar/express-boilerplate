@@ -4,7 +4,7 @@ import {
   HttpStatusCode,
   ServiceUnavailableHttpResponse,
 } from '@inversifyjs/http-core';
-import {OasResponse, OasSummary} from '@inversifyjs/http-open-api';
+import {OasResponse, OasSummary, OasTag} from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
 import {DataSource} from 'typeorm';
 import {ApiConstants} from '../../../constant/api.constants.js';
@@ -19,11 +19,19 @@ export class HealthV1Resource {
     @inject(CacheService) private readonly cache: CacheService,
   ) {}
 
+  @OasTag('Health')
+
   @OasSummary('Liveness and database readiness')
-  @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Service is healthy'))
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json(
+      'Service is healthy',
+      OpenApiConstants.ref('HealthV1'),
+    ),
+  )
   @OasResponse(
     HttpStatusCode.SERVICE_UNAVAILABLE,
-    OpenApiConstants.json('Database not connected'),
+    OpenApiConstants.problem('Database not connected'),
   )
   @Get()
   getHealth(): ApiResponse<{database: string; cache: string}> {

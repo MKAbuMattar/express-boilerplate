@@ -16,11 +16,213 @@ export class OpenApiConstants {
     },
   };
 
-  static json(description: string): OpenApi3Dot1ResponseObject {
+  /** Reusable schemas, published under components.schemas. */
+  static readonly SCHEMAS: Record<string, OpenApi3Dot1SchemaObject> = {
+    Problem: {
+      type: 'object',
+      description: 'RFC 9457 problem details, used by every 4xx and 5xx.',
+      required: ['type', 'title', 'status'],
+      properties: {
+        type: {type: 'string', example: 'about:blank'},
+        title: {type: 'string', example: 'Bad Request'},
+        status: {type: 'integer', example: 400},
+        detail: {type: 'string', example: 'Validation failed'},
+        instance: {type: 'string', example: '/api/v2/users'},
+        requestId: {
+          type: 'string',
+          description: 'Same as the X-Request-Id header',
+        },
+        success: {type: 'boolean', const: false},
+        message: {
+          type: 'string',
+          description: 'Same as detail (envelope compatibility)',
+        },
+        data: {
+          type: ['object', 'null'],
+          description: 'Field errors on 400, else null',
+          additionalProperties: {type: 'string'},
+        },
+      },
+    },
+    UserV1: {
+      type: 'object',
+      required: ['id', 'name', 'email', 'age', 'createdAt', 'updatedAt'],
+      properties: {
+        id: {type: 'string', example: '1677725a-0232-408a-a993-753c3cd6728c'},
+        name: {type: 'string', example: 'Alice'},
+        email: {type: 'string', format: 'email', example: 'alice@example.com'},
+        age: {type: 'integer', minimum: 0, maximum: 150, example: 42},
+        createdAt: {type: 'string', format: 'date-time'},
+        updatedAt: {type: 'string', format: 'date-time'},
+      },
+    },
+    UserV2: {
+      allOf: [
+        {$ref: '#/components/schemas/UserV1'},
+        {
+          type: 'object',
+          required: ['phone'],
+          properties: {
+            phone: {type: ['string', 'null'], example: '+962 79 123 4567'},
+          },
+        },
+      ],
+    },
+    UserPage: {
+      type: 'object',
+      required: ['items', 'page', 'size', 'total', 'pages'],
+      properties: {
+        items: {type: 'array', items: {$ref: '#/components/schemas/UserV2'}},
+        page: {type: 'integer', minimum: 1},
+        size: {type: 'integer', minimum: 1, maximum: 100},
+        total: {type: 'integer', minimum: 0},
+        pages: {type: 'integer', minimum: 0},
+      },
+    },
+    UserPatch: {
+      type: 'object',
+      minProperties: 1,
+      additionalProperties: false,
+      description: 'Only the fields to change; phone null clears it.',
+      properties: {
+        name: {type: 'string', minLength: 1, maxLength: 120},
+        email: {type: 'string', format: 'email', maxLength: 254},
+        age: {type: 'integer', minimum: 0, maximum: 150},
+        phone: {type: ['string', 'null']},
+      },
+    },
+    Principal: {
+      type: 'object',
+      description: 'The authenticated caller.',
+      properties: {
+        strategy: {enum: ['mtls', 'hmac', 'jwt', 'oauth2', 'oidc', 'saml']},
+        subject: {type: 'string'},
+        claims: {type: 'object', additionalProperties: true},
+      },
+    },
+    HealthV1: {
+      type: 'object',
+      properties: {
+        database: {type: 'string', example: 'postgres'},
+        cache: {type: 'string', example: 'redis'},
+      },
+    },
+    ActuatorHealth: {
+      type: 'object',
+      description: 'Spring Boot Actuator health.',
+      properties: {
+        status: {enum: ['UP', 'DOWN', 'OUT_OF_SERVICE', 'UNKNOWN']},
+        components: {
+          type: 'object',
+          additionalProperties: {
+            type: 'object',
+            properties: {
+              status: {enum: ['UP', 'DOWN', 'OUT_OF_SERVICE', 'UNKNOWN']},
+              details: {type: 'object', additionalProperties: true},
+            },
+          },
+        },
+      },
+    },
+    Variant: {
+      type: 'object',
+      properties: {
+        experiment: {type: 'string', example: 'new-checkout'},
+        variant: {enum: ['A', 'B']},
+      },
+    },
+    PingResult: {
+      type: 'object',
+      properties: {
+        host: {type: 'string'},
+        reachable: {type: 'boolean'},
+        latencyMs: {type: ['number', 'null']},
+      },
+    },
+    JobAccepted: {
+      type: 'object',
+      properties: {jobId: {type: 'string'}},
+    },
+    DeadLetter: {
+      type: 'object',
+      properties: {
+        id: {type: 'string'},
+        queue: {type: 'string'},
+        payload: {type: 'object', additionalProperties: true},
+        error: {type: 'string'},
+        attempts: {type: 'integer'},
+        failedAt: {type: 'string', format: 'date-time'},
+      },
+    },
+    JwkSet: {
+      type: 'object',
+      properties: {
+        keys: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              kty: {type: 'string'},
+              crv: {type: 'string'},
+              x: {type: 'string'},
+              y: {type: 'string'},
+              kid: {type: 'string'},
+              alg: {type: 'string'},
+              use: {type: 'string'},
+            },
+          },
+        },
+      },
+    },
+  };
+
+  static ref(name: string): OpenApi3Dot1SchemaObject {
+    return {$ref: `#/components/schemas/${name}`};
+  }
+
+  static list(name: string): OpenApi3Dot1SchemaObject {
+    return {type: 'array', items: OpenApiConstants.ref(name)};
+  }
+
+  /** 2xx in the {success, message, data} envelope, with data typed. */
+  static json(
+    description: string,
+    data: OpenApi3Dot1SchemaObject = {},
+  ): OpenApi3Dot1ResponseObject {
     return {
       description,
-      content: {'application/json': {schema: OpenApiConstants.ENVELOPE}},
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              success: {type: 'boolean', const: true},
+              message: {type: 'string'},
+              data,
+            },
+          },
+        },
+      },
     };
+  }
+
+  /** 4xx/5xx: RFC 9457 problem details. */
+  static problem(description: string): OpenApi3Dot1ResponseObject {
+    return {
+      description,
+      content: {
+        'application/problem+json': {schema: OpenApiConstants.ref('Problem')},
+      },
+    };
+  }
+
+  /** A body that is not in the envelope (JWKS, Actuator, SSE). */
+  static raw(
+    description: string,
+    mediaType: string,
+    schema: OpenApi3Dot1SchemaObject,
+  ): OpenApi3Dot1ResponseObject {
+    return {description, content: {[mediaType]: {schema}}};
   }
 
   static readonly NO_CONTENT: OpenApi3Dot1ResponseObject = {
