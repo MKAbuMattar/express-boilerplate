@@ -32,6 +32,16 @@ export class MigrationColumns {
       }),
       precision: types.updateDatePrecision,
       default: types.updateDateDefault,
+      // MySQL and MariaDB keep updatedAt current in the column itself, as
+      // @UpdateDateColumn declares it there.
+      ...(MigrationColumns.isMysql(queryRunner) && {
+        onUpdate: types.updateDateDefault,
+      }),
     };
+  }
+
+  private static isMysql(queryRunner: QueryRunner): boolean {
+    const {type} = queryRunner.connection.options;
+    return type === 'mysql' || type === 'mariadb';
   }
 }

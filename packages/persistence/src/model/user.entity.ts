@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ObjectIdColumn,
   PrimaryColumn,
   UpdateDateColumn,
@@ -33,7 +34,10 @@ export class UserEntity {
   @Column('varchar', {length: 120})
   name!: string;
 
-  @Column('varchar', {length: 254, unique: true})
+  // A named unique index, not unique: true, so every dialect (and the
+  // migration) agrees on one name instead of generating UQ_/IDX_ hashes.
+  @Index('UQ_users_email', {unique: true})
+  @Column('varchar', {length: 254})
   email!: string;
 
   @Column('int')

@@ -110,18 +110,10 @@ export class Containers {
         MONGO_INITDB_ROOT_PASSWORD: 'app',
       })
       .withExposedPorts(27017)
-      .withHealthCheck({
-        test: [
-          'CMD',
-          'mongosh',
-          '--quiet',
-          '--eval',
-          "db.adminCommand('ping')",
-        ],
-        interval: 1000,
-        retries: 120,
-      })
-      .withWaitStrategy(Wait.forHealthCheck())
+      // With MONGO_INITDB_* the image starts mongod once to create the user,
+      // stops it, then starts it for real: ready on the second message.
+      .withWaitStrategy(Wait.forLogMessage(/Waiting for connections/, 2))
+      .withStartupTimeout(120_000)
       .start();
     return new StartedService(
       c,

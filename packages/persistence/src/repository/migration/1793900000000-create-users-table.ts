@@ -12,10 +12,13 @@ export class CreateUsersTable1793900000000 implements MigrationInterface {
         columns: [
           {name: 'id', type: 'varchar', length: '36', isPrimary: true},
           {name: 'name', type: 'varchar', length: '120'},
-          {name: 'email', type: 'varchar', length: '254', isUnique: true},
+          {name: 'email', type: 'varchar', length: '254'},
           {name: 'age', type: MigrationColumns.type(queryRunner, 'int')},
           MigrationColumns.createdAt(queryRunner),
           MigrationColumns.updatedAt(queryRunner),
+        ],
+        indices: [
+          {name: 'UQ_users_email', columnNames: ['email'], isUnique: true},
         ],
       }),
     );
