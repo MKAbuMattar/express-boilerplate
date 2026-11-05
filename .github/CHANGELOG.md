@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>2.4.7 (2026-11-05)</small>
+
+* fix(deps): update all non-major dependencies (#833) ([dbe9edd](https://github.com/MKAbuMattar/express-boilerplate/commit/dbe9edd)), closes [#833](https://github.com/MKAbuMattar/express-boilerplate/issues/833)
+* chore(deps): update actions/checkout action to v7 (#787) ([c1bdcee](https://github.com/MKAbuMattar/express-boilerplate/commit/c1bdcee)), closes [#787](https://github.com/MKAbuMattar/express-boilerplate/issues/787)
+* chore(deps): update actions/stale action to v11 (#805) ([a198514](https://github.com/MKAbuMattar/express-boilerplate/commit/a198514)), closes [#805](https://github.com/MKAbuMattar/express-boilerplate/issues/805)
+* chore(deps): update dependency @biomejs/biome to v2.5.13 (#829) ([4a8d76a](https://github.com/MKAbuMattar/express-boilerplate/commit/4a8d76a)), closes [#829](https://github.com/MKAbuMattar/express-boilerplate/issues/829)
+* chore(deps): update dependency @biomejs/biome to v2.6.5 (#830) ([a6522a1](https://github.com/MKAbuMattar/express-boilerplate/commit/a6522a1)), closes [#830](https://github.com/MKAbuMattar/express-boilerplate/issues/830)
+* chore(deps): update dependency semantic-release to v23.1.1 (#831) ([3833d71](https://github.com/MKAbuMattar/express-boilerplate/commit/3833d71)), closes [#831](https://github.com/MKAbuMattar/express-boilerplate/issues/831)
+* chore(deps): update dependency semantic-release to v25 (#832) ([14fd267](https://github.com/MKAbuMattar/express-boilerplate/commit/14fd267)), closes [#832](https://github.com/MKAbuMattar/express-boilerplate/issues/832)
+* chore(deps): update pnpm to v12 (#827) ([8d6f0a6](https://github.com/MKAbuMattar/express-boilerplate/commit/8d6f0a6)), closes [#827](https://github.com/MKAbuMattar/express-boilerplate/issues/827)
+* chore(deps): update vitest to v5 (#826) ([14d2fdf](https://github.com/MKAbuMattar/express-boilerplate/commit/14d2fdf)), closes [#826](https://github.com/MKAbuMattar/express-boilerplate/issues/826)
+
 ## [2.4.6](https://github.com/MKAbuMattar/express-boilerplate/compare/v2.4.5...v2.4.6) (2026-09-13)
 
 
