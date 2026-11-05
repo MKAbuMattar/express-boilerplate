@@ -1,0 +1,6 @@
+---
+description: Project rules for express-boilerplate
+alwaysApply: true
+---
+
+Follow @AGENTS.md. It is the single source of project rules: commands, package layers, code rules, TLS-only security rules, tests and commits.
