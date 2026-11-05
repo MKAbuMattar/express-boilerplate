@@ -2,10 +2,10 @@ import type express from 'express';
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import type {Application} from '../../src/application.js';
+import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
 import {Scopes} from '../../src/security/authorization/scopes.js';
 import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {Principal} from '../../src/security/principal.js';
-import {AuthStrategy} from '../../src/enumeration/auth-strategy.enum.js';
 import {TestApp} from '../support/test-app.js';
 
 describe('Security: scope-based authorization', () => {

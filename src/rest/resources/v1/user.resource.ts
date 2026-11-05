@@ -20,8 +20,8 @@ import {
 import {inject} from 'inversify';
 import {ApiConstants} from '../../../constant/api.constants.js';
 import {OpenApiConstants} from '../../../constant/openapi.constants.js';
-import {UserConverter} from '../../../converter/user.converter.js';
 import {ScopeConstants} from '../../../constant/scope.constants.js';
+import {UserConverter} from '../../../converter/user.converter.js';
 import {Scopes} from '../../../security/authorization/scopes.js';
 import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
 import {UserService} from '../../../service/user.service.js';
