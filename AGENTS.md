@@ -62,4 +62,4 @@ Tests live in `apps/api/test/<type>/` (unit, integration, e2e, security, monkey,
 
 ## Commits
 
-Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`), imperative title under 72 characters, body says why. No co-author or "generated with" trailers. Do not push or open pull requests unless asked.
+Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `chore:`), imperative title under 72 characters, body says why. Pull request titles are checked by `pr-title.yml` and may only use `feat`, `fix`, `docs`, `ci` or `chore`. No co-author or "generated with" trailers. Do not push or open pull requests unless asked.
