@@ -159,6 +159,22 @@ export class AppConfig {
         default: 20,
         desc: 'Requests per IP per window on /auth (login brute force)',
       }),
+      ALLOWED_HOSTS: str({
+        default: '',
+        desc: 'Extra Host names to serve, comma-separated (PUBLIC_URL host is always allowed)',
+      }),
+      OPS_ALLOWED_CIDRS: str({
+        default:
+          '127.0.0.0/8,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7',
+        desc: 'Networks allowed to call ops routes (queues, network)',
+      }),
+      IDEMPOTENCY_TTL_SECONDS: num({default: 24 * 60 * 60}),
+      JSON_MAX_DEPTH: num({default: 32}),
+      JSON_MAX_NODES: num({default: 10_000}),
+      HTTP_HANDLER_TIMEOUT_MS: num({
+        default: 15_000,
+        desc: 'Answer 503 if a handler runs longer than this',
+      }),
       HTTP_HEADERS_TIMEOUT_MS: num({
         default: 10_000,
         desc: 'Slowloris guard: time allowed to send request headers',

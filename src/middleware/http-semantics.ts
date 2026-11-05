@@ -103,6 +103,13 @@ export class HttpSemantics {
         const problem = ProblemDetails.isProblem(body)
           ? body
           : ProblemDetails.from(status, body, request.originalUrl);
+        const requestId = response.getHeader('X-Request-Id');
+        if (
+          problem instanceof ProblemDetails &&
+          typeof requestId === 'string'
+        ) {
+          problem.requestId = requestId;
+        }
         response.type(ProblemDetails.CONTENT_TYPE);
         return response.send(JSON.stringify(problem));
       };

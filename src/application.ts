@@ -18,6 +18,7 @@ import {GlobalErrorFilter} from './exceptions/global-exception.filter.js';
 import {ApiVersioning} from './middleware/api-versioning.js';
 import {HttpSemantics} from './middleware/http-semantics.js';
 import {RateLimiter} from './middleware/rate-limiter.js';
+import {RequestGuards} from './middleware/request-guards.js';
 import {EventV1Resource} from './rest/resources/v1/event.resource.js';
 import {ExperimentV1Resource} from './rest/resources/v1/experiment.resource.js';
 import {HealthV1Resource} from './rest/resources/v1/health.resource.js';
@@ -84,8 +85,19 @@ export class Application {
           compression.filter(request, response),
       }),
     );
+    const store = this.beans.getBean(CacheStore);
+    const {logger} = this.beans.getBean(AppLogger);
     app.use(HttpSemantics.problemResponses());
-    app.use(RateLimiter.middleware(config, this.beans.getBean(CacheStore)));
+    app.use(RequestGuards.requestId());
+    app.use(
+      pinoHttp({
+        logger,
+        genReqId: (_request, response) =>
+          String(response.getHeader('X-Request-Id')),
+      }),
+    );
+    app.use(RequestGuards.hostValidation(config));
+    app.use(RateLimiter.middleware(config, store));
     app.use(HttpSemantics.options(() => built));
     app.use(
       cors({
@@ -93,6 +105,7 @@ export class Application {
         credentials: true,
       }),
     );
+    app.use(RequestGuards.crossSite(config));
     app.use(cookieParser(config.env.SESSION_SECRET));
     app.use(HttpSemantics.jsonBodiesOnly());
     // Keep the raw bytes so HmacGuard verifies exactly what the client signed.
@@ -107,8 +120,15 @@ export class Application {
       }),
     );
     app.use(express.urlencoded({extended: false, limit: '1mb'}));
-    app.use(pinoHttp({logger: this.beans.getBean(AppLogger).logger}));
+    app.use(RequestGuards.jsonLimits(config));
     app.use(ApiVersioning.middleware());
+    app.use(RequestGuards.cacheControl());
+    app.use(RequestGuards.deadline(config));
+    app.use(
+      RequestGuards.ipAllowlist(config, /^\/api\/v\d+\/(queues|network)(\/|$)/),
+    );
+    app.use(RequestGuards.auditLog(logger));
+    app.use(RequestGuards.idempotency(config, store));
 
     if (config.isDevelopment) this.registerSwagger();
 

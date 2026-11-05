@@ -26,6 +26,9 @@ export class ProblemDetails {
   readonly success = false;
   readonly message: string;
 
+  /** Same as the X-Request-Id header; quote it when reporting an error. */
+  requestId?: string;
+
   constructor(
     readonly status: number,
     readonly detail: string,
@@ -74,10 +77,13 @@ export class ProblemDetails {
     headers: Record<string, string> = {},
   ): void {
     if (response.headersSent) return;
+    const problem = ProblemDetails.from(status, body, instance);
+    const requestId = response.getHeader('X-Request-Id');
+    if (typeof requestId === 'string') problem.requestId = requestId;
     response
       .status(status)
       .set({...ProblemDetails.STATUS_HEADERS[status], ...headers})
       .type(ProblemDetails.CONTENT_TYPE)
-      .send(JSON.stringify(ProblemDetails.from(status, body, instance)));
+      .send(JSON.stringify(problem));
   }
 }

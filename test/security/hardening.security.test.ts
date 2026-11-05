@@ -184,6 +184,7 @@ describe('Security: runtime hardening', () => {
     it('production sends the security headers and hides the framework', async () => {
       const {application, app} = await TestApp.create({
         NODE_ENV: 'production',
+        ALLOWED_HOSTS: '127.0.0.1',
         SESSION_SECRET: 'x'.repeat(40),
       });
       try {
