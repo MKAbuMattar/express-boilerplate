@@ -6,7 +6,8 @@
       "!**/dist/**/*",
       "!**/node_modules/**/*",
       "!**/coverage/**/*",
-      "!**/src/generated/**/*"
+      "!**/src/generated/**/*",
+      "!**/CHANGELOG.md"
     ],
     "ignoreUnknown": true
   },
