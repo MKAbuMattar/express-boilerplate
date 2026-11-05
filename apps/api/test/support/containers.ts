@@ -106,7 +106,9 @@ export class Containers {
   static async mongodb(): Promise<StartedService> {
     // No MONGO_INITDB_* user: the image then starts mongod once, with no
     // init-and-restart cycle, and the test database needs no auth.
-    const c = await new GenericContainer('mongo:8')
+    // MongoDB 8.0+ refuses to start on Linux kernel 6.19+ (SERVER-121912),
+    // which CI runners use. 7.0 runs there and is still supported.
+    const c = await new GenericContainer('mongo:7')
       .withExposedPorts(27017)
       // mongod logs JSON; show its errors (s: E) and fatals (s: F) in the test
       // output, so a container that dies says why.
