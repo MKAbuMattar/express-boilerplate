@@ -3,8 +3,8 @@ import type {ExpressErrorFilter} from '@inversifyjs/http-express';
 import type {Request, Response} from 'express';
 import {inject} from 'inversify';
 import {DataSource} from 'typeorm';
-import {ApiResponse} from '../rest/dto/api-response.dto.js';
 import {AppLogger} from '../util/app-logger.js';
+import {ProblemDetails} from './problem-details.js';
 
 @CatchError() // also registers the class as injectable
 export class GlobalErrorFilter implements ExpressErrorFilter {
@@ -34,8 +34,16 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
   ) {}
 
   catch(error: unknown, request: Request, response: Response): void {
+    const instance = request.originalUrl;
     if (isHttpResponse(error)) {
-      response.status(error.statusCode).json(error.body);
+      const headers = (error as {headers?: Record<string, string>}).headers;
+      ProblemDetails.send(
+        response,
+        error.statusCode,
+        error.body,
+        instance,
+        headers,
+      );
       return;
     }
     this.appLogger.logger.error(
@@ -43,10 +51,10 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
       'Unhandled error',
     );
     if (this.isUnavailable(error)) {
-      response.status(503).json(ApiResponse.fail('Service Unavailable'));
+      ProblemDetails.send(response, 503, 'Service Unavailable', instance);
       return;
     }
-    response.status(500).json(ApiResponse.fail('Internal Server Error'));
+    ProblemDetails.send(response, 500, 'Internal Server Error', instance);
   }
 
   private isUnavailable(error: unknown): boolean {

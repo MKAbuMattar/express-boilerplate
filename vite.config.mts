@@ -43,6 +43,10 @@ export default defineConfig({
       },
       {
         extends: true,
+        test: {name: 'security', include: ['test/security/**/*.test.ts']},
+      },
+      {
+        extends: true,
         test: {
           name: 'chaos',
           include: ['test/chaos/**/*.test.ts'],

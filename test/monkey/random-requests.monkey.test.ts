@@ -41,6 +41,17 @@ describe('Monkey: random requests never cause a 5xx', () => {
     '/auth/saml/login',
     '/auth/saml/acs',
     '/auth/saml/metadata',
+    '/api/v1/health',
+    '/api/v1/users',
+    '/api/v2/users',
+    '/api/v2/users?page=2&size=1',
+    '/api/v2/users?search=%25',
+    '/api/v2/users/search',
+    '/api/v2/users/00000000-0000-4000-8000-000000000000',
+    '/api/v1/network/ping',
+    '/api/v1/queues',
+    '/api/v1/queues/demo/jobs',
+    '/api/v1/queues/demo/dead-letters',
   ];
 
   const path = fc.oneof(
@@ -50,7 +61,15 @@ describe('Monkey: random requests never cause a 5xx', () => {
       .map(([base, extra]) => `${base}/${extra}`),
     fc.webPath().map((p) => p || '/'),
   );
-  const method = fc.constantFrom('get', 'post', 'put', 'patch', 'delete');
+  const method = fc.constantFrom(
+    'get',
+    'post',
+    'put',
+    'patch',
+    'delete',
+    'head',
+    'options',
+  );
   const junk = fc.oneof(
     fc.string({maxLength: 200}),
     fc.constant('Bearer'),
@@ -104,11 +123,12 @@ describe('Monkey: random requests never cause a 5xx', () => {
           unexpected5xx,
           `${m.toUpperCase()} ${p} -> ${response.status}`,
         ).toBe(false);
-        if (
-          !redirect &&
-          response.status !== 204 &&
-          !p.includes('/saml/metadata')
-        ) {
+        // HEAD, OPTIONS, 204 and 304 carry no body by definition.
+        const bodyless =
+          m === 'head' ||
+          m === 'options' ||
+          [204, 304].includes(response.status);
+        if (!redirect && !bodyless && !p.includes('/saml/metadata')) {
           expect(
             response.headers['content-type'],
             `${m.toUpperCase()} ${p}`,

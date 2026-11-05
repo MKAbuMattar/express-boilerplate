@@ -17,6 +17,7 @@ export class Main {
       ? https.createServer(TlsConfig.serverOptions(config), app)
       : http.createServer(app);
 
+    await application.startTransports(server);
     server.listen(config.env.PORT, config.env.HOST, () => {
       const scheme = config.env.TLS_ENABLED ? 'https' : 'http';
       logger.info(

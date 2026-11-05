@@ -17,15 +17,15 @@ import type {
   Response as ExpressResponse,
 } from 'express';
 import {inject} from 'inversify';
-import {ApiConstants} from '../../constant/api.constants.js';
-import {ExperimentConstants} from '../../constant/experiment.constants.js';
-import {OpenApiConstants} from '../../constant/openapi.constants.js';
-import {SessionService} from '../../security/sso/session.service.js';
-import {ExperimentService} from '../../service/experiment.service.js';
-import {ApiResponse} from '../dto/api-response.dto.js';
+import {ApiConstants} from '../../../constant/api.constants.js';
+import {ExperimentConstants} from '../../../constant/experiment.constants.js';
+import {OpenApiConstants} from '../../../constant/openapi.constants.js';
+import {SessionService} from '../../../security/sso/session.service.js';
+import {ExperimentService} from '../../../service/experiment.service.js';
+import {ApiResponse} from '../../dto/api-response.dto.js';
 
-@Controller(ApiConstants.API_EXPERIMENTS)
-export class ExperimentResource {
+@Controller(ApiConstants.V1_EXPERIMENTS)
+export class ExperimentV1Resource {
   constructor(
     @inject(ExperimentService)
     private readonly experimentService: ExperimentService,

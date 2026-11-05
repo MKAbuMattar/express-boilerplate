@@ -23,6 +23,11 @@
     "start": "node --env-file-if-exists=.env dist/main.js",
     "certs": "tsx scripts/generate-certs.ts",
     "jwt": "tsx --env-file=.env.development --env-file-if-exists=.env scripts/issue-jwt.ts",
+    "migration:show": "tsx --env-file=.env.development --env-file-if-exists=.env node_modules/typeorm/cli.js migration:show -d src/config/cli.data-source.ts",
+    "migration:run": "tsx --env-file=.env.development --env-file-if-exists=.env node_modules/typeorm/cli.js migration:run -d src/config/cli.data-source.ts",
+    "migration:revert": "tsx --env-file=.env.development --env-file-if-exists=.env node_modules/typeorm/cli.js migration:revert -d src/config/cli.data-source.ts",
+    "migration:create": "tsx node_modules/typeorm/cli.js migration:create",
+    "migration:prod": "node node_modules/typeorm/cli.js migration:run -d dist/config/cli.data-source.js",
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist coverage",
     "lint": "biome check ./src ./test ./scripts",
@@ -34,6 +39,7 @@
     "test:containers": "vitest run --project containers",
     "test:e2e": "vitest run --project e2e",
     "test:monkey": "vitest run --project monkey",
+    "test:security": "vitest run --project security",
     "test:chaos": "vitest run --project chaos",
     "test:dev": "vitest dev",
     "test:cov": "vitest run --coverage --project unit --project integration"
@@ -43,6 +49,7 @@
     "@inversifyjs/http-express": "5.9.2",
     "@inversifyjs/http-open-api": "5.9.2",
     "@node-saml/node-saml": "5.2.0",
+    "bullmq": "6.7.0",
     "compression": "1.8.2",
     "cookie-parser": "1.4.7",
     "cors": "2.8.6",
@@ -60,7 +67,8 @@
     "redis": "6.3.1",
     "reflect-metadata": "0.2.2",
     "sql.js": "1.15.2",
-    "typeorm": "1.1.2"
+    "typeorm": "1.1.2",
+    "ws": "8.22.1"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.5",
@@ -71,6 +79,7 @@
     "@types/express": "5.0.6",
     "@types/node": "26.6.6",
     "@types/supertest": "7.2.1",
+    "@types/ws": "8.18.2",
     "@vitest/coverage-v8": "5.1.0",
     "fast-check": "4.10.2",
     "lint-staged": "17.6.0",

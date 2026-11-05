@@ -65,7 +65,7 @@ src/
 ├── repository/              UserRepository
 ├── rest/
 │   ├── dto/                 ApiResponse, CreateUserDto (validates input), UserDto
-│   └── resources/           HealthResource, UserResource, SecureResource
+│   └── resources/           HealthV1Resource, UserV1Resource, SecureV1Resource
 ├── security/
 │   ├── principal.ts         Principal set on the request by every guard
 │   ├── hmac/  jwt/  mtls/  oauth2/  sso/

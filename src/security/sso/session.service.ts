@@ -44,7 +44,11 @@ export class SessionService {
 
   async read(request: Request): Promise<Principal | null> {
     const token: unknown = request.cookies?.[SecurityConstants.SESSION_COOKIE];
-    if (typeof token !== 'string') return null;
+    return typeof token === 'string' ? this.readToken(token) : null;
+  }
+
+  /** For callers without an Express request, such as the WebSocket upgrade. */
+  async readToken(token: string): Promise<Principal | null> {
     try {
       const {payload} = await jwtVerify(token, this.key, {
         algorithms: [SecurityConstants.JWT_ALGORITHM],

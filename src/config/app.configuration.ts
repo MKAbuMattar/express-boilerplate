@@ -4,7 +4,9 @@ import {CacheService} from '../service/cache.service.js';
 import {ExperimentService} from '../service/experiment.service.js';
 import {CacheServiceImpl} from '../service/impl/cache.service.impl.js';
 import {ExperimentServiceImpl} from '../service/impl/experiment.service.impl.js';
+import {NetworkServiceImpl} from '../service/impl/network.service.impl.js';
 import {UserServiceImpl} from '../service/impl/user.service.impl.js';
+import {NetworkService} from '../service/network.service.js';
 import {UserService} from '../service/user.service.js';
 import {AppLogger} from '../util/app-logger.js';
 import {AppConfig} from './app.config.js';
@@ -13,6 +15,9 @@ import {CacheStore} from './cache/cache-store.js';
 import {MemoryCacheStore} from './cache/memory-cache.store.js';
 import {RedisCacheStore} from './cache/redis-cache.store.js';
 import {DatabaseConfig} from './database.config.js';
+import {BullMqQueueBroker} from './queue/bullmq-queue.broker.js';
+import {MemoryQueueBroker} from './queue/memory-queue.broker.js';
+import {QueueBroker} from './queue/queue-broker.js';
 
 @Configuration()
 export class AppConfiguration {
@@ -36,6 +41,18 @@ export class AppConfiguration {
     return new RedisCacheStore(CACHE_URL, CACHE_CLUSTER);
   }
 
+  @Bean(QueueBroker)
+  queueBroker(beans: BeanFactory): QueueBroker {
+    const {QUEUE_TYPE, QUEUE_URL, CACHE_URL, QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS} =
+      beans.getBean(AppConfig).env;
+    if (QUEUE_TYPE === 'memory') {
+      return new MemoryQueueBroker(QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS);
+    }
+    const url = QUEUE_URL || CACHE_URL;
+    if (!url) throw new Error('QUEUE_URL or CACHE_URL is required for bullmq');
+    return new BullMqQueueBroker(url, QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS);
+  }
+
   // Service contracts to implementations, as Spring autowires an interface.
   @Bean(CacheService)
   cacheService(beans: BeanFactory): CacheService {
@@ -45,6 +62,11 @@ export class AppConfiguration {
   @Bean(ExperimentService)
   experimentService(beans: BeanFactory): ExperimentService {
     return beans.getBean(ExperimentServiceImpl);
+  }
+
+  @Bean(NetworkService)
+  networkService(beans: BeanFactory): NetworkService {
+    return beans.getBean(NetworkServiceImpl);
   }
 
   @Bean(UserService)

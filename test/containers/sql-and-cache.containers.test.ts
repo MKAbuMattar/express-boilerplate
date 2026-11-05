@@ -1,8 +1,10 @@
 import {createHmac} from 'node:crypto';
 import request from 'supertest';
-import {describe, expect, it} from 'vitest';
+import {DataSource} from 'typeorm';
+import {describe, expect, it, vi} from 'vitest';
 import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {Containers, type StartedService} from '../support/containers.js';
+import {SchemaCheck} from '../support/schema-check.js';
 import {TestApp} from '../support/test-app.js';
 
 const docker = await Containers.dockerAvailable();
@@ -34,6 +36,12 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
       try {
         const health = await request(app).get('/api/health');
         expect(health.body.data.database).toBe(dbType);
+        // Migrations produced exactly the schema the entities describe.
+        expect(
+          await SchemaCheck.pendingChanges(
+            application.beans.getBean(DataSource),
+          ),
+        ).toEqual([]);
         const token = await application.beans
           .getBean(TokenProvider)
           .createToken('it');
@@ -56,6 +64,9 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
           const {application, app} = await TestApp.create({
             CACHE_TYPE: 'redis',
             CACHE_URL: cache.url,
+            QUEUE_TYPE: 'bullmq',
+            QUEUE_ATTEMPTS: '2',
+            QUEUE_BACKOFF_MS: '10',
           });
           try {
             expect(
@@ -83,6 +94,25 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
                 .send(body);
             expect((await send()).status).toBe(200);
             expect((await send()).status).toBe(401);
+
+            // BullMQ: a failing job ends in the dead-letter queue.
+            const auth = {authorization: `Bearer ${token}`};
+            await request(app)
+              .post('/api/v1/queues/demo/jobs')
+              .set(auth)
+              .send({fail: true});
+            await vi.waitFor(
+              async () => {
+                const letters = (
+                  await request(app)
+                    .get('/api/v1/queues/demo/dead-letters')
+                    .set(auth)
+                ).body.data;
+                expect(letters).toHaveLength(1);
+                expect(letters[0].error).toBe('demo job asked to fail');
+              },
+              {timeout: 15_000, interval: 200},
+            );
           } finally {
             await application.close();
           }

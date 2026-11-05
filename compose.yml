@@ -29,7 +29,7 @@ services:
       TLS_CA_FILE: /app/certs/ca.crt
       DB_TYPE: ${DB_TYPE:-postgres}
       DB_URL: ${DB_URL:-postgres://app:app@postgres:5432/app}
-      DB_SYNCHRONIZE: ${DB_SYNCHRONIZE:-true}
+      DB_MIGRATIONS_RUN: ${DB_MIGRATIONS_RUN:-true}
       CACHE_TYPE: ${CACHE_TYPE:-redis}
       CACHE_URL: ${CACHE_URL:-redis://redis:6379}
     ports:

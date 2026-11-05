@@ -1,5 +1,5 @@
-/** Public shape of a user. Keeps the API stable when the entity changes. */
-export class UserDto {
+/** v1 public shape of a user. Keeps the API stable when the entity changes. */
+export class UserV1Dto {
   constructor(
     readonly id: string,
     readonly name: string,

@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {SignJWT} from 'jose';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
+import {WebSocket} from 'ws';
 import {HttpsClient} from '../support/https-client.js';
 import {MockIdentityProvider} from '../support/mock-identity-provider.js';
 import {TestApp} from '../support/test-app.js';
@@ -40,7 +41,6 @@ describe('E2E: real HTTPS server', () => {
         TLS_CA_FILE: join(certs, 'ca.crt'),
         DB_TYPE: 'sqljs',
         DB_URL: '',
-        DB_SYNCHRONIZE: 'true',
         CACHE_TYPE: 'memory',
         JWT_SECRET,
         HMAC_CLIENTS: `e2e-partner:${HMAC_SECRET}`,
@@ -221,6 +221,63 @@ describe('E2E: real HTTPS server', () => {
     });
     expect(acs.status).toBe(401);
     expect(acs.cookie('session')).toBeUndefined();
+  });
+
+  it('WebSocket over TLS (wss://) with a JWT', async () => {
+    const token = await jwt();
+    const reply = await new Promise<any>((resolve, reject) => {
+      const ws = new WebSocket(`wss://localhost:${client.port}/ws`, {
+        ca: readFileSync(join(certs, 'ca.crt')),
+        headers: {authorization: `Bearer ${token}`},
+      });
+      ws.on('message', (data) => {
+        const message = JSON.parse(String(data));
+        if (message.type === 'whoami') {
+          ws.close();
+          resolve(message);
+        }
+      });
+      ws.once('open', () => ws.send(JSON.stringify({type: 'whoami'})));
+      ws.once('error', reject);
+    });
+    expect(reply).toEqual({
+      type: 'whoami',
+      strategy: 'jwt',
+      subject: 'e2e-admin',
+    });
+  });
+
+  it('API v2: PUT create, PATCH, QUERY, ETag 304, problem details', async () => {
+    const auth = {authorization: `Bearer ${await jwt()}`};
+    const id = '11111111-2222-4333-8444-555555555555';
+    const put = await client.request('PUT', `/api/v2/users/${id}`, {
+      headers: auth,
+      body: {name: 'Eve', email: 'eve@example.com', age: 28},
+    });
+    expect(put.status).toBe(201);
+    expect(put.headers.location).toBe(`/api/v2/users/${id}`);
+    const patched = await client.request('PATCH', `/api/v2/users/${id}`, {
+      headers: {...auth, 'content-type': 'application/merge-patch+json'},
+      body: {phone: '+1 555 0199'},
+    });
+    expect(patched.json.data.phone).toBe('+1 555 0199');
+    const found = await client.request('QUERY', '/api/v2/users/search', {
+      body: {search: 'eve'},
+    });
+    expect(found.json.data.total).toBe(1);
+    const etag = String(
+      (await client.request('GET', `/api/v2/users/${id}`)).headers.etag,
+    );
+    expect(
+      (
+        await client.request('GET', `/api/v2/users/${id}`, {
+          headers: {'if-none-match': etag},
+        })
+      ).status,
+    ).toBe(304);
+    const problem = await client.request('DELETE', `/api/v2/users/${id}`);
+    expect(problem.status).toBe(401);
+    expect(String(problem.headers['content-type'])).toMatch(/problem\+json/);
   });
 
   it('A/B: a visitor keeps the variant', async () => {

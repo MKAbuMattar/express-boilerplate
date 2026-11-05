@@ -36,6 +36,13 @@ export class OpenApiConstants {
     content: {'application/xml': {schema: {type: 'string'}}},
   };
 
+  static readonly QUEUE_PATH_PARAM: OpenApi3Dot1ParameterObject = {
+    name: 'name',
+    in: 'path',
+    required: true,
+    schema: {type: 'string', enum: ['welcome-email', 'demo']},
+  };
+
   static readonly ID_PATH_PARAM: OpenApi3Dot1ParameterObject = {
     name: 'id',
     in: 'path',
@@ -71,6 +78,28 @@ export class OpenApiConstants {
               example: 'alice@example.com',
             },
             age: {type: 'integer', minimum: 0, maximum: 150, example: 42},
+          },
+        },
+      },
+    },
+  };
+
+  static readonly CREATE_USER_V2_BODY: OpenApi3Dot1RequestBodyObject = {
+    required: true,
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          required: ['name', 'email', 'age'],
+          properties: {
+            name: {type: 'string', example: 'Alice'},
+            email: {
+              type: 'string',
+              format: 'email',
+              example: 'alice@example.com',
+            },
+            age: {type: 'integer', minimum: 0, maximum: 150, example: 42},
+            phone: {type: 'string', example: '+962 7 9123 4567'},
           },
         },
       },

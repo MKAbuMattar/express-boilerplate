@@ -5,7 +5,7 @@ import type {Application} from '../../src/application.js';
 import {TokenProvider} from '../../src/security/jwt/token.provider.js';
 import {TestApp} from '../support/test-app.js';
 
-describe('UserResource', () => {
+describe('UserV1Resource', () => {
   let application: Application;
   let app: express.Application;
   let token: string;

@@ -7,13 +7,13 @@ import {
 import {OasResponse, OasSummary} from '@inversifyjs/http-open-api';
 import {inject} from 'inversify';
 import {DataSource} from 'typeorm';
-import {ApiConstants} from '../../constant/api.constants.js';
-import {OpenApiConstants} from '../../constant/openapi.constants.js';
-import {CacheService} from '../../service/cache.service.js';
-import {ApiResponse} from '../dto/api-response.dto.js';
+import {ApiConstants} from '../../../constant/api.constants.js';
+import {OpenApiConstants} from '../../../constant/openapi.constants.js';
+import {CacheService} from '../../../service/cache.service.js';
+import {ApiResponse} from '../../dto/api-response.dto.js';
 
-@Controller(ApiConstants.API_HEALTH)
-export class HealthResource {
+@Controller(ApiConstants.V1_HEALTH)
+export class HealthV1Resource {
   constructor(
     @inject(DataSource) private readonly dataSource: DataSource,
     @inject(CacheService) private readonly cache: CacheService,

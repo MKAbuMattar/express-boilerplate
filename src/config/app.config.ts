@@ -89,7 +89,14 @@ export class AppConfig {
         default: '',
         desc: 'Connection URL, or file path for sqljs',
       }),
-      DB_SYNCHRONIZE: bool({default: false}),
+      DB_SYNCHRONIZE: bool({
+        default: false,
+        desc: 'Prototype only: lets TypeORM rewrite the schema. Use migrations.',
+      }),
+      DB_MIGRATIONS_RUN: bool({
+        default: true,
+        desc: 'Apply pending migrations at startup',
+      }),
 
       CACHE_TYPE: str({
         choices: Object.values(CacheType),
@@ -106,6 +113,23 @@ export class AppConfig {
         default: 200,
         desc: 'Cache calls slower than this count as a miss',
       }),
+
+      WS_ENABLED: bool({default: true, desc: 'WebSocket on the HTTP(S) port'}),
+      WS_PATH: str({default: '/ws'}),
+      WS_MAX_PAYLOAD_BYTES: num({default: 64 * 1024}),
+      TCP_ENABLED: bool({default: false}),
+      TCP_PORT: port({default: 9443, desc: 'TLS when TLS_ENABLED'}),
+      UDP_ENABLED: bool({default: false}),
+      UDP_PORT: port({default: 9444}),
+      PING_TIMEOUT_MS: num({default: 2000}),
+
+      QUEUE_TYPE: str({choices: ['memory', 'bullmq'], default: 'memory'}),
+      QUEUE_URL: str({default: '', desc: 'Redis URL; empty uses CACHE_URL'}),
+      QUEUE_ATTEMPTS: num({
+        default: 3,
+        desc: 'Tries before a job is dead-lettered',
+      }),
+      QUEUE_BACKOFF_MS: num({default: 500, desc: 'Exponential backoff base'}),
 
       EXPERIMENTS: str({
         default: 'new-checkout:50',

@@ -3,14 +3,44 @@ import {ApiResponse} from './api-response.dto.js';
 
 export class CreateUserDto {
   private static readonly EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  private static readonly PHONE = /^\+?[0-9 ()-]{6,32}$/;
 
   private constructor(
     readonly name: string,
     readonly email: string,
     readonly age: number,
+    readonly phone: string | null = null,
   ) {}
 
-  /** Validates untrusted input; throws 400 with every failing field. */
+  /** API v2: v1 fields plus an optional phone. */
+  static fromV2(body: unknown): CreateUserDto {
+    const phone = (body as {phone?: unknown} | null)?.phone;
+    const phoneError =
+      phone !== undefined &&
+      phone !== null &&
+      (typeof phone !== 'string' || !CreateUserDto.PHONE.test(phone));
+    let base: CreateUserDto | undefined;
+    let errors: Record<string, string> = {};
+    try {
+      base = CreateUserDto.from(body);
+    } catch (error) {
+      errors = (error as {body: {data: Record<string, string>}}).body.data;
+    }
+    if (phoneError) errors.phone = 'must be 6 to 32 digits, spaces, ()+-';
+    if (!base || phoneError) {
+      throw new BadRequestHttpResponse(
+        ApiResponse.fail('Validation failed', errors),
+      );
+    }
+    return new CreateUserDto(
+      base.name,
+      base.email,
+      base.age,
+      typeof phone === 'string' ? phone : null,
+    );
+  }
+
+  /** API v1. Validates untrusted input; throws 400 with every failing field. */
   static from(body: unknown): CreateUserDto {
     const input = (
       typeof body === 'object' && body !== null ? body : {}

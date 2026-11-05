@@ -28,7 +28,6 @@ export class TestApp {
         NODE_ENV: 'test',
         TLS_ENABLED: 'false',
         DB_TYPE: 'sqljs',
-        DB_SYNCHRONIZE: 'true',
         SESSION_SECRET: 'test-session-secret-0123456789abcdef',
         JWT_SECRET: TestApp.JWT_SECRET,
         HMAC_CLIENTS: `partner-a:${TestApp.HMAC_SECRET}`,

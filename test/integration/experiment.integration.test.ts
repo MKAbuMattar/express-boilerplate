@@ -7,7 +7,7 @@ import {Principal} from '../../src/security/principal.js';
 import {SessionService} from '../../src/security/sso/session.service.js';
 import {TestApp} from '../support/test-app.js';
 
-describe('ExperimentResource (A/B over HTTP)', () => {
+describe('ExperimentV1Resource (A/B over HTTP)', () => {
   let application: Application;
   let app: express.Application;
 

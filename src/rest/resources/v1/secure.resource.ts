@@ -14,19 +14,19 @@ import {
   OasSummary,
 } from '@inversifyjs/http-open-api';
 import type {Request as ExpressRequest} from 'express';
-import {ApiConstants} from '../../constant/api.constants.js';
-import {OpenApiConstants} from '../../constant/openapi.constants.js';
-import {HmacGuard} from '../../security/hmac/hmac.guard.js';
-import {JwtGuard} from '../../security/jwt/jwt.guard.js';
-import {MtlsGuard} from '../../security/mtls/mtls.guard.js';
-import {OAuth2Guard} from '../../security/oauth2/oauth2.guard.js';
-import type {Principal} from '../../security/principal.js';
-import {SsoGuard} from '../../security/sso/sso.guard.js';
-import {ApiResponse} from '../dto/api-response.dto.js';
+import {ApiConstants} from '../../../constant/api.constants.js';
+import {OpenApiConstants} from '../../../constant/openapi.constants.js';
+import {HmacGuard} from '../../../security/hmac/hmac.guard.js';
+import {JwtGuard} from '../../../security/jwt/jwt.guard.js';
+import {MtlsGuard} from '../../../security/mtls/mtls.guard.js';
+import {OAuth2Guard} from '../../../security/oauth2/oauth2.guard.js';
+import type {Principal} from '../../../security/principal.js';
+import {SsoGuard} from '../../../security/sso/sso.guard.js';
+import {ApiResponse} from '../../dto/api-response.dto.js';
 
 /** One endpoint per auth strategy. Copy the guard you need onto your own routes. */
-@Controller(ApiConstants.API_SECURE)
-export class SecureResource {
+@Controller(ApiConstants.V1_SECURE)
+export class SecureV1Resource {
   @OasSummary('No auth')
   @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('Public endpoint'))
   @Get('/public')
@@ -50,7 +50,7 @@ export class SecureResource {
   @UseGuard(MtlsGuard)
   @Get('/mtls')
   mtls(@Request() request: ExpressRequest): ApiResponse<Principal> {
-    return SecureResource.whoami(request);
+    return SecureV1Resource.whoami(request);
   }
 
   @OasSummary('HMAC-SHA256 signed request')
@@ -78,7 +78,7 @@ export class SecureResource {
   @UseGuard(HmacGuard)
   @Post('/hmac')
   hmac(@Request() request: ExpressRequest): ApiResponse<Principal> {
-    return SecureResource.whoami(request);
+    return SecureV1Resource.whoami(request);
   }
 
   @OasSummary('JWT issued by this service')
@@ -98,7 +98,7 @@ export class SecureResource {
   @UseGuard(JwtGuard)
   @Get('/jwt')
   jwt(@Request() request: ExpressRequest): ApiResponse<Principal> {
-    return SecureResource.whoami(request);
+    return SecureV1Resource.whoami(request);
   }
 
   @OasSummary('OAuth 2.0 access token from an external authorization server')
@@ -118,7 +118,7 @@ export class SecureResource {
   @UseGuard(OAuth2Guard)
   @Get('/oauth2')
   oauth2(@Request() request: ExpressRequest): ApiResponse<Principal> {
-    return SecureResource.whoami(request);
+    return SecureV1Resource.whoami(request);
   }
 
   @OasSummary('SSO session from OIDC or SAML')
@@ -137,7 +137,7 @@ export class SecureResource {
   @UseGuard(SsoGuard)
   @Get('/sso')
   sso(@Request() request: ExpressRequest): ApiResponse<Principal> {
-    return SecureResource.whoami(request);
+    return SecureV1Resource.whoami(request);
   }
 
   private static whoami(request: ExpressRequest): ApiResponse<Principal> {

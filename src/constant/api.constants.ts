@@ -8,10 +8,20 @@ export class ApiConstants {
   static readonly AUTH_ME = '/me';
   static readonly AUTH_LOGOUT = '/logout';
 
-  static readonly API_HEALTH = '/api/health';
-  static readonly API_USERS = '/api/users';
-  static readonly API_SECURE = '/api/secure';
-  static readonly API_EXPERIMENTS = '/api/experiments';
+  /** Unversioned /api/* is rewritten to this version (see ApiVersioning). */
+  static readonly DEFAULT_VERSION = 'v1';
+  static readonly API_V1 = '/api/v1';
+  static readonly API_V2 = '/api/v2';
+
+  static readonly V1_HEALTH = `${ApiConstants.API_V1}/health`;
+  static readonly V1_USERS = `${ApiConstants.API_V1}/users`;
+  static readonly V1_SECURE = `${ApiConstants.API_V1}/secure`;
+  static readonly V1_EXPERIMENTS = `${ApiConstants.API_V1}/experiments`;
+  static readonly V1_EVENTS = `${ApiConstants.API_V1}/events`;
+  static readonly V1_NETWORK = `${ApiConstants.API_V1}/network`;
+  static readonly V1_QUEUES = `${ApiConstants.API_V1}/queues`;
+
+  static readonly V2_USERS = `${ApiConstants.API_V2}/users`;
 
   static readonly DOCS = '/docs';
 }

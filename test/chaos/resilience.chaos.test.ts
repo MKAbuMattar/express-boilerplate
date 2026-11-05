@@ -43,7 +43,12 @@ describe('Chaos: dependencies fail, the app degrades cleanly', () => {
     expect(health.status).toBe(503);
     const users = await request(app).get('/api/users');
     expect(users.status).toBe(503);
-    expect(users.body).toEqual({
+    expect(users.headers['content-type']).toMatch(/application\/problem\+json/);
+    expect(users.headers['retry-after']).toBe('5');
+    expect(users.body).toMatchObject({
+      type: 'about:blank',
+      title: 'Service Unavailable',
+      status: 503,
       success: false,
       message: 'Service Unavailable',
       data: null,
