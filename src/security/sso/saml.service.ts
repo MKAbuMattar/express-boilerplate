@@ -19,7 +19,16 @@ export class SamlService {
   }
 
   async handleAssertion(body: Record<string, string>): Promise<Principal> {
-    const {profile} = await this.client().validatePostResponseAsync(body);
+    const client = this.client();
+    let profile: Awaited<
+      ReturnType<SAML['validatePostResponseAsync']>
+    >['profile'];
+    try {
+      ({profile} = await client.validatePostResponseAsync(body));
+    } catch {
+      // Unsigned, expired or malformed assertion: a failed login, not a 500.
+      throw AuthException.unauthorized(AuthStrategy.Saml, 'invalid assertion');
+    }
     if (!profile?.nameID) {
       throw AuthException.unauthorized(
         AuthStrategy.Saml,

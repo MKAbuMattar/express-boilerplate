@@ -57,14 +57,17 @@ export class OidcService {
     currentUrl: URL,
     loginState: OidcLoginState,
   ): Promise<Principal> {
-    const tokens = await authorizationCodeGrant(
-      await this.discover(),
-      currentUrl,
-      {
+    const configuration = await this.discover();
+    let tokens: Awaited<ReturnType<typeof authorizationCodeGrant>>;
+    try {
+      tokens = await authorizationCodeGrant(configuration, currentUrl, {
         pkceCodeVerifier: loginState.codeVerifier,
         expectedState: loginState.state,
-      },
-    );
+      });
+    } catch {
+      // Bad state, code, PKCE verifier or id_token: a failed login, not a 500.
+      throw AuthException.unauthorized(AuthStrategy.Oidc, 'login failed');
+    }
     const claims = tokens.claims();
     if (!claims) {
       throw AuthException.unauthorized(AuthStrategy.Oidc, 'no id_token');
