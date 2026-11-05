@@ -111,6 +111,11 @@ describe('OpenAPI document (Swagger, development)', () => {
     expect(undefinedRefs).toEqual([]);
   });
 
+  it('does not list the QUERY route under methods that answer 405', () => {
+    expect(spec.paths['/api/v2/users/search']).toBeUndefined();
+    expect(JSON.stringify(spec.tags)).toContain('QUERY /api/v2/users/search');
+  });
+
   it('types the main payloads', () => {
     const data = (path: string, method: string, code: string) =>
       JSON.stringify(spec.paths[path]?.[method]?.responses?.[code]);

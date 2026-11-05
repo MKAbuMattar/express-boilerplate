@@ -196,9 +196,11 @@ export class Application {
 
   /** Swagger UI at /docs, development only; the document is OpenApiConfig. */
   private registerSwagger(): void {
-    new SwaggerUiProvider({
+    const provider = new SwaggerUiProvider({
       api: {path: '/docs', openApiObject: OpenApiConfig.document(this.config)},
       ui: {title: 'Express Boilerplate API'},
-    }).provide(this.beans.container);
+    });
+    provider.provide(this.beans.container);
+    OpenApiConfig.dropQueryRoutes(provider.openApiObject);
   }
 }

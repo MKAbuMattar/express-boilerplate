@@ -19,7 +19,7 @@ export class OpenApiConfig {
     {
       name: 'Users v2',
       description:
-        'Users, version 2: paging, search, phone, and every HTTP method with its RFC 9110 meaning. Writes take If-Match; reads return an ETag.',
+        'Users, version 2: paging, search, phone, and every HTTP method with its RFC 9110 meaning. Writes take If-Match; reads return an ETag. Also `QUERY /api/v2/users/search` with a JSON body `{search, page, size}`: a safe, idempotent search (OpenAPI 3.1 cannot list the QUERY method, so it is described here).',
     },
     {
       name: 'Authentication',
@@ -78,6 +78,17 @@ export class OpenApiConfig {
         securitySchemes: OpenApiConfig.securitySchemes(config),
       },
     } as OpenApi3Dot1Object;
+  }
+
+  /**
+   * QUERY routes are registered for every method (@All) and answer 405 to
+   * all but QUERY. OpenAPI 3.1 has no QUERY, so remove the misleading
+   * operations; the tag description documents them instead.
+   */
+  static dropQueryRoutes(document: OpenApi3Dot1Object): void {
+    delete (document.paths as Record<string, unknown> | undefined)?.[
+      '/api/v2/users/search'
+    ];
   }
 
   private static securitySchemes(config: AppConfig) {
