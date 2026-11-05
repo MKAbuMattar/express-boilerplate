@@ -7,6 +7,13 @@ deployment:
 apisix:
   node_listen: 9080
 
+# The app runs with TLS_CLIENT_AUTH=require, so the gateway presents a client
+# cert on every upstream connection.
+nginx_config:
+  http_server_location_configuration_snippet: |
+    proxy_ssl_certificate /certs/client.crt;
+    proxy_ssl_certificate_key /certs/client.key;
+
 plugin_attr:
   prometheus:
     export_addr:

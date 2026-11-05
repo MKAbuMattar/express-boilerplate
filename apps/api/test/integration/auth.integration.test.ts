@@ -211,10 +211,11 @@ describe('auth strategies', () => {
   });
 
   describe('mtls over a real TLS socket', () => {
-    let server: https.Server;
-    let port: number;
+    const servers: https.Server[] = [];
+    let required: number;
+    let none: number;
 
-    beforeAll(async () => {
+    const listen = async (clientAuth: 'none' | 'require') => {
       const config = application.config;
       const tls = TlsConfig.serverOptions(
         Object.assign(Object.create(Object.getPrototypeOf(config)), config, {
@@ -223,18 +224,30 @@ describe('auth strategies', () => {
             TLS_KEY_FILE: join(certs, 'server.key'),
             TLS_CERT_FILE: join(certs, 'server.crt'),
             TLS_CA_FILE: join(certs, 'ca.crt'),
+            TLS_CLIENT_AUTH: clientAuth,
           },
         }),
       );
-      server = https.createServer(tls, app);
+      const server = https.createServer(tls, app);
+      servers.push(server);
       await new Promise<void>((resolve) => server.listen(0, resolve));
-      port = (server.address() as AddressInfo).port;
+      return (server.address() as AddressInfo).port;
+    };
+
+    beforeAll(async () => {
+      required = await listen('require');
+      none = await listen('none');
     });
-    afterAll(
-      () => new Promise<void>((resolve) => server.close(() => resolve())),
+    afterAll(() =>
+      Promise.all(
+        servers.map(
+          (server) =>
+            new Promise<void>((resolve) => server.close(() => resolve())),
+        ),
+      ),
     );
 
-    const get = (withClientCert: boolean) =>
+    const get = (withClientCert: boolean, port = required) =>
       new Promise<{status: number; body: any}>((resolve, reject) => {
         https
           .get(
@@ -262,14 +275,19 @@ describe('auth strategies', () => {
           .on('error', reject);
       });
 
-    it('accepts a client cert signed by the CA', async () => {
+    it('require: accepts a client cert signed by the CA', async () => {
       const response = await get(true);
       expect(response.status).toBe(200);
       expect(response.body.data.subject).toBe('local-client');
     });
 
-    it('rejects a request without a client cert', async () => {
-      expect((await get(false)).status).toBe(401);
+    it('require: refuses a connection without a client cert at the handshake', async () => {
+      await expect(get(false)).rejects.toThrow();
+    });
+
+    it('none: never asks for a cert, so the mTLS route is 401', async () => {
+      expect((await get(true, none)).status).toBe(401);
+      expect((await get(false, none)).status).toBe(401);
     });
   });
 });

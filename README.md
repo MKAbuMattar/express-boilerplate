@@ -122,7 +122,7 @@ Put a guard on a route or a whole controller with `@UseGuard(...)`. Each guard s
 | Strategy       | Guard         | Configure                                             | Client sends                                               |
 | -------------- | ------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
 | Public         | none          | nothing                                               | nothing                                                    |
-| mTLS           | `MtlsGuard`   | `TLS_CA_FILE`                                         | a client certificate signed by that CA                     |
+| mTLS           | `MtlsGuard`   | `TLS_CA_FILE`, `TLS_CLIENT_AUTH=require`              | a client certificate signed by that CA                     |
 | HMAC           | `HmacGuard`   | `HMAC_CLIENTS=id:secret,...`                          | `X-Client-Id`, `X-Timestamp`, `X-Signature`                |
 | JWT            | `JwtGuard`    | `JWT_SECRET` (32+ chars)                              | `Authorization: Bearer <token from TokenProvider>`         |
 | OAuth 2.0      | `OAuth2Guard` | `OAUTH2_ISSUER`, `OAUTH2_AUDIENCE`, `OAUTH2_JWKS_URI` | a Bearer access token from Keycloak, Auth0, Entra ID, Okta |
@@ -133,7 +133,7 @@ Put a guard on a route or a whole controller with `@UseGuard(...)`. Each guard s
 
 **SSO:** OIDC uses the authorization code flow with PKCE. SAML uses SP-initiated login with an HTTP-POST ACS at `/auth/saml/acs` and metadata at `/auth/saml/metadata`. Both end in the same signed, httpOnly session cookie (8 hours). Use `GET /auth/me` to read it and `POST /auth/logout` to end it.
 
-**mTLS behind a load balancer:** `MtlsGuard` reads the direct TLS socket. If TLS terminates at a proxy, read the client certificate header your proxy forwards.
+**mTLS is all or nothing at the handshake.** With `TLS_CLIENT_AUTH=require`, every connection must present a certificate signed by `TLS_CA_FILE`, so put a proxy with its own client certificate in front and let it forward end-user certificates (below). With the default `none`, no certificate is requested and mTLS routes answer 401. `require` does not fit Kubernetes `httpGet` probes, which send no client certificate.
 
 ### Authorization (scopes)
 

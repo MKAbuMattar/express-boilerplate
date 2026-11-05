@@ -67,6 +67,9 @@ services:
       QUEUE_TYPE: ${QUEUE_TYPE:-bullmq}
       TRUST_PROXY: 1
       MTLS_FORWARDED_HEADER: x-client-cert
+      # Every connection needs a client cert: Caddy (edge-proxy), Prometheus
+      # and APISIX (client). End-user certs arrive forwarded by Caddy.
+      TLS_CLIENT_AUTH: require
     expose: ["8443"] # internal only; Caddy is the public entry point
     volumes:
       - ./certs:/app/certs:ro
@@ -198,6 +201,7 @@ services:
     volumes:
       - ./deploy/apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./deploy/apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
+      - ./certs:/certs:ro
     depends_on:
       app: { condition: service_started }
 

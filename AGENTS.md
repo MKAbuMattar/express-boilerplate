@@ -54,6 +54,7 @@ A change is done when `pnpm lint`, `pnpm typecheck` and `pnpm test` pass. Contai
 - Every outgoing connection is encrypted: `DB_TLS`, `rediss://`, `smtps://`, `https://`. `AppConfig` enforces this in staging and production; keep that check passing.
 - Every route needs a guard and `Scopes.require(...)` unless it is public on purpose. The route audit test lists the public ones.
 - Swagger (`/docs`) is development only.
+- Client certificates are all or nothing: `TLS_CLIENT_AUTH=none` or `require`. Never add an optional handshake (`rejectUnauthorized: false`); code scanning blocks it.
 - Never commit or print `.env`, `apps/api/certs/`, `*.key` or `*.pem`. Secrets come from the environment or Vault.
 
 ## Tests

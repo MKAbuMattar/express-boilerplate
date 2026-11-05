@@ -13,6 +13,7 @@ import {Principal} from '../principal.js';
 /**
  * Requires a client certificate signed by TLS_CA_FILE, presented either
  * directly on this TLS socket, or forwarded by the edge proxy (HTTP/3 setup).
+ * Both need TLS_CLIENT_AUTH=require: with "none" no cert is ever requested.
  *
  * A forwarded certificate (MTLS_FORWARDED_HEADER, base64 DER) is trusted only
  * when this connection itself is the proxy, proven by the proxy's own client

@@ -138,6 +138,11 @@ export class AppConfig {
       TLS_KEY_FILE: str({default: 'certs/server.key'}),
       TLS_CERT_FILE: str({default: 'certs/server.crt'}),
       TLS_CA_FILE: str({default: 'certs/ca.crt', desc: 'CA for mTLS clients'}),
+      TLS_CLIENT_AUTH: str({
+        choices: ['none', 'require'],
+        default: 'none',
+        desc: 'require: every connection must present a cert signed by TLS_CA_FILE',
+      }),
 
       DB_TYPE: str({
         choices: Object.values(DatabaseType),

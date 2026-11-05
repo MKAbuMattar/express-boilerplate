@@ -125,12 +125,12 @@ describe('E2E: real HTTPS server', () => {
     expect((await client.request('GET', `/api/users/${id}`)).status).toBe(404);
   });
 
-  it('mTLS: 200 with the client cert, 401 without', async () => {
+  it('mTLS: off by default (TLS_CLIENT_AUTH=none), so the route is 401', async () => {
+    // require mode is covered on a real socket in auth.integration.
     const withCert = await client.request('GET', '/api/secure/mtls', {
       clientCert: true,
     });
-    expect(withCert.status).toBe(200);
-    expect(withCert.json.data.subject).toBe('local-client');
+    expect(withCert.status).toBe(401);
     expect((await client.request('GET', '/api/secure/mtls')).status).toBe(401);
   });
 
