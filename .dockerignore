@@ -14,4 +14,6 @@ compose.override.yml
 compose.traefik.yml
 compose.yml
 Dockerfile
-Dockerfile.aws
+
+# TLS keys never enter the build context
+certs

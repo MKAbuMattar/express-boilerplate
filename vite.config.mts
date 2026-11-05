@@ -1,22 +1,9 @@
-import tsconfigPaths from 'vite-tsconfig-paths';
-import {defineConfig, type ViteUserConfig} from 'vitest/config';
+import {defineConfig} from 'vitest/config';
 
-const viteConfig: ViteUserConfig = defineConfig({
+export default defineConfig({
   test: {
-    coverage: {
-      include: ['src/**'],
-      exclude: [
-        '**/node_modules/**',
-        '**/bin/*.ts',
-        '**/schemas/*',
-        '**/types/*',
-        '**/server.ts',
-      ],
-    },
-    globals: true,
+    environment: 'node',
     restoreMocks: true,
+    coverage: {include: ['src/**'], exclude: ['src/main.ts']},
   },
-  plugins: [tsconfigPaths()],
-}) satisfies ViteUserConfig;
-
-export default viteConfig;
+});

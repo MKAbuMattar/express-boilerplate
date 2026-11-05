@@ -2,7 +2,7 @@
   "name": "tsx",
   "type": "node",
   "request": "launch",
-  "program": "${workspaceFolder}/src/index.ts",
+  "program": "${workspaceFolder}/src/main.ts",
   "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/tsx",
   "console": "integratedTerminal",
   "internalConsoleOptions": "neverOpen",

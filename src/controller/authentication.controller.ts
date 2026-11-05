@@ -1,0 +1,114 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  Response,
+  UseGuard,
+} from '@inversifyjs/http-core';
+import {OasSummary} from '@inversifyjs/http-open-api';
+import type {
+  Request as ExpressRequest,
+  Response as ExpressResponse,
+} from 'express';
+import {inject} from 'inversify';
+import {ApiConstants} from '../constant/api.constants.js';
+import {SecurityConstants} from '../constant/security.constants.js';
+import {ApiResponse} from '../rest/dto/api-response.dto.js';
+import type {Principal} from '../security/principal.js';
+import {OidcLoginState, OidcService} from '../security/sso/oidc.service.js';
+import {SamlService} from '../security/sso/saml.service.js';
+import {SessionService} from '../security/sso/session.service.js';
+import {SsoGuard} from '../security/sso/sso.guard.js';
+
+/** SSO entry points. Both OIDC and SAML end in the same session cookie. */
+@Controller(ApiConstants.AUTH)
+export class AuthenticationController {
+  constructor(
+    @inject(OidcService) private readonly oidcService: OidcService,
+    @inject(SamlService) private readonly samlService: SamlService,
+    @inject(SessionService) private readonly sessionService: SessionService,
+  ) {}
+
+  @OasSummary('Start OIDC login (redirects to the IdP)')
+  @Get(ApiConstants.AUTH_OIDC_LOGIN)
+  async oidcLogin(@Response() response: ExpressResponse): Promise<void> {
+    const {url, loginState} = await this.oidcService.createLoginUrl();
+    response.cookie(
+      SecurityConstants.OIDC_STATE_COOKIE,
+      JSON.stringify(loginState),
+      {
+        ...this.sessionService.cookieOptions,
+        signed: true,
+        maxAge: SecurityConstants.OIDC_STATE_TTL_MS,
+      },
+    );
+    response.redirect(url.href);
+  }
+
+  @OasSummary('OIDC redirect URI')
+  @Get(ApiConstants.AUTH_OIDC_CALLBACK)
+  async oidcCallback(
+    @Request() request: ExpressRequest,
+    @Response() response: ExpressResponse,
+  ): Promise<void> {
+    const saved: unknown =
+      request.signedCookies?.[SecurityConstants.OIDC_STATE_COOKIE];
+    const parsed =
+      typeof saved === 'string'
+        ? (JSON.parse(saved) as OidcLoginState)
+        : new OidcLoginState('', '');
+    const currentUrl = new URL(
+      request.originalUrl,
+      this.oidcService.redirectUri,
+    );
+    const principal = await this.oidcService.handleCallback(
+      currentUrl,
+      new OidcLoginState(parsed.codeVerifier, parsed.state),
+    );
+    response.clearCookie(
+      SecurityConstants.OIDC_STATE_COOKIE,
+      this.sessionService.cookieOptions,
+    );
+    await this.sessionService.start(response, principal);
+    response.redirect(ApiConstants.AUTH + ApiConstants.AUTH_ME);
+  }
+
+  @OasSummary('Start SAML login (redirects to the IdP)')
+  @Get(ApiConstants.AUTH_SAML_LOGIN)
+  async samlLogin(@Response() response: ExpressResponse): Promise<void> {
+    response.redirect(await this.samlService.createLoginUrl());
+  }
+
+  @OasSummary('SAML assertion consumer service (HTTP-POST)')
+  @Post(ApiConstants.AUTH_SAML_ACS)
+  async samlAcs(
+    @Body() body: Record<string, string>,
+    @Response() response: ExpressResponse,
+  ): Promise<void> {
+    const principal = await this.samlService.handleAssertion(body);
+    await this.sessionService.start(response, principal);
+    response.redirect(ApiConstants.AUTH + ApiConstants.AUTH_ME);
+  }
+
+  @OasSummary('SAML service provider metadata')
+  @Get(ApiConstants.AUTH_SAML_METADATA)
+  samlMetadata(@Response() response: ExpressResponse): void {
+    response.type('application/xml').send(this.samlService.metadata());
+  }
+
+  @OasSummary('Current SSO session (OIDC or SAML)')
+  @UseGuard(SsoGuard)
+  @Get(ApiConstants.AUTH_ME)
+  me(@Request() request: ExpressRequest): ApiResponse<Principal> {
+    return ApiResponse.ok('Authenticated', request.principal!);
+  }
+
+  @OasSummary('End the SSO session')
+  @Post(ApiConstants.AUTH_LOGOUT)
+  logout(@Response() response: ExpressResponse): void {
+    this.sessionService.end(response);
+    response.status(204).end();
+  }
+}

@@ -6,7 +6,6 @@
       "!**/dist/**/*",
       "!**/node_modules/**/*",
       "!**/coverage/**/*",
-      "!**/src/generated/**/*",
       "!**/CHANGELOG.md"
     ],
     "ignoreUnknown": true
@@ -29,10 +28,14 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "suspicious": {
         "noExplicitAny": "off",
         "noConfusingVoidType": "off"
+      },
+      "performance": {
+        // House rule: named imports only, never `import * as x`.
+        "noNamespaceImport": "error"
       },
       "style": {
         "noUselessElse": "off",
@@ -48,7 +51,9 @@
         "noInferrableTypes": "error"
       },
       "complexity": {
-        "noForEach": "off"
+        "noForEach": "off",
+        // House rule: all code lives in classes, including static-only helpers.
+        "noStaticOnlyClass": "off"
       }
     }
   }

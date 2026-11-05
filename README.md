@@ -1,6 +1,6 @@
 # Express Boilerplate
 
-A boilerplate for building scalable applications with Express.js, TypeScript, TSOA, and Pino Logger
+A boilerplate for building scalable applications with Express.js, TypeScript, and Pino Logger
 
 <div class="badges" align="center">
 
@@ -10,7 +10,7 @@ A boilerplate for building scalable applications with Express.js, TypeScript, TS
 [![GitHub Forks](https://img.shields.io/github/forks/MKAbuMattar/express-boilerplate.svg?style=for-the-badge)](https://github.com/MKAbuMattar/express-boilerplate/forks)
 [![GitHub Issues](https://img.shields.io/github/issues/MKAbuMattar/express-boilerplate.svg?style=for-the-badge)](https://github.com/MKAbuMattar/express-boilerplate/issues)
 [![GitHub License](https://img.shields.io/github/license/MKAbuMattar/express-boilerplate.svg?style=for-the-badge)](LICENSE)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.0.0-brightgreen.svg?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2026-brightgreen.svg?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/language-TypeScript-blue.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![CI Pipeline](https://img.shields.io/github/actions/workflow/status/MKAbuMattar/express-boilerplate/ci-pipeline.yml?branch=main&style=for-the-badge&label=CI%20Pipeline)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/ci-pipeline.yml)
 [![CI CodeQL Analysis](https://img.shields.io/github/actions/workflow/status/MKAbuMattar/express-boilerplate/codeql-analysis.yml?branch=main&style=for-the-badge&label=CodeQL%20Analysis)](https://github.com/MKAbuMattar/express-boilerplate/actions/workflows/codeql-analysis.yml)
@@ -18,169 +18,162 @@ A boilerplate for building scalable applications with Express.js, TypeScript, TS
 
 </div>
 
-## Table of Contents
+## Quick start
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-  - [Running the Server](#running-the-server)
-  - [Building for Production](#building-for-production)
-  - [Running with Docker](#running-with-docker)
-- [Project Structure](#project-structure)
-- [Testing](#testing)
-- [Git Strategy](#git-strategy)
-  - [Branches](#branches)
-  - [Workflow](#workflow)
-  - [Semantic Commit Messages and Versioning](#semantic-commit-messages-and-versioning)
-- [GitHub Environments](#github-environments)
-  - [Why Use GitHub Environments?](#why-use-github-environments)
-  - [Setting Up GitHub Environments](#setting-up-github-environments)
-  - [Using Secrets in Your Workflow](#using-secrets-in-your-workflow)
-  - [Best Practices for Managing GitHub Environments](#best-practices-for-managing-github-environments)
-- [Running the Server with Docker and GitHub Container Registry (ghcr.io)](#running-the-server-with-docker-and-github-container-registry-ghcrio)
-  - [Login to GitHub Container Registry](#login-to-github-container-registry)
-  - [Run the Docker Container](#run-the-docker-container)
-    - [Explanation of the Command:](#explanation-of-the-command)
-  - [Verify the Container is Running](#verify-the-container-is-running)
-- [Contributing](#contributing)
-  - [Additional Guidelines](#additional-guidelines)
-- [License](#license)
-- [Further Reading](#further-reading)
-
-## Introduction
-
-This boilerplate provides a strong foundation for building applications using Express.js and TypeScript. It follows best practices for code quality, structure, and development workflow. The repository also supports Docker and includes preconfigured Git workflows for streamlined project management.
-
-## Features
-
-- **Express.js** with **TypeScript**: Combines the simplicity of Express.js with the type safety and scalability of TypeScript.
-- **Docker** support: Ensures consistent environment setups across different machines, simplifying deployment and scaling.
-- Centralized **logging** with [Pino](https://getpino.io/): A high-performance logger designed to handle heavy workloads with minimal overhead.
-- **Error handling** middleware: Built-in centralized error handling to manage different error types efficiently.
-- Unit and integration testing with [Vitest](https://vitest.dev/): Fast and simple testing for both unit and integration tests.
-- **API documentation** with OpenAPI Swagger: Automatically generate API documentation from your codebase.
-- **Linting** and **Formatting** with [Biome](https://biomejs.dev/): Ensures code consistency and quality across the project.
-- **GitHub Actions** for CI/CD pipelines: Automates testing, linting, and deployment workflows.
-- **Semantic Versioning** and **Conventional Commits**: Ensures a structured release process and maintainable commit history.
-
-## Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (v20 or later)
-- [Docker](https://www.docker.com/get-started) (optional, for containerization)
-
-### Installation
-
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/MKAbuMattar/express-boilerplate.git
-   cd express-boilerplate
-   ```
-
-2. Install dependencies:
-
-   ```sh
-   pnpm install
-   ```
-
-3. Set up environment variables:
-
-   ```sh
-   cp .env.example .env
-   ```
-
-## Usage
-
-### Running the Server
-
-To start the development server, run:
+Needs Node 26+, pnpm 12, and openssl.
 
 ```sh
-pnpm dev
+pnpm install
+pnpm certs          # local CA, server cert (localhost) and client cert in ./certs
+pnpm dev            # https://localhost/docs
 ```
 
-The server will start on the port specified in your `.env` file (default: 8080).
+`pnpm dev` loads `.env.development` (NODE_ENV and an in-memory database), then your `.env` if it exists. Copy `.env.example` to `.env` to turn on JWT, HMAC, OAuth2, OIDC or SAML. `pnpm jwt` prints a token for Swagger's Authorize button.
 
-### Building for Production
+Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/docs` runs only when `NODE_ENV=development`.
 
-To build the project for production:
+| Script | What it does |
+|---|---|
+| `pnpm dev` | Watch mode with tsx |
+| `pnpm build` | Compile with TypeScript 7 to `dist/` |
+| `pnpm start` | Run `dist/main.js` |
+| `pnpm test` / `pnpm test:cov` | Vitest |
+| `pnpm lint` / `pnpm lint:fix` | Biome |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm certs [dir] [--force]` | Generate local TLS and mTLS certs |
+| `pnpm jwt [subject] [ttl]` | Print a dev JWT signed with `JWT_SECRET` |
+
+## Project structure
+
+Layered like a Spring Boot application. Every unit is a class.
+
+```
+src/
+├── main.ts                  Main: starts the HTTPS (or HTTP) server, graceful shutdown
+├── application.ts           Application: builds the container and the Express app
+├── config/                  AppConfig (env), AppConfiguration (@Bean methods), BeanFactory,
+│   │                        stereotypes, DatabaseConfig, TlsConfig
+│   └── cache/               CacheStore, MemoryCacheStore, RedisCacheStore
+├── constant/                ApiConstants (routes), SecurityConstants, CacheConstants
+├── controller/              AuthenticationController (OIDC and SAML login flows)
+├── converter/               UserConverter (entity to DTO)
+├── enumeration/             AuthStrategy, DatabaseType, CacheType
+├── exceptions/              AuthException, GlobalExceptionFilter
+├── model/                   UserEntity (TypeORM)
+├── repository/              UserRepository
+├── rest/
+│   ├── dto/                 ApiResponse, CreateUserDto (validates input), UserDto
+│   └── resources/           HealthResource, UserResource, SecureResource
+├── security/
+│   ├── principal.ts         Principal set on the request by every guard
+│   ├── hmac/  jwt/  mtls/  oauth2/  sso/
+├── service/                 UserService, CacheService (abstract contracts)
+│   └── impl/                UserServiceImpl, CacheServiceImpl
+└── util/                    AppLogger, @Cacheable / @CacheEvict
+```
+
+### Beans and dependency injection
+
+`BeanFactory` wraps an Inversify 8 container. Beans are singletons by default.
+
+- `@Component()`, `@Service()` and `@Repository()` mark classes the container builds itself.
+- A `@Configuration()` class holds `@Bean(Token)` methods for everything else: third-party objects, and an abstract service bound to its implementation.
+
+```ts
+@Configuration()
+export class AppConfiguration {
+  @Bean(UserService)
+  userService(beans: BeanFactory): UserService {
+    return beans.getBean(UserServiceImpl);
+  }
+}
+```
+
+`@Bean` takes the token explicitly because esbuild (used by tsx and Vitest) emits no return type metadata. Constructor parameters use `@inject(Token)` for the same reason.
+
+## Authentication
+
+Put a guard on a route or a whole controller with `@UseGuard(...)`. Each guard sets `request.principal`. `/api/secure/*` has one demo route per guard. A strategy with no configuration returns **501**; bad credentials return **401**.
+
+| Strategy | Guard | Configure | Client sends |
+|---|---|---|---|
+| Public | none | nothing | nothing |
+| mTLS | `MtlsGuard` | `TLS_CA_FILE` | a client certificate signed by that CA |
+| HMAC | `HmacGuard` | `HMAC_CLIENTS=id:secret,...` | `X-Client-Id`, `X-Timestamp`, `X-Signature` |
+| JWT | `JwtGuard` | `JWT_SECRET` (32+ chars) | `Authorization: Bearer <token from TokenProvider>` |
+| OAuth 2.0 | `OAuth2Guard` | `OAUTH2_ISSUER`, `OAUTH2_AUDIENCE`, `OAUTH2_JWKS_URI` | a Bearer access token from Keycloak, Auth0, Entra ID, Okta |
+| OIDC (SSO) | `SsoGuard` | `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_CLIENT_SECRET` | browser login at `/auth/oidc/login` |
+| SAML 2.0 (SSO) | `SsoGuard` | `SAML_ENTRY_POINT`, `SAML_ISSUER`, `SAML_IDP_CERT` | browser login at `/auth/saml/login` |
+
+**HMAC signature:** hex `HMAC-SHA256(secret, "<unix-seconds>\n<METHOD>\n<path?query>\n<raw body>")`. The timestamp must be within 5 minutes, and each signature is accepted once.
+
+**SSO:** OIDC uses the authorization code flow with PKCE. SAML uses SP-initiated login with an HTTP-POST ACS at `/auth/saml/acs` and metadata at `/auth/saml/metadata`. Both end in the same signed, httpOnly session cookie (8 hours). Use `GET /auth/me` to read it and `POST /auth/logout` to end it.
+
+**mTLS behind a load balancer:** `MtlsGuard` reads the direct TLS socket. If TLS terminates at a proxy, read the client certificate header your proxy forwards.
+
+## Databases
+
+TypeORM 1.x. Set `DB_TYPE` and `DB_URL`.
+
+| `DB_TYPE` | Driver | `DB_URL` example |
+|---|---|---|
+| `postgres` | `pg` | `postgres://app:app@localhost:5432/app` |
+| `mysql` | `mysql2` | `mysql://app:app@localhost:3306/app` |
+| `mariadb` | `mysql2` | `mysql://app:app@localhost:3307/app` |
+| `mongodb` | `mongodb` | `mongodb://app:app@localhost:27017/app?authSource=admin` |
+| `mssql` | `mssql` (install it) | `mssql://sa:Passw0rd!@localhost:1433/app` |
+| `sqljs` | `sql.js` | empty for in-memory, or a file path |
+
+`DB_SYNCHRONIZE=true` creates tables for development. Production should use TypeORM migrations instead.
+
+## Cache
+
+`CACHE_TYPE=memory` keeps the cache in the process, for dev and tests. `CACHE_TYPE=redis` works with Redis, Valkey, AWS ElastiCache and MemoryDB:
+
+- `CACHE_URL=rediss://...` for TLS (ElastiCache in-transit encryption)
+- `CACHE_CLUSTER=true` for cluster-mode endpoints
+
+Services use Spring-style cache-aside decorators:
+
+```ts
+@Cacheable((id: string) => CacheConstants.user(id))
+findById(id: string): Promise<UserEntity> { ... }
+
+@CacheEvict(() => CacheConstants.USERS_ALL, (id: string) => CacheConstants.user(id))
+delete(id: string): Promise<void> { ... }
+```
+
+`@Cacheable` returns the cached value, or runs the method and stores the result for `CACHE_TTL_SECONDS`. `@CacheEvict` runs the method, then deletes the listed keys. Values round-trip through JSON, so the converters accept dates as either `Date` or ISO strings. The HMAC guard also uses the cache to reject replayed signatures, so run Redis when you have more than one instance.
+
+## Docker
 
 ```sh
-pnpm build
+pnpm certs
+docker compose up --build                                   # app on https://localhost
+docker compose --profile postgres --profile redis up --build
 ```
 
-Then, to start the production server:
+Profiles: `postgres`, `mysql`, `mariadb`, `mongodb`, `redis`, `valkey`. The image runs as the non-root `node` user on port 8443, published as 443. Certs are mounted read-only at `/app/certs`, and secrets come from the environment, never from build args. To pull the base image from AWS ECR Public:
 
 ```sh
-pnpm start
+docker build --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:26-alpine .
 ```
 
-### Running with Docker
-
-Using Docker helps maintain a consistent development environment across machines. To build and run the project using Docker, use the following commands:
+### From GitHub Container Registry
 
 ```sh
-docker-compose up -d --build
+echo <YOUR_PAT_TOKEN> | docker login ghcr.io -u <USERNAME> --password-stdin
+
+docker run -d -p 443:8443 \
+    -v "$PWD/certs:/app/certs:ro" \
+    -e SESSION_SECRET="<32+ random characters>" \
+    -e JWT_SECRET="<32+ random characters>" \
+    -e DB_TYPE=postgres -e DB_URL="postgres://app:app@db:5432/app" \
+    -e CACHE_TYPE=redis -e CACHE_URL="redis://cache:6379" \
+    ghcr.io/mkabumattar/express-boilerplate:latest
 ```
 
-## Project Structure
-
-```
-express-boilerplate/
-├── .github/               # GitHub configurations for CI/CD and issue templates
-├── .vscode/               # VSCode-specific settings for workspace
-├── plugins/               # Custom plugins (e.g., Pino transports)
-├── src/                   # Core application source code
-│   ├── api/               # API routes and controllers
-│   ├── bin/               # Application entry point (startup scripts)
-│   ├── configs/           # Configuration files for logger, environment, etc.
-│   ├── docs/              # API documentation and OpenAPI specs
-│   ├── libs/              # Reusable libraries
-│   ├── middlewares/       # Custom middleware logic
-│   ├── models/            # Data models and schemas
-│   ├── schemas/           # Validation schemas
-│   ├── utils/             # Utility functions for the app
-│   ├── validations/       # Business logic validations
-│   └── index.ts           # Main server file
-├── Dockerfile             # Docker configuration
-├── compose.yml            # Docker Compose for multi-service applications
-├── .env.example           # Example environment variables
-├── LICENSE                # License file
-├── package.json           # Project metadata and scripts
-├── tsconfig.json          # TypeScript configuration
-└── README.md              # Project documentation
-```
-
-## Testing
-
-Testing is crucial to ensure code reliability and prevent regressions. This project uses [Vitest](https://vitest.dev/) for running unit and integration tests.
-
-- **Unit Tests**: Test individual units of code in isolation.
-- **Integration Tests**: Test the interaction between different units of code.
-
-- **Test Files**: Test files are located in the `src` directory with the `.test.ts` extension.
-
-  ```sh
-  pnpm test
-  ```
-- **Coverage Reports**: To generate a code coverage report:
-
-  ```sh
-  pnpm test:cov
-  ```
-- **Watch Mode**: To run tests in watch mode (ideal for active development):
-
-  ```sh
-  pnpm test:dev
-  ```
-
-> [!TIP]
-> Focus on writing tests that verify the behavior of the code, not implementation details.
+The PAT needs the `read:packages` scope. Create one [here](https://github.com/settings/tokens).
 
 ## Git Strategy
 
@@ -319,67 +312,6 @@ jobs:
 
 By following these guidelines, you can establish a robust and secure CI/CD process that enhances your development workflow while maintaining best practices for managing sensitive information.
 
-## Running the Server with Docker and GitHub Container Registry (ghcr.io)
-
-### Login to GitHub Container Registry
-
-Before running the Docker container, ensure you're logged into the GitHub Container Registry (GHCR). Replace `TOKEN` and `USERNAME` with your GitHub Personal Access Token (PAT) and GitHub username, respectively:
-
-```sh
-echo <YOUR_PAT_TOKEN> | docker login ghcr.io -u <USERNAME> --password-stdin
-```
-
-- **`<YOUR_PAT_TOKEN>`**: Your GitHub Personal Access Token with access to the container registry.
-- **`<USERNAME>`**: Your GitHub username.
-
-You can create a GitHub PAT [here](https://github.com/settings/tokens), ensuring it has the `read:packages` scope.
-
-> [!NOTE]
-> This step is required to pull the Docker image from the GitHub Container Registry for private repositories.
-
-### Run the Docker Container
-
-Once logged in, run the Docker container using the following command. Be sure to replace the environment variables and image information with your specific values:
-
-```sh
-docker run -d -p 8080:8080 \
-    -e NODE_ENV="development" \
-    -e PORT="8080" \
-    -e HOST="localhost" \
-    -e CORS_WHITELIST="*" \
-    -e API_KEY="uk6XUcp7Hj6f4O+w6b<O" \
-    ghcr.io/<USERNAME>/<REPOSITORY_NAME>:<DIGEST>
-```
-
-#### Explanation of the Command:
-
-- **`-p 8080:8080`**: Maps the container's internal port `8080` to port `8080` on your machine.
-- **`-e NODE_ENV="development"`**: Sets the `NODE_ENV` environment variable to `development`. Other options might be `production` or `staging` depending on your setup.
-- **`-e PORT="8080"`**: Specifies the port on which the app should run inside the container.
-- **`-e HOST="localhost"`**: Defines the host, typically `localhost` for local development.
-- **`-e CORS_WHITELIST="*"`**: Allows all domains by using a wildcard for CORS. Adjust this according to your security needs.
-- **`-e API_KEY="uk6XUcp7Hj6f4O+w6b<O"`**: An API key required by your application. Replace with your actual key.
-- **`ghcr.io/<USERNAME>/<REPOSITORY_NAME>:<DIGEST>`**: Replace `<USERNAME>`, `<REPOSITORY_NAME>`, and `<DIGEST>` with your GitHub username, the repository name, and the specific image digest or tag (e.g., `latest`).
-
-```sh
-docker run -d --network host \
-    -e NODE_ENV="production" \
-    -e PORT="8080" \
-    -e HOST="0.0.0.0" \
-    -e CORS_WHITELIST="https://example.com" \
-    -e API_KEY="superSecretAPIKey123" \
-    ghcr.io/mkabumattar/express-boilerplate:latest
-```
-
-### Verify the Container is Running
-
-To check if your container is running, you can use the following command:
-
-```sh
-docker ps
-```
-
-This will display a list of all active containers. You should see your container listed with the port mappings (`8080:8080` in this case).
 
 ## Contributing
 
@@ -395,12 +327,12 @@ Contributions are welcome! Please follow the guidelines in [CONTRIBUTING.md](.gi
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details by [@MKAbuMattar](https://github.com/MKAbuMattar).
 
-## Further Reading
 
-- [Express.js Documentation](https://expressjs.com/)
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [Docker Documentation](https://docs.docker.com/)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Pino Logger](https://getpino.io/)
-- [Vitest Testing Framework](https://vitest.dev/)
-- [Biome Linting](https://biomejs.dev/)
+## Further reading
+
+- [Express 5](https://expressjs.com/)
+- [InversifyJS HTTP](https://inversify.io/framework/)
+- [TypeORM](https://typeorm.io/)
+- [jose](https://github.com/panva/jose), [openid-client](https://github.com/panva/openid-client), [node-saml](https://github.com/node-saml/node-saml)
+- [node-redis](https://github.com/redis/node-redis)
+- [Pino](https://getpino.io/), [Vitest](https://vitest.dev/), [Biome](https://biomejs.dev/)
