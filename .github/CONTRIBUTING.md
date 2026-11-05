@@ -79,7 +79,6 @@ The server will start on the port specified in your `.env` file.
 
 6. **Submit a Pull Request**  
    Go to the original repository and submit a Pull Request from your branch. Ensure the PR includes:
-
    - A description of the changes
    - A reference to the issue (if applicable)
    - Any relevant test results or screenshots

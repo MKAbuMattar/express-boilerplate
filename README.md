@@ -164,14 +164,17 @@ Testing is crucial to ensure code reliability and prevent regressions. This proj
 - **Integration Tests**: Test the interaction between different units of code.
 
 - **Test Files**: Test files are located in the `src` directory with the `.test.ts` extension.
+
   ```sh
   pnpm test
   ```
 - **Coverage Reports**: To generate a code coverage report:
+
   ```sh
   pnpm test:cov
   ```
 - **Watch Mode**: To run tests in watch mode (ideal for active development):
+
   ```sh
   pnpm test:dev
   ```
@@ -204,26 +207,32 @@ Testing is crucial to ensure code reliability and prevent regressions. This proj
 This project adheres to [Semantic Versioning](https://semver.org/) and uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) to manage releases. Every commit message and version change should follow this standard:
 
 - **fix**: Patches a bug in your codebase (`PATCH` release) or a hotfix.
+
   ```sh
   git commit -m "fix(api): fix health check route"
   ```
 - **feat**: Introduces a new feature (`MINOR` release) or enhancement.
+
   ```sh
   git commit -m "feat(api): add user route"
   ```
 - **BREAKING CHANGE**: Introduces breaking changes (`MAJOR` release) that require a manual update.
+
   ```sh
   git commit -m "feat!(api): change user route to use UUID"
   ```
 - **chore**: Updates dependencies, refactors code, or makes other changes that don't affect the user-facing code.
+
   ```sh
   git commit -m "chore: update dependencies"
   ```
 - **docs**: Updates documentation, README, or other non-code files.
+
   ```sh
   git commit -m "docs: update README"
   ```
 - **ci**: Updates CI/CD configurations or workflows.
+
   ```sh
   git commit -m "ci: add GitHub Actions workflow"
   ```
@@ -245,16 +254,13 @@ Using GitHub Environments offers several advantages:
 Follow these steps to set up GitHub Environments for your project:
 
 1. **Navigate to Your Repository**:
-
    - Open your web browser and go to your GitHub repository.
 
 2. **Access Environment Settings**:
-
    - Click on the **Settings** tab at the top of the repository page.
    - In the left sidebar, find and select **Environments** under the **Security** section.
 
 3. **Create a New Environment**:
-
    - Click the **New environment** button.
    - Provide a meaningful name for your environment (e.g., `development`, `staging`, `production`) to indicate its purpose.
    - (Optional) Configure specific rules, such as requiring manual approval for deployment, to enhance control over the process.
