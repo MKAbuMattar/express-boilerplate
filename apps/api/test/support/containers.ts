@@ -104,20 +104,24 @@ export class Containers {
   }
 
   static async mongodb(): Promise<StartedService> {
+    // No MONGO_INITDB_* user: the image then starts mongod once, with no
+    // init-and-restart cycle, and the test database needs no auth.
     const c = await new GenericContainer('mongo:8')
-      .withEnvironment({
-        MONGO_INITDB_ROOT_USERNAME: 'app',
-        MONGO_INITDB_ROOT_PASSWORD: 'app',
-      })
       .withExposedPorts(27017)
-      // With MONGO_INITDB_* the image starts mongod once to create the user,
-      // stops it, then starts it for real: ready on the second message.
-      .withWaitStrategy(Wait.forLogMessage(/Waiting for connections/, 2))
+      // mongod logs JSON; show its errors (s: E) and fatals (s: F) in the test
+      // output, so a container that dies says why.
+      .withLogConsumer((stream) =>
+        stream.on('data', (line: string | Buffer) => {
+          if (/"s":"[EF]"/.test(String(line)))
+            process.stderr.write(`mongo: ${line}`);
+        }),
+      )
+      .withWaitStrategy(Wait.forLogMessage(/Waiting for connections/))
       .withStartupTimeout(120_000)
       .start();
     return new StartedService(
       c,
-      `mongodb://app:app@${c.getHost()}:${c.getMappedPort(27017)}/app?authSource=admin`,
+      `mongodb://${c.getHost()}:${c.getMappedPort(27017)}/app`,
     );
   }
 

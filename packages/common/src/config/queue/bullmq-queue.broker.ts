@@ -40,7 +40,8 @@ export class BullMqQueueBroker extends QueueBroker {
               attempts: job.attemptsMade,
               failedAt: new Date().toISOString(),
             },
-            {jobId: String(job.id)},
+            // BullMQ refuses custom ids that look like integers.
+            {jobId: `failed-${job.id}`},
           );
         }
       });
