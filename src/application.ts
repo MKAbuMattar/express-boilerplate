@@ -14,6 +14,7 @@ import {AppConfiguration} from './config/app.configuration.js';
 import {BeanFactory} from './config/bean-factory.js';
 import {CacheStore} from './config/cache/cache-store.js';
 import {AuthenticationController} from './controller/authentication.controller.js';
+import {WellKnownController} from './controller/well-known.controller.js';
 import {GlobalErrorFilter} from './exceptions/global-exception.filter.js';
 import {ApiVersioning} from './middleware/api-versioning.js';
 import {HttpSemantics} from './middleware/http-semantics.js';
@@ -44,6 +45,7 @@ export class Application {
     EventV1Resource,
     NetworkV1Resource,
     QueueV1Resource,
+    WellKnownController,
   ];
 
   readonly beans: BeanFactory;

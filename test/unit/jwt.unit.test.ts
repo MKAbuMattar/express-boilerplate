@@ -1,13 +1,12 @@
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
 import {JwtGuard} from '../../src/security/jwt/jwt.guard.js';
-import {TokenProvider} from '../../src/security/jwt/token.provider.js';
-import {UnitFixtures} from '../support/unit-fixtures.js';
+import {TokenProviders, UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('TokenProvider + JwtGuard', () => {
   const SECRET = 'unit-jwt-secret-0123456789abcdef0123';
   const provider = (env: Record<string, string> = {}) =>
-    new TokenProvider(UnitFixtures.config({JWT_SECRET: SECRET, ...env}));
+    TokenProviders.build(UnitFixtures.config({JWT_SECRET: SECRET, ...env}));
   const statusOf = async (promise: Promise<unknown>) => {
     try {
       await promise;
@@ -36,7 +35,8 @@ describe('TokenProvider + JwtGuard', () => {
   });
 
   it('rejects an expired token', async () => {
-    const token = await provider().createToken('a', {}, '-1s');
+    // Past the 30 s clock tolerance.
+    const token = await provider().createToken('a', {}, '-60s');
     await expect(provider().validateToken(token)).rejects.toThrow();
   });
 
@@ -54,7 +54,9 @@ describe('TokenProvider + JwtGuard', () => {
         ),
       ),
     ).toBe(401);
-    const unconfigured = new JwtGuard(new TokenProvider(UnitFixtures.config()));
+    const unconfigured = new JwtGuard(
+      TokenProviders.build(UnitFixtures.config()),
+    );
     expect(await statusOf(unconfigured.activate(bearer('x.y.z')))).toBe(501);
   });
 });

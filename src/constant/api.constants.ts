@@ -7,6 +7,9 @@ export class ApiConstants {
   static readonly AUTH_SAML_METADATA = '/saml/metadata';
   static readonly AUTH_ME = '/me';
   static readonly AUTH_LOGOUT = '/logout';
+  static readonly AUTH_TOKEN_REVOKE = '/token/revoke';
+  static readonly WELL_KNOWN = '/.well-known';
+  static readonly JWKS = '/jwks.json';
 
   /** Unversioned /api/* is rewritten to this version (see ApiVersioning). */
   static readonly DEFAULT_VERSION = 'v1';

@@ -100,7 +100,9 @@ export class HmacGuard implements ExpressGuard {
       );
     }
 
-    request.principal = new Principal(AuthStrategy.Hmac, clientId);
+    request.principal = new Principal(AuthStrategy.Hmac, clientId, {
+      scope: this.config.hmacClientScopes.get(clientId) ?? '',
+    });
     return true;
   }
 }

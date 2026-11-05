@@ -82,6 +82,8 @@ describe('E2E: real HTTPS server', () => {
     new SignJWT({scope: 'users:write ops:queues ops:network'})
       .setProtectedHeader({alg: 'HS256'})
       .setSubject('e2e-admin')
+      .setJti(randomBytes(8).toString('hex'))
+      .setIssuedAt()
       .setIssuer('express-boilerplate')
       .setAudience('express-boilerplate')
       .setExpirationTime('5m')

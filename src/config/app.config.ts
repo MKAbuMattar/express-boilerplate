@@ -11,12 +11,16 @@ export class AppConfig {
   readonly hmacClients: ReadonlyMap<string, string>;
   readonly corsOrigins: string[];
   readonly experiments: ReadonlyMap<string, number>;
+  readonly hmacClientScopes: ReadonlyMap<string, string>;
+  readonly mtlsClientScopes: ReadonlyMap<string, string>;
   /** Hops for Express 'trust proxy'; false when not behind a proxy. */
   readonly trustProxy: number | false;
 
   constructor(source: NodeJS.ProcessEnv = process.env) {
     this.env = AppConfig.read(source);
     this.corsOrigins = AppConfig.list(this.env.CORS_ORIGINS);
+    this.hmacClientScopes = AppConfig.scopeMap(this.env.HMAC_CLIENT_SCOPES);
+    this.mtlsClientScopes = AppConfig.scopeMap(this.env.MTLS_CLIENT_SCOPES);
     // A hop count, never `true`: `true` trusts the leftmost X-Forwarded-For,
     // which the client writes, so anyone could pick their own rate-limit IP.
     const proxy = this.env.TRUST_PROXY.trim().toLowerCase();
@@ -190,10 +194,28 @@ export class AppConfig {
       SESSION_SECRET: AppConfig.secret({
         devDefault: 'dev-only-session-secret-0123456789abcdef',
       }),
+      JWT_ALGORITHM: str({choices: ['HS256', 'ES256'], default: 'HS256'}),
       JWT_SECRET: AppConfig.optionalSecret({default: ''}),
+      JWT_PRIVATE_KEY_FILE: str({
+        default: '',
+        desc: 'ES256 signing key (PKCS#8 PEM)',
+      }),
+      JWT_PUBLIC_KEY_FILES: str({
+        default: '',
+        desc: 'Previous ES256 public keys still accepted (rotation), comma-separated',
+      }),
+      JWT_CLOCK_TOLERANCE_SECONDS: num({default: 30}),
       JWT_ISSUER: str({default: 'express-boilerplate'}),
       JWT_AUDIENCE: str({default: 'express-boilerplate'}),
       HMAC_CLIENTS: str({default: '', desc: 'clientId:secret,clientId:secret'}),
+      HMAC_CLIENT_SCOPES: str({
+        default: '',
+        desc: 'clientId=scope scope,clientId=scope (what each HMAC client may do)',
+      }),
+      MTLS_CLIENT_SCOPES: str({
+        default: '',
+        desc: 'certCN=scope scope,certCN=scope (what each mTLS client may do)',
+      }),
 
       OAUTH2_ISSUER: str({default: ''}),
       OAUTH2_AUDIENCE: str({default: ''}),
@@ -207,6 +229,21 @@ export class AppConfig {
       SAML_ISSUER: str({default: ''}),
       SAML_IDP_CERT: str({default: '', desc: 'IdP signing cert, PEM body'}),
     });
+  }
+
+  /** "name=scope scope,name2=scope" to name -> "scope scope". */
+  private static scopeMap(value: string): Map<string, string> {
+    return new Map(
+      AppConfig.list(value).map((entry) => {
+        const index = entry.indexOf('=');
+        if (index < 1)
+          throw new Error(`Bad scope entry "${entry}": use name=scope scope`);
+        return [
+          entry.slice(0, index).trim(),
+          entry.slice(index + 1).trim(),
+        ] as const;
+      }),
+    );
   }
 
   private static list(value: string): string[] {

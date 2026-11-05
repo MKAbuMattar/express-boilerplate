@@ -1,3 +1,4 @@
+import {randomUUID} from 'node:crypto';
 import type {CookieOptions, Request, Response} from 'express';
 import {inject} from 'inversify';
 import {jwtVerify, SignJWT} from 'jose';
@@ -5,6 +6,7 @@ import {AppConfig} from '../../config/app.config.js';
 import {Component} from '../../config/stereotypes.js';
 import {SecurityConstants} from '../../constant/security.constants.js';
 import type {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
+import {TokenRevocation} from '../jwt/token-revocation.js';
 import {Principal} from '../principal.js';
 
 /** Stateless SSO session: a signed JWT in an httpOnly cookie. */
@@ -12,7 +14,10 @@ import {Principal} from '../principal.js';
 export class SessionService {
   private readonly key: Uint8Array;
 
-  constructor(@inject(AppConfig) private readonly config: AppConfig) {
+  constructor(
+    @inject(AppConfig) private readonly config: AppConfig,
+    @inject(TokenRevocation) private readonly revocation: TokenRevocation,
+  ) {
     this.key = new TextEncoder().encode(config.env.SESSION_SECRET);
   }
 
@@ -33,6 +38,7 @@ export class SessionService {
     })
       .setProtectedHeader({alg: SecurityConstants.JWT_ALGORITHM})
       .setSubject(principal.subject)
+      .setJti(randomUUID())
       .setIssuedAt()
       .setExpirationTime(`${ttl}s`)
       .sign(this.key);
@@ -52,7 +58,9 @@ export class SessionService {
     try {
       const {payload} = await jwtVerify(token, this.key, {
         algorithms: [SecurityConstants.JWT_ALGORITHM],
+        requiredClaims: ['sub', 'jti', 'exp'],
       });
+      if (await this.revocation.isRevoked(String(payload.jti))) return null;
       return new Principal(
         payload.strategy as AuthStrategy,
         payload.sub ?? '',
@@ -63,7 +71,24 @@ export class SessionService {
     }
   }
 
-  end(response: Response): void {
+  /**
+   * Logout: revokes this session server-side, so a copied cookie stops
+   * working at once, not when it expires.
+   */
+  async end(request: Request, response: Response): Promise<void> {
+    const token: unknown = request.cookies?.[SecurityConstants.SESSION_COOKIE];
+    if (typeof token === 'string') {
+      try {
+        const {payload} = await jwtVerify(token, this.key, {
+          algorithms: [SecurityConstants.JWT_ALGORITHM],
+        });
+        if (payload.jti && payload.exp) {
+          await this.revocation.revoke(payload.jti, payload.exp);
+        }
+      } catch {
+        // An invalid or expired cookie has nothing left to revoke.
+      }
+    }
     response.clearCookie(SecurityConstants.SESSION_COOKIE, this.cookieOptions);
   }
 }

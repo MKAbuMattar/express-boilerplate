@@ -6,6 +6,7 @@ import {
   type Configuration,
   calculatePKCECodeChallenge,
   discovery,
+  randomNonce,
   randomPKCECodeVerifier,
   randomState,
 } from 'openid-client';
@@ -22,6 +23,8 @@ export class OidcLoginState {
   constructor(
     readonly codeVerifier: string,
     readonly state: string,
+    /** Binds the id_token to this login, so a stolen one cannot be replayed. */
+    readonly nonce: string,
   ) {}
 }
 
@@ -44,6 +47,7 @@ export class OidcService {
     const loginState = new OidcLoginState(
       randomPKCECodeVerifier(),
       randomState(),
+      randomNonce(),
     );
     const url = buildAuthorizationUrl(configuration, {
       redirect_uri: this.redirectUri,
@@ -51,6 +55,7 @@ export class OidcService {
       code_challenge: await calculatePKCECodeChallenge(loginState.codeVerifier),
       code_challenge_method: 'S256',
       state: loginState.state,
+      nonce: loginState.nonce,
     });
     return {url, loginState};
   }
@@ -65,6 +70,7 @@ export class OidcService {
       tokens = await authorizationCodeGrant(configuration, currentUrl, {
         pkceCodeVerifier: loginState.codeVerifier,
         expectedState: loginState.state,
+        expectedNonce: loginState.nonce,
       });
     } catch {
       // Bad state, code, PKCE verifier or id_token: a failed login, not a 500.

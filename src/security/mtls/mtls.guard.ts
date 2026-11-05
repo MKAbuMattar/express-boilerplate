@@ -45,6 +45,7 @@ export class MtlsGuard implements ExpressGuard {
           fingerprint256: certificate.fingerprint256,
           serialNumber: certificate.serialNumber,
           via: MTLS_TRUSTED_PROXY_CN,
+          scope: this.scopesFor(MtlsGuard.commonName(certificate.subject)),
         },
       );
       return true;
@@ -53,7 +54,11 @@ export class MtlsGuard implements ExpressGuard {
     request.principal = new Principal(
       AuthStrategy.Mtls,
       String(peer.subject.CN),
-      {fingerprint256: peer.fingerprint256, serialNumber: peer.serialNumber},
+      {
+        fingerprint256: peer.fingerprint256,
+        serialNumber: peer.serialNumber,
+        scope: this.scopesFor(String(peer.subject.CN)),
+      },
     );
     return true;
   }
@@ -76,6 +81,10 @@ export class MtlsGuard implements ExpressGuard {
       (certificate.keyUsage ?? []).includes(MtlsGuard.CLIENT_AUTH_OID);
     if (!valid) throw MtlsGuard.denied('forwarded certificate not trusted');
     return certificate;
+  }
+
+  private scopesFor(commonName: string): string {
+    return this.config.mtlsClientScopes.get(commonName) ?? '';
   }
 
   private caCertificate(): X509Certificate {

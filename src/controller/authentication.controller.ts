@@ -3,12 +3,13 @@ import {
   Controller,
   Get,
   HttpStatusCode,
+  NoContentHttpResponse,
   Post,
   Request,
   Response,
   UseGuard,
 } from '@inversifyjs/http-core';
-import {OasResponse, OasSummary} from '@inversifyjs/http-open-api';
+import {OasResponse, OasSecurity, OasSummary} from '@inversifyjs/http-open-api';
 import type {
   Request as ExpressRequest,
   Response as ExpressResponse,
@@ -18,6 +19,8 @@ import {ApiConstants} from '../constant/api.constants.js';
 import {OpenApiConstants} from '../constant/openapi.constants.js';
 import {SecurityConstants} from '../constant/security.constants.js';
 import {ApiResponse} from '../rest/dto/api-response.dto.js';
+import {JwtGuard} from '../security/jwt/jwt.guard.js';
+import {TokenProvider} from '../security/jwt/token.provider.js';
 import type {Principal} from '../security/principal.js';
 import {OidcLoginState, OidcService} from '../security/sso/oidc.service.js';
 import {SamlService} from '../security/sso/saml.service.js';
@@ -31,6 +34,7 @@ export class AuthenticationController {
     @inject(OidcService) private readonly oidcService: OidcService,
     @inject(SamlService) private readonly samlService: SamlService,
     @inject(SessionService) private readonly sessionService: SessionService,
+    @inject(TokenProvider) private readonly tokenProvider: TokenProvider,
   ) {}
 
   @OasSummary('Start OIDC login (redirects to the IdP)')
@@ -70,14 +74,14 @@ export class AuthenticationController {
     const parsed =
       typeof saved === 'string'
         ? (JSON.parse(saved) as OidcLoginState)
-        : new OidcLoginState('', '');
+        : new OidcLoginState('', '', '');
     const currentUrl = new URL(
       request.originalUrl,
       this.oidcService.redirectUri,
     );
     const principal = await this.oidcService.handleCallback(
       currentUrl,
-      new OidcLoginState(parsed.codeVerifier, parsed.state),
+      new OidcLoginState(parsed.codeVerifier, parsed.state, parsed.nonce),
     );
     response.clearCookie(
       SecurityConstants.OIDC_STATE_COOKIE,
@@ -140,8 +144,27 @@ export class AuthenticationController {
   @OasSummary('End the SSO session')
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
   @Post(ApiConstants.AUTH_LOGOUT)
-  logout(@Response() response: ExpressResponse): void {
-    this.sessionService.end(response);
+  async logout(
+    @Request() request: ExpressRequest,
+    @Response() response: ExpressResponse,
+  ): Promise<void> {
+    await this.sessionService.end(request, response);
     response.status(204).end();
+  }
+
+  @OasSummary('Revoke the bearer JWT used for this call (API logout)')
+  @OasSecurity({bearerAuth: []})
+  @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
+  @OasResponse(
+    HttpStatusCode.UNAUTHORIZED,
+    OpenApiConstants.json('Missing or invalid JWT'),
+  )
+  @UseGuard(JwtGuard)
+  @Post(ApiConstants.AUTH_TOKEN_REVOKE)
+  async revokeToken(
+    @Request() request: ExpressRequest,
+  ): Promise<NoContentHttpResponse> {
+    await this.tokenProvider.revoke(request.principal!.claims);
+    return new NoContentHttpResponse();
   }
 }

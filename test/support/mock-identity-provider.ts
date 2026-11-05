@@ -15,6 +15,8 @@ export class MockIdentityProvider {
 
   private server?: https.Server;
   private privateKey?: CryptoKey;
+  /** Nonce from the last authorize call, echoed into the id_token. */
+  private nonce = '';
   private jwk?: JWK;
   issuer = '';
 
@@ -97,6 +99,7 @@ export class MockIdentityProvider {
         return json({keys: [this.jwk]});
       case '/authorize': {
         const back = new URL(url.searchParams.get('redirect_uri') ?? '');
+        this.nonce = url.searchParams.get('nonce') ?? '';
         back.searchParams.set('code', 'test-code');
         back.searchParams.set('state', url.searchParams.get('state') ?? '');
         response.writeHead(302, {location: back.href}).end();
@@ -108,7 +111,7 @@ export class MockIdentityProvider {
           token_type: 'Bearer',
           expires_in: 300,
           id_token: await this.sign(
-            {email: 'oidc@example.com', name: 'OIDC User'},
+            {email: 'oidc@example.com', name: 'OIDC User', nonce: this.nonce},
             MockIdentityProvider.CLIENT_ID,
             'oidc-user',
           ),

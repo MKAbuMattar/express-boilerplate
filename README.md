@@ -44,7 +44,8 @@ Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/d
 | `pnpm lint` / `pnpm lint:fix` | Biome |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm certs [dir] [--force]` | Generate local TLS and mTLS certs |
-| `pnpm jwt [subject] [ttl]` | Print a dev JWT signed with `JWT_SECRET` |
+| `pnpm jwt [subject] [ttl] [scopes]` | Print a dev JWT (all scopes by default) |
+| `pnpm jwt:keygen` | New ES256 key pair for `JWT_ALGORITHM=ES256` |
 
 ## Project structure
 
@@ -117,6 +118,35 @@ Put a guard on a route or a whole controller with `@UseGuard(...)`. Each guard s
 **SSO:** OIDC uses the authorization code flow with PKCE. SAML uses SP-initiated login with an HTTP-POST ACS at `/auth/saml/acs` and metadata at `/auth/saml/metadata`. Both end in the same signed, httpOnly session cookie (8 hours). Use `GET /auth/me` to read it and `POST /auth/logout` to end it.
 
 **mTLS behind a load balancer:** `MtlsGuard` reads the direct TLS socket. If TLS terminates at a proxy, read the client certificate header your proxy forwards.
+
+### Authorization (scopes)
+
+Authentication says who the caller is; scopes say what they may do. Put `Scopes.require(...)` after an auth guard:
+
+```ts
+@UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
+```
+
+A caller missing a scope gets `403` with `WWW-Authenticate: Bearer error="insufficient_scope"`. Scopes come from the token claims IdPs use: `scope` (OAuth 2.0), `scp` (Entra ID), `roles`, `permissions` (Auth0). HMAC and mTLS clients get scopes from `HMAC_CLIENT_SCOPES` and `MTLS_CLIENT_SCOPES`.
+
+| Scope | Routes |
+|---|---|
+| `users:write` | every user write, v1 and v2 |
+| `ops:queues` | `/api/v1/queues/*` (also limited to `OPS_ALLOWED_CIDRS`) |
+| `ops:network` | `/api/v1/network/ping` (also limited to `OPS_ALLOWED_CIDRS`) |
+
+`pnpm test:security` includes a route audit: every route must refuse an anonymous caller unless it is on the public list in `test/security/route-audit.security.test.ts`, so a route that forgets its guard fails CI.
+
+### Tokens
+
+- Every JWT has `sub`, `jti`, `iat`, `exp`; all four are required, plus issuer, audience and the configured algorithm (no `alg: none`, no algorithm confusion), with 30 s clock tolerance.
+- Revocation: `POST /auth/token/revoke` revokes the bearer token; `POST /auth/logout` revokes the SSO session server-side, so a copied cookie stops working at once. The deny-list lives in the cache until the token would have expired; if the cache is down it fails open (tokens are short-lived).
+- Keys: `JWT_ALGORITHM=HS256` uses `JWT_SECRET`. `ES256` signs with `JWT_PRIVATE_KEY_FILE` and publishes public keys at `/.well-known/jwks.json`, so other services verify without a secret. Rotate with `pnpm jwt:keygen`: point `JWT_PRIVATE_KEY_FILE` at the new key and list the old `.pub` in `JWT_PUBLIC_KEY_FILES` until its tokens expire.
+- OIDC logins use PKCE, state and a nonce.
+
+### Request protection
+
+Every request passes, in order: request id (`X-Request-Id`, also in error bodies), host check (421 for unknown hosts), rate limit, CORS, cross-site guard (Fetch Metadata and Origin block CSRF on writes), JSON-only bodies and size and depth limits, `Cache-Control` (`no-store` with credentials), a handler deadline (503), the ops IP allowlist, an audit log line for every write, and `Idempotency-Key` on POST and PATCH (a retried create replays the first response).
 
 ## REST API
 

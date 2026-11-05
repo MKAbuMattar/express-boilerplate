@@ -1,6 +1,7 @@
 import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it, vi} from 'vitest';
 import {MemoryCacheStore} from '../../src/config/cache/memory-cache.store.js';
+import {Scopes} from '../../src/security/authorization/scopes.js';
 import {HmacGuard} from '../../src/security/hmac/hmac.guard.js';
 import {CacheServiceImpl} from '../../src/service/impl/cache.service.impl.js';
 import {AppLogger} from '../../src/util/app-logger.js';
@@ -71,6 +72,27 @@ describe('HmacGuard', () => {
   ])('rejects %s with 401', async (_label, overrides) => {
     const {guard} = build();
     expect(await statusOf(guard.activate(signedRequest(overrides)))).toBe(401);
+  });
+
+  it('gives the client the scopes from HMAC_CLIENT_SCOPES', async () => {
+    const config = UnitFixtures.config({
+      HMAC_CLIENTS: `client-a:${SECRET}`,
+      HMAC_CLIENT_SCOPES: 'client-a=ops:queues users:write',
+    });
+    const guard = new HmacGuard(
+      config,
+      new CacheServiceImpl(
+        new MemoryCacheStore(),
+        config,
+        new AppLogger(config),
+      ),
+    );
+    const request = signedRequest();
+    await guard.activate(request);
+    expect([...Scopes.of(request.principal!)].sort()).toEqual([
+      'ops:queues',
+      'users:write',
+    ]);
   });
 
   it('rejects a replay of the same signature', async () => {

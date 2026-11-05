@@ -23,6 +23,7 @@
     "start": "node --disable-proto=delete --env-file-if-exists=.env dist/main.js",
     "certs": "tsx scripts/generate-certs.ts",
     "jwt": "tsx --env-file=.env.development --env-file-if-exists=.env scripts/issue-jwt.ts",
+    "jwt:keygen": "tsx scripts/generate-jwt-key.ts",
     "migration:show": "tsx --env-file=.env.development --env-file-if-exists=.env node_modules/typeorm/cli.js migration:show -d src/config/cli.data-source.ts",
     "migration:run": "tsx --env-file=.env.development --env-file-if-exists=.env node_modules/typeorm/cli.js migration:run -d src/config/cli.data-source.ts",
     "migration:revert": "tsx --env-file=.env.development --env-file-if-exists=.env node_modules/typeorm/cli.js migration:revert -d src/config/cli.data-source.ts",
