@@ -14,7 +14,7 @@ import type {HealthReport} from '../model/health.js';
 import {HealthService} from '../service/health.service.js';
 
 /**
- * Spring Boot Actuator-compatible endpoints, plus the Kubernetes short paths.
+ * Health, info and metrics endpoints, plus the Kubernetes short paths.
  *
  *   /actuator/health             /healthz   every indicator
  *   /actuator/health/liveness    /livez     ping only

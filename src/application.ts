@@ -110,7 +110,7 @@ export class Application {
       const metrics = this.beans.getBean(Metrics);
       app.use(metrics.middleware());
       // Same network restriction as the ops routes.
-      // Also at /actuator/prometheus, Spring's name for it.
+      // Also at /actuator/prometheus, beside the other /actuator endpoints.
       for (const path of ['/metrics', '/actuator/prometheus']) {
         app.get(
           path,

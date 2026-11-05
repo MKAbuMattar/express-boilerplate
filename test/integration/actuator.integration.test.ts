@@ -6,10 +6,10 @@ import type {Application} from '../../src/application.js';
 import {CacheStore} from '../../src/config/cache/cache-store.js';
 import {TestApp} from '../support/test-app.js';
 
-describe('Actuator (Spring Boot style health)', () => {
+describe('Actuator health', () => {
   let application: Application;
   let app: express.Application;
-  const MEDIA = /application\/vnd\.spring-boot\.actuator\.v3\+json/;
+  const MEDIA = /^application\/json/;
 
   beforeAll(async () => {
     ({application, app} = await TestApp.create());

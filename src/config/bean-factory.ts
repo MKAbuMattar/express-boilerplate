@@ -32,7 +32,7 @@ export const Bean = BeanDecorators.bean;
 export const Configuration = BeanDecorators.configuration;
 
 /**
- * Spring-like bean factory over an Inversify container. Classes marked
+ * Bean factory over an Inversify container. Classes marked
  * @Component, @Service, @Repository or @Controller are autobound singletons;
  * @Bean methods register everything else (third-party objects, config).
  */

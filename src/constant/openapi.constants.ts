@@ -109,7 +109,7 @@ export class OpenApiConstants {
     },
     ActuatorHealth: {
       type: 'object',
-      description: 'Spring Boot Actuator health.',
+      description: 'Health of the service and its dependencies.',
       properties: {
         status: {enum: ['UP', 'DOWN', 'OUT_OF_SERVICE', 'UNKNOWN']},
         components: {

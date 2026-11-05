@@ -14,13 +14,13 @@ import {
 } from './health-indicators.js';
 
 /**
- * Spring Boot Actuator health: runs a group's indicators in parallel, each
+ * Health: runs a group's indicators in parallel, each
  * with a timeout, and reports DOWN (503) if any is down.
  *   liveness:  ping only, so a database outage never restarts pods
  *   readiness: db and cache, so traffic stops while they are unreachable
  *   all:       every indicator
  * Details (database type, latency, errors) are shown only when
- * HEALTH_SHOW_DETAILS=always, Spring's management.endpoint.health.show-details.
+ * HEALTH_SHOW_DETAILS=always.
  */
 @Service()
 export class HealthServiceImpl extends HealthService {

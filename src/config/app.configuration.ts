@@ -58,7 +58,7 @@ export class AppConfiguration {
     return new BullMqQueueBroker(url, QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS);
   }
 
-  // Service contracts to implementations, as Spring autowires an interface.
+  // Service contracts (abstract classes) bound to their implementations.
   @Bean(CacheService)
   cacheService(beans: BeanFactory): CacheService {
     return beans.getBean(CacheServiceImpl);

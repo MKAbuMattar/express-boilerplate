@@ -49,7 +49,7 @@ export class OpenApiConfig {
     {
       name: 'Actuator',
       description:
-        'Spring Boot Actuator-style health groups (and the /healthz, /livez, /readyz aliases), info and Prometheus metrics.',
+        'Health groups (and the /healthz, /livez, /readyz aliases), info and Prometheus metrics.',
     },
     {
       name: 'Discovery',
@@ -145,7 +145,7 @@ export class OpenApiConfig {
   }
 
   private static readonly DESCRIPTION = `
-A layered Express 5 API (Spring Boot style) with several databases, caches, queues and authentication methods.
+A layered Express 5 API with several databases, caches, queues and authentication methods.
 
 **Versions.** Every route lives under \`/api/v1\` or \`/api/v2\`. Plain \`/api/...\` is an alias of v1. Each response carries an \`API-Version\` header.
 

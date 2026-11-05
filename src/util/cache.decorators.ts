@@ -9,7 +9,7 @@ type KeyBuilder = (...args: any[]) => string;
 type AsyncMethod = (this: CacheAware, ...args: any[]) => Promise<unknown>;
 
 export class CacheDecorators {
-  /** Spring @Cacheable: return the cached result, or run and cache it. */
+  /** @Cacheable: return the cached result, or run and cache it. */
   static cacheable(key: KeyBuilder, ttlSeconds?: number): MethodDecorator {
     return (_target, _name, descriptor: PropertyDescriptor) => {
       const original = descriptor.value as AsyncMethod;
@@ -23,7 +23,7 @@ export class CacheDecorators {
     };
   }
 
-  /** Spring @CacheEvict: run the method, then drop the listed keys. */
+  /** @CacheEvict: run the method, then drop the listed keys. */
   static cacheEvict(...keys: KeyBuilder[]): MethodDecorator {
     return (_target, _name, descriptor: PropertyDescriptor) => {
       const original = descriptor.value as AsyncMethod;

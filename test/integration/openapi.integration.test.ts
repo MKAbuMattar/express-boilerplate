@@ -90,7 +90,8 @@ describe('OpenAPI document (Swagger, development)', () => {
           response.content?.['application/problem+json']?.schema?.$ref;
         // Actuator DOWN (503) is the Actuator body by design.
         const actuator =
-          response.content?.['application/vnd.spring-boot.actuator.v3+json'];
+          response.content?.['application/json']?.schema?.$ref ===
+          '#/components/schemas/ActuatorHealth';
         if (ref !== '#/components/schemas/Problem' && !actuator)
           wrong.push(`${name} ${code}`);
       }

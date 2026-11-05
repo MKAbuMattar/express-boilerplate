@@ -49,7 +49,7 @@ Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/d
 
 ## Project structure
 
-Layered like a Spring Boot application. Every unit is a class.
+Layered by responsibility: config, controller, service, repository, and so on. Every unit is a class.
 
 ```
 src/
@@ -260,7 +260,7 @@ TypeORM 1.x. Set `DB_TYPE` and `DB_URL`.
 - `CACHE_URL=rediss://...` for TLS (ElastiCache in-transit encryption)
 - `CACHE_CLUSTER=true` for cluster-mode endpoints
 
-Services use Spring-style cache-aside decorators:
+Services use cache-aside decorators:
 
 ```ts
 @Cacheable((id: string) => CacheConstants.user(id))
