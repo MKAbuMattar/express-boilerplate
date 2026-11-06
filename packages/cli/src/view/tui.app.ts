@@ -36,7 +36,7 @@ type Screen =
 
 type Props = {
   cli: CliConfiguration;
-  /** Open on this flow instead of the menu (npx create-expresso). */
+  /** Open on this flow instead of the menu (npx create-expresso-api). */
   start?: 'create';
   cwd: string;
   template?: string;

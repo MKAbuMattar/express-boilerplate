@@ -1,6 +1,6 @@
 # Generator: create a project, generate code
 
-The `create-expresso` package (`eb` for short) has two jobs:
+The `create-expresso-api` package (`eb` for short) has two jobs:
 
 - **create:** copy this template into a new project with only the features you pick.
 - **generate:** inside a project, write new code through every layer and register it where the app looks.
@@ -11,11 +11,11 @@ Every command and flag is listed in [`packages/cli/README.md`](../packages/cli/R
 
 ## Run it
 
-| From                | Command                                                                                            |
-| ------------------- | -------------------------------------------------------------------------------------------------- |
-| anywhere (npm)      | `npx create-expresso my-api` or `pnpm create expresso my-api` or `pnpm dlx create-expresso my-api` |
-| a template checkout | `pnpm eb create ../my-api`                                                                         |
-| inside a project    | `pnpm eb` (the app) or `pnpm eb <command>`                                                         |
+| From                | Command                                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------------------- |
+| anywhere (npm)      | `npx create-expresso-api my-api` or `pnpm create expresso-api my-api` or `pnpm dlx create-expresso-api my-api` |
+| a template checkout | `pnpm eb create ../my-api`                                                                                     |
+| inside a project    | `pnpm eb` (the app) or `pnpm eb <command>`                                                                     |
 
 `eb` with no arguments in a terminal opens a full-screen app with a menu, a checklist, a preview of every file, a confirmation and live progress. The same commands also run with flags, which is what CI and scripts use. Without a terminal there are no prompts, and a missing argument is an error.
 
@@ -31,11 +31,11 @@ Where `create` gets the template:
 ## 1. Create
 
 ```sh
-npx create-expresso my-api                           # the app: pick features, preview, confirm
-npx create-expresso my-api --preset minimal --yes    # core only, no questions
-npx create-expresso my-api --features auth-oidc,redis,metrics
-npx create-expresso my-api --config eb.config.json   # {"name", "preset" | "features", "install"}
-npx create-expresso features                         # every feature and preset
+npx create-expresso-api my-api                           # the app: pick features, preview, confirm
+npx create-expresso-api my-api --preset minimal --yes    # core only, no questions
+npx create-expresso-api my-api --features auth-oidc,redis,metrics
+npx create-expresso-api my-api --config eb.config.json   # {"name", "preset" | "features", "install"}
+npx create-expresso-api features                         # every feature and preset
 ```
 
 Presets:

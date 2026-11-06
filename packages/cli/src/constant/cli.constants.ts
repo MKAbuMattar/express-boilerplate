@@ -1,7 +1,7 @@
 export class CliConstants {
   static readonly USAGE = `Usage:
   eb                                             the app: menu, wizards, previews (in a terminal)
-  create-expresso [dir] [options]                create a project (prompts when interactive)
+  create-expresso-api [dir] [options]            create a project (prompts when interactive)
   eb create [dir] [options]                      same, from a checkout or an installed CLI
   eb generate <kind> <name> [options]            alias: eb g; prompts for what is missing
      kinds: resource, entity, migration, repository, service, controller, endpoint,

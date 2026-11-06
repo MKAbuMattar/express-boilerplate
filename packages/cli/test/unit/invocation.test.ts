@@ -6,17 +6,25 @@ const COMMANDS = ['create', 'generate', 'g', 'doctor'];
 describe('Invocation.isBareCreate', () => {
   it('npx: the bin name says create', () => {
     expect(
-      Invocation.isBareCreate('/x/.bin/create-expresso', 'my-api', COMMANDS),
+      Invocation.isBareCreate(
+        '/x/.bin/create-expresso-api',
+        'my-api',
+        COMMANDS,
+      ),
     ).toBe(true);
     expect(
-      Invocation.isBareCreate('/x/.bin/create-expresso', undefined, COMMANDS),
+      Invocation.isBareCreate(
+        '/x/.bin/create-expresso-api',
+        undefined,
+        COMMANDS,
+      ),
     ).toBe(true);
   });
 
   it('pnpm dlx / pnpm create: argv[1] is the bundle, a bare word means create', () => {
     expect(
       Invocation.isBareCreate(
-        '/store/create-expresso/dist/main.js',
+        '/store/create-expresso-api/dist/main.js',
         'my-api',
         COMMANDS,
       ),
@@ -26,13 +34,13 @@ describe('Invocation.isBareCreate', () => {
   it('a command word is always that command', () => {
     expect(
       Invocation.isBareCreate(
-        '/store/create-expresso/dist/main.js',
+        '/store/create-expresso-api/dist/main.js',
         'doctor',
         COMMANDS,
       ),
     ).toBe(false);
     expect(
-      Invocation.isBareCreate('/x/.bin/create-expresso', 'g', COMMANDS),
+      Invocation.isBareCreate('/x/.bin/create-expresso-api', 'g', COMMANDS),
     ).toBe(false);
   });
 
