@@ -2,7 +2,7 @@
 #   docker build -t express-boilerplate .
 # Docker Hub by default. For AWS ECR Public (no Docker Hub rate limits):
 #   docker build --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:26-alpine .
-ARG NODE_IMAGE=node:26-alpine@sha256:c6ad9e9c1d80f6eb607c26b4b0a132ff7a2344fad1c78ea3baa2a7d4c8de6d94
+ARG NODE_IMAGE=node:26-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216
 ARG APP=@express-boilerplate/api
 
 FROM ${NODE_IMAGE} AS base
