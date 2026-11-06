@@ -18,23 +18,47 @@ Express and TypeScript API in a pnpm and Turborepo monorepo. HTTPS only on port 
 
 </div>
 
+## Documentation
+
+| Guide                                | Covers                                                                     |
+| ------------------------------------ | -------------------------------------------------------------------------- |
+| [Overview](docs/README.md)           | how the parts connect, which path to take                                  |
+| [Local setup](docs/local-setup.md)   | certificates, hosts names, trusting the CA, port 443, `pnpm dev`           |
+| [Generator](docs/generator.md)       | create a project with only the features you need, generate code inside one |
+| [Docker compose](docs/docker.md)     | the full local stack behind the public and private gateways                |
+| [Kubernetes](docs/kubernetes.md)     | the Helm chart, the two APISIX gateways, kind, production values, Argo CD  |
+| [Architecture](docs/architecture.md) | layers, a request end to end, dependency injection, errors, TLS            |
+
+![How the parts connect](docs/diagrams/overview.svg)
+
 ## Quick start
 
 Needs Node 26+, pnpm 12, and openssl.
 
+**New project with only the features you want** (interactive):
+
 ```sh
-pnpm install
-pnpm certs          # local CA, server cert (localhost) and client cert in ./certs
-pnpm dev            # https://localhost/docs
+pnpm create express-boilerplate my-api      # or, from a checkout: pnpm eb create ../my-api
+cd my-api
 ```
 
-`pnpm dev` loads `.env.development` (NODE_ENV and an in-memory database), then your `.env` if it exists. Copy `.env.example` to `.env` to turn on JWT, HMAC, OAuth2, OIDC or SAML. `pnpm jwt` prints a token for Swagger's Authorize button.
+**Or work on this repository directly:**
 
-Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/docs` runs only when `NODE_ENV=development`.
+```sh
+pnpm install
+pnpm certs          # local CA + *.express-boilerplate.len cert in apps/api/certs; prints the /etc/hosts line
+pnpm dev            # https://api.express-boilerplate.len/docs (HTTPS, port 443)
+```
+
+Every local server answers at `https://<name>.express-boilerplate.len` on 443 and nowhere else. `pnpm certs` signs one wildcard certificate for them and prints the `/etc/hosts` line to add (hosts files have no wildcards; a local DNS such as dnsmasq `address=/.express-boilerplate.len/127.0.0.1` covers every name at once). On Linux, binding 443 without root needs `sudo sysctl -w net.ipv4.ip_unprivileged_port_start=443` once; `pnpm dev` prints that line if the bind fails.
+
+`pnpm dev` loads `.env.development` (NODE_ENV, the local domain, an in-memory database), then your `.env` if it exists. It runs the workspace packages from source, so a change anywhere reloads without a build. Copy `.env.example` to `.env` to configure each authentication method. `pnpm jwt` prints a token for Swagger's Authorize button.
+
+Trust `apps/api/certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/docs` runs only when `NODE_ENV=development`.
 
 | Script                                                 | What it does                                                                        |
 | ------------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| `pnpm dev`                                             | Watch mode with tsx                                                                 |
+| `pnpm dev`                                             | Watch mode with tsx, packages loaded from source                                    |
 | `pnpm build`                                           | Compile with TypeScript 7 to `dist/`                                                |
 | `pnpm start`                                           | Run `dist/main.js`                                                                  |
 | `pnpm test`                                            | Every test type (see Testing)                                                       |
@@ -43,9 +67,69 @@ Trust `certs/ca.crt` in your OS to remove the browser warning. Swagger UI at `/d
 | `pnpm test:cov`                                        | Coverage for unit and integration                                                   |
 | `pnpm lint` / `pnpm lint:fix`                          | Biome                                                                               |
 | `pnpm typecheck`                                       | `tsc --noEmit`                                                                      |
-| `pnpm certs [dir] [--force]`                           | Generate local TLS and mTLS certs                                                   |
+| `pnpm certs [dir] [--force]`                           | Local CA, wildcard server cert, client and etcd certs                               |
+| `pnpm eb create <dir>`                                 | New project with the features you pick (see Create a project)                       |
+| `pnpm eb generate resource <name>`                     | Scaffold a CRUD resource through every layer (see Generate code)                    |
 | `pnpm jwt [subject] [ttl] [scopes]`                    | Print a dev JWT (all scopes by default)                                             |
 | `pnpm jwt:keygen`                                      | New ES256 key pair for `JWT_ALGORITHM=ES256`                                        |
+
+## Create a project
+
+`create-express-boilerplate` (also `pnpm eb create` from a checkout) copies this repository with only the features you choose. Code for the others is removed, not switched off: their files, their dependencies, their env settings, their compose services and their tests are gone, and what is left lints, typechecks and passes its tests. CI generates the `minimal`, `standard` and `full` presets on every push to keep that true.
+
+```sh
+pnpm create express-boilerplate my-api                          # the app: menu, checklist, preview
+pnpm create express-boilerplate my-api --preset minimal --yes   # core only
+pnpm create express-boilerplate my-api --features auth-oidc,redis,metrics
+pnpm create express-boilerplate my-api --config eb.config.json  # {"name", "preset" | "features", "install"}
+pnpm eb features                                                # list features and presets
+```
+
+The name (default: the folder) becomes the package scope (`@my-api/common`) and the local domain (`https://api.my-api.len`). The chosen features are recorded in `boilerplate.json`.
+
+| Group    | Feature                                                                      |      Standard      |
+| -------- | ---------------------------------------------------------------------------- | :----------------: |
+| core     | users, health, Actuator, JWT, scopes, API v1/v2, queues, Swagger             |       always       |
+| auth     | `auth-mtls`, `auth-hmac`, `auth-oauth2`, `auth-oidc`, `auth-saml`            | mtls, hmac, oauth2 |
+| data     | `db-mysql`, `db-mongodb`, `db-mssql` (Postgres and sql.js are core), `redis` |       redis        |
+| ops      | `metrics`, `tracing`, `vault`, `mail`                                        |  metrics, tracing  |
+| realtime | `websocket`, `sse`, `tcp`                                                    |   websocket, sse   |
+| examples | `experiments`, `network`                                                     |         no         |
+| deploy   | `helm`                                                                       |        yes         |
+
+How it works: `boilerplate.features.json` lists what each feature owns (files, dependencies, requirements). Code shared with other features sits between `// @feature:<id>` and `// @end:<id>` comment lines (`#` in YAML and env files); `// @feature:!<id>` marks a fallback used only when the feature is off. When you add code for an optional feature, mark it the same way (see AGENTS.md).
+
+## Generate code
+
+Inside any project, run `pnpm eb` for the app (menu, checklist, preview, confirm), or `eb generate` (alias `eb g`) with flags. Either way it writes code the way the repo already writes it and registers each piece.
+
+```sh
+pnpm eb g resource blog-post --fields title:string,views:int,published:boolean,body:text
+pnpm eb g service pricing
+pnpm eb g migration add_status_to_orders --fields status:string
+pnpm eb g exception payment-required --status 402
+pnpm eb g job send-report --dry-run        # print the plan, write nothing
+
+# One route on an existing controller, with its own authentication
+pnpm eb g endpoint order --method POST --path /:id/approve --auth hmac --scope orders:approve
+pnpm eb g resource payment --fields amount:int --auth mtls   # every route needs a client certificate
+pnpm eb g controller status --public                         # no authentication
+```
+
+`--auth jwt|mtls|hmac|oauth2|sso` picks the guard per resource, controller or endpoint; `--public` removes it and records the route in the route audit test.
+
+Kinds: `resource`, `entity`, `migration`, `repository`, `service`, `controller`, `endpoint`, `dto`, `guard`, `middleware`, `exception`, `enum`, `constant`, `job`, `test`. See [`packages/cli`](packages/cli/README.md) for what each writes and registers.
+
+Other project commands:
+
+```sh
+pnpm eb add websocket experiments   # turn features on after create (three-way merge into your code)
+pnpm eb remove experiments          # and off
+pnpm eb info                        # project, features, versions
+pnpm eb doctor                      # certs, hosts entry, port 443, Docker
+pnpm eb routes                      # every route
+pnpm eb migrate show                # run | revert | show
+```
 
 ## Project structure
 
@@ -57,10 +141,13 @@ A pnpm workspace run by Turborepo. Each package has its own README:
 | [`packages/service`](packages/service/README.md)         | Business logic: service contracts and their implementations                                         | persistence, common |
 | [`packages/persistence`](packages/persistence/README.md) | Data access: entities, repositories, migrations, the database connection                            | common              |
 | [`packages/common`](packages/common/README.md)           | Shared infrastructure: config, dependency injection, security, errors, cache, queues, observability | nothing             |
+| [`packages/cli`](packages/cli/README.md)                 | `create-express-boilerplate` and `eb`: create a project, generate resources                         | nothing             |
 
 The package dependencies enforce the direction: pnpm only resolves what a package declares, so `persistence` cannot import `service`, and nothing can import `api`. A Biome rule keeps the API layer off `persistence` too; only `application.ts`, the composition root, wires it in. `turbo run build` builds the layers in that order and caches the result.
 
-Inside each package the folders keep the same names: config, constant, controller, converter, enumeration, exceptions, model, repository, rest, security, service (+ impl), util. Every unit is a class. Other layers import by path, for example `@express-boilerplate/service/service/user.service.js`.
+Inside each package the folders keep the same names: config, constant, controller, converter, enumeration, exceptions, model, repository, rest, security, service (+ impl), util. Every unit is a class. Other layers import by path, for example `@express-boilerplate/service/service/user.service.js`. Each package exports `src/` under the `source` condition (dev, tests, typecheck) and `dist/` otherwise (`pnpm build`, production).
+
+Services throw domain errors (`NotFoundException`, `ConflictException`, `ValidationException` in `common/exceptions`), never HTTP responses; `GlobalExceptionFilter` maps them to 404, 409 and 400 problem details, so a queue job or script can call the same service.
 
 ```
 apps/api/src/                          HTTP API
@@ -299,6 +386,8 @@ delete(id: string): Promise<void> { ... }
 
 `@Cacheable` returns the cached value, or runs the method and stores the result for `CACHE_TTL_SECONDS`. `@CacheEvict` runs the method, then deletes the listed keys. Values round-trip through JSON, so the converters accept dates as either `Date` or ISO strings. The HMAC guard also uses the cache to reject replayed signatures, so run Redis when you have more than one instance.
 
+<!-- @feature:experiments -->
+
 ## A/B experiments
 
 Configure experiments as `name:percentInA` pairs:
@@ -308,6 +397,8 @@ EXPERIMENTS=new-checkout:50,new-search:10
 ```
 
 `GET /api/experiments/{name}` returns `{experiment, variant}` and an `X-Experiment-Variant` header. Signed-in (SSO) users are bucketed by their subject, so they keep their variant across devices. Visitors get a signed `ab_id` cookie. Bucketing hashes `experiment:subject` into 0..99, so it needs no storage, every instance agrees, and each experiment splits users independently. In code, inject `ExperimentService` and call `assign(name, subjectId)`.
+
+<!-- @end:experiments -->
 
 ## Testing
 
@@ -333,14 +424,14 @@ What the chaos tests pin down:
 
 ### Known CVEs
 
-| Layer                          | Guard                                                                                                                                                                  |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| npm dependencies               | `pnpm audit --prod --audit-level=high` fails CI; also daily, because new CVEs hit unchanged code                                                                       |
-| Docker image                   | Trivy scans OS packages and `node_modules` (fails on fixable HIGH/CRITICAL), results in GitHub code scanning, CycloneDX SBOM as an artifact                            |
-| Dockerfile, compose, Caddyfile | Trivy config scan                                                                                                                                                      |
-| updates                        | Renovate opens CVE fixes at any time; other npm updates wait 3 days                                                                                                    |
-| supply chain                   | pnpm `minimumReleaseAge` refuses versions younger than 3 days (most hijacked releases are pulled within hours); install scripts are off unless listed in `allowBuilds` |
-| code                           | CodeQL, dependency review on PRs, OpenSSF Scorecard (existing workflows)                                                                                               |
+| Layer                        | Guard                                                                                                                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| npm dependencies             | `pnpm audit --prod --audit-level=high` fails CI; also daily, because new CVEs hit unchanged code                                                                       |
+| Docker image                 | Trivy scans OS packages and `node_modules` (fails on fixable HIGH/CRITICAL), results in GitHub code scanning, CycloneDX SBOM as an artifact                            |
+| Dockerfile, compose, gateway | Trivy config scan                                                                                                                                                      |
+| updates                      | Renovate opens CVE fixes at any time; other npm updates wait 3 days                                                                                                    |
+| supply chain                 | pnpm `minimumReleaseAge` refuses versions younger than 3 days (most hijacked releases are pulled within hours); install scripts are off unless listed in `allowBuilds` |
+| code                         | CodeQL, dependency review on PRs, OpenSSF Scorecard (existing workflows)                                                                                               |
 
 Dev-only advisories are patched with `overrides` in `pnpm-workspace.yaml`; each entry says why and when to drop it.
 
@@ -353,23 +444,42 @@ Dev-only advisories are patched with `overrides` in `pnpm-workspace.yaml`; each 
 - Headers: Helmet (HSTS, CSP, nosniff, frame options), no `X-Powered-By`, no stack traces in responses.
 - Container: non-root, read-only filesystem, all capabilities dropped, no privilege escalation, npm and yarn removed from the image, OS packages upgraded at build.
 
-## HTTP/3
+## Edge: APISIX, a public and a private gateway
 
-Express runs on Node's HTTP/1.1 stack, and Node has no stable HTTP/3. So, as with CDNs and cloud load balancers, HTTP/3 ends at an edge proxy: compose puts [Caddy](https://caddyserver.com) on port 443 (TCP for HTTP/1.1 and HTTP/2, UDP for HTTP/3 over QUIC), advertising `Alt-Svc: h3`. Caddy talks HTTPS to the app, which is not published.
+Two gateways, the way production runs them. Each has its own control plane, data plane and etcd prefix (its own release on Kubernetes), so the public one can never serve a private route.
 
-mTLS keeps working through the proxy: Caddy forwards the client certificate in `X-Client-Cert`, and `MtlsGuard` trusts that header only on a connection that presents the proxy's own certificate (`edge-proxy`), then verifies the forwarded certificate against the CA. The app trusts one proxy hop (`TRUST_PROXY=1`), so a client cannot fake its IP to dodge the rate limit.
+| Gateway | Serves                                                                                                                    | Local address   |
+| ------- | ------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| public  | `api.*` (also `https://localhost`), `keycloak.*` for the login pages                                                      | `127.0.0.1:443` |
+| private | `dashboard.*` (private routes), `dashboard-public.*` (public routes), `grafana.*`, `prometheus.*`, `vault.*`, `mailpit.*` | `127.0.0.2:443` |
 
-Production: set `SITE_ADDRESS=api.example.com` and follow the comment in `deploy/caddy/Caddyfile` to switch to automatic Let's Encrypt certificates. On AWS, CloudFront or an ALB with HTTP/3 can play the same role.
+`pnpm certs` prints both `/etc/hosts` lines. `127.0.0.2` is loopback on Linux; on macOS add it once with `sudo ifconfig lo0 alias 127.0.0.2`.
+
+Only port 443 is ever open (HTTP/1.1, HTTP/2 and HTTP/3). Nothing the gateways answer themselves shows a stock page or a product name:
+
+| Case                                           | Answer                                                    |
+| ---------------------------------------------- | --------------------------------------------------------- |
+| `http://` sent to 443                          | `308` to `https://`, body in problem details              |
+| No route for the host and path                 | `404` problem details (a lowest-priority catch-all route) |
+| Body over 1 MB, malformed request, slow client | `413`, `400`, `408` problem details                       |
+| Gateway rate limit                             | `429` problem details with `Retry-After`                  |
+| App down or too slow                           | `502`, `503`, `504` problem details                       |
+| Every response                                 | no `Server` header                                        |
+
+The app's own errors pass through untouched; they are already RFC 9457.
+
+APISIX talks HTTPS to the app with `client.crt` (the app runs `TLS_CLIENT_AUTH=require`). That certificate is not the trusted proxy identity (`MTLS_TRUSTED_PROXY_CN`), so the app never trusts an `X-Client-Cert` header that arrives through the gateway; end-user mTLS goes straight to the app. The app trusts one proxy hop (`TRUST_PROXY=1`), so a client cannot fake its IP to dodge the rate limit.
+
+On Kubernetes, [`deploy/k8s/apisix`](deploy/k8s/apisix/README.md) installs the same two gateways (apache/apisix chart 2.17.0) with the same rules; the app chart uses the public one with `ingress.className: apisix`.
 
 ## Docker
 
 ```sh
-pnpm certs
-docker compose up --build                                   # Caddy (HTTP/3) + app on https://localhost
-docker compose --profile postgres --profile redis up --build
+docker compose up --build                     # APISIX on 443 + app + Postgres + Redis
+                                              # https://api.express-boilerplate.len/docs
 ```
 
-Profiles: `postgres`, `mysql`, `mariadb`, `mongodb`, `redis`, `valkey`. The image runs as the non-root `node` user on port 8443, reachable only through Caddy on 443. Certs are mounted read-only at `/app/certs`, and secrets come from the environment, never from build args. To pull the base image from AWS ECR Public:
+The `certs` service generates `./certs` on first run. Only port 443 (TCP and UDP) and the databases are published. Profiles: `mysql`, `mariadb`, `mongodb`, `valkey` (Postgres and Redis run by default). The image runs as the non-root `node` user on port 8443, reachable only through APISIX. Certs are mounted read-only, and secrets come from the environment, never from build args. To pull the base image from AWS ECR Public:
 
 ```sh
 docker build --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:26-alpine .
@@ -377,27 +487,25 @@ docker build --build-arg NODE_IMAGE=public.ecr.aws/docker/library/node:26-alpine
 
 ### Full local stack
 
-One command runs the app with a real identity provider, a gateway, a secrets store, observability and a mail catcher:
+One command runs the app with a real identity provider, a secrets store, observability and a mail catcher. Every tool is HTTPS on 443 under the same wildcard certificate:
 
 ```sh
-pnpm certs
 APP_ENV_FILE=deploy/full-stack.env docker compose --profile full up --build
 ```
 
-| Profile         | Service                                 | Open                                          | What it shows                                                                                                                                                   |
-| --------------- | --------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| default         | Caddy, app, Postgres, Redis             | https://localhost                             | HTTP/3, the API, Swagger at `/docs`                                                                                                                             |
-| `idp`           | Keycloak 26                             | https://keycloak.localhost:8543 (admin/admin) | realm `demo`: browser login as alice/alice through OIDC; `api-client` gets tokens with `users:write` by client credentials, checked by `OAuth2Guard` and scopes |
-| `gateway`       | APISIX 3                                | http://localhost:9080                         | the same API behind a gateway: request id, edge rate limit, body limit, metrics                                                                                 |
-| `vault`         | Vault                                   | http://localhost:8200 (dev-root-token)        | `vault-seed` writes random `SESSION_SECRET`, `JWT_SECRET`, `HMAC_CLIENTS`; the app loads them at boot                                                           |
-| `observability` | Prometheus, Grafana, Loki, Tempo, Alloy | http://localhost:3000 (admin/admin)           | dashboard "API overview": rate, p95 latency, status classes, event-loop lag, logs; traces in Tempo                                                              |
-| `mail`          | Mailpit                                 | http://localhost:8025                         | the welcome email sent when a user is created                                                                                                                   |
+| Profile         | Service                                    | Open (`*.express-boilerplate.len`)                      | What it shows                                                                                                                                                   |
+| --------------- | ------------------------------------------ | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| default         | APISIX (+ dashboard), app, Postgres, Redis | `https://api.`, `https://dashboard.`                    | HTTP/3, the API, Swagger at `/docs`, routes in the dashboard (admin/admin)                                                                                      |
+| `idp`           | Keycloak 26                                | `https://keycloak.` (admin/admin)                       | realm `demo`: browser login as alice/alice through OIDC; `api-client` gets tokens with `users:write` by client credentials, checked by `OAuth2Guard` and scopes |
+| `vault`         | Vault                                      | `https://vault.` (dev-root-token)                       | `vault-seed` writes random `SESSION_SECRET`, `JWT_SECRET`, `HMAC_CLIENTS`; the app loads them at boot                                                           |
+| `observability` | Prometheus, Grafana, Loki, Tempo, Alloy    | `https://grafana.` (admin/admin), `https://prometheus.` | dashboard "API overview": rate, p95 latency, status classes, event-loop lag, logs; traces in Tempo                                                              |
+| `mail`          | Mailpit                                    | `https://mailpit.`                                      | the welcome email sent when a user is created                                                                                                                   |
 
 Try OAuth2 machine-to-machine:
 
 ```sh
-TOKEN=$(curl -s --cacert certs/ca.crt https://keycloak.localhost:8543/realms/demo/protocol/openid-connect/token   -d grant_type=client_credentials -d client_id=api-client -d client_secret=dev-api-secret-change-me | jq -r .access_token)
-curl --cacert certs/ca.crt -H "Authorization: Bearer $TOKEN" https://localhost/api/v1/secure/oauth2
+TOKEN=$(curl -s --cacert certs/ca.crt https://keycloak.express-boilerplate.len/realms/demo/protocol/openid-connect/token -d grant_type=client_credentials -d client_id=api-client -d client_secret=dev-api-secret-change-me | jq -r .access_token)
+curl --cacert certs/ca.crt -H "Authorization: Bearer $TOKEN" https://api.express-boilerplate.len/api/v1/secure/oauth2
 ```
 
 Everything in `deploy/` is development configuration: fixed demo passwords, Vault in dev mode, and Alloy reading the Docker socket. Keep the shape, replace the secrets.
@@ -447,26 +555,31 @@ This project adheres to [Semantic Versioning](https://semver.org/) and uses [Con
   ```sh
   git commit -m "fix(api): fix health check route"
   ```
+
 - **feat**: Introduces a new feature (`MINOR` release) or enhancement.
 
   ```sh
   git commit -m "feat(api): add user route"
   ```
+
 - **BREAKING CHANGE**: Introduces breaking changes (`MAJOR` release) that require a manual update.
 
   ```sh
   git commit -m "feat!(api): change user route to use UUID"
   ```
+
 - **chore**: Updates dependencies, refactors code, or makes other changes that don't affect the user-facing code.
 
   ```sh
   git commit -m "chore: update dependencies"
   ```
+
 - **docs**: Updates documentation, README, or other non-code files.
 
   ```sh
   git commit -m "docs: update README"
   ```
+
 - **ci**: Updates CI/CD configurations or workflows.
 
   ```sh
@@ -509,7 +622,7 @@ Follow these steps to set up GitHub Environments for your project:
 
 ### Using Secrets in Your Workflow
 
-To utilize the `PAT_TOKEN` secret in your GitHub Actions workflow for building Docker images, reference the secret using the syntax shown in the example workflow below. You can find this configuration in your [docker-image.yml](.github/workflows/docker-image.yml) file:
+To utilize the `PAT_TOKEN` secret in your GitHub Actions workflow for building Docker images, reference the secret using the syntax shown in the example workflow below. You can find this configuration in [ci-pipeline.yml](.github/workflows/ci-pipeline.yml):
 
 ```yaml
 name: Docker Image CI
