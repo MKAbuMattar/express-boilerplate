@@ -49,14 +49,14 @@ jobs:
           node-version: 26
           registry-url: https://registry.npmjs.org
 
-      - name: Publish create-expresso
+      - name: Publish create-expresso-api
         if: steps.semantic.outputs.new_release_published == 'true'
         working-directory: packages/cli
         env:
           VERSION: ${{ steps.semantic.outputs.new_release_version }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          pnpm install --frozen-lockfile --filter create-expresso
+          pnpm install --frozen-lockfile --filter create-expresso-api
           npm version "$VERSION" --no-git-tag-version
           pnpm test
           pnpm publish --no-git-checks

@@ -26,7 +26,7 @@ Three rules hold everywhere, from `pnpm dev` to production:
 
 | You want to                         | Start with                                                              |
 | ----------------------------------- | ----------------------------------------------------------------------- |
-| Build an API on this base           | `pnpm create expresso my-api`, then [Generator](generator.md)           |
+| Build an API on this base           | `pnpm create expresso-api my-api`, then [Generator](generator.md)       |
 | Hack on the API alone, fast reloads | [Local setup](local-setup.md), `pnpm dev`                               |
 | See everything running together     | [Docker compose](docker.md), `docker compose --profile full up --build` |
 | Ship it                             | [Kubernetes](kubernetes.md)                                             |

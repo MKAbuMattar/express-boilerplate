@@ -95,7 +95,7 @@ jobs:
 
       # The CLI runs from source here, so it needs its own packages (ink).
       - name: Install the CLI
-        run: pnpm install --frozen-lockfile --filter create-expresso
+        run: pnpm install --frozen-lockfile --filter create-expresso-api
 
       # Every preset must stand on its own: the cut leaves no dangling code.
       - name: Create the project

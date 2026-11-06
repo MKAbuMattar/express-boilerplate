@@ -32,7 +32,7 @@ A change is done when `pnpm lint`, `pnpm typecheck` and `pnpm test` pass. Contai
 | `packages/service`     | Service contracts and implementations                                               | persistence, common      |
 | `packages/persistence` | Entities, repositories, migrations, DataSource                                      | common                   |
 | `packages/common`      | Config, DI, security, errors, cache, queues, observability                          | nothing in the workspace |
-| `packages/cli`         | `create-expresso` / `eb`: project generator and resource scaffolding                | nothing in the workspace |
+| `packages/cli`         | `create-expresso-api` / `eb`: project generator and resource scaffolding            | nothing in the workspace |
 
 - Never import upward. pnpm and the package dependencies enforce it; do not add a workspace dependency to get around it.
 - `apps/api` must not import `@express-boilerplate/persistence`, except entity types in converters and `application.ts`. A Biome rule fails otherwise.
