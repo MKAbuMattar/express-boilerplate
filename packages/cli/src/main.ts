@@ -73,13 +73,18 @@ export class Main {
     if (cli.interactive && command === undefined) {
       return cli.tui.run(cli, cwd, tuiOptions);
     }
+    // `npm create expresso-api [dir]` in a terminal: the app, at create.
     if (
       cli.interactive &&
       bare &&
-      args.length === 0 &&
+      args.length <= 1 &&
       Main.noCreateFlags(values)
     ) {
-      return cli.tui.run(cli, cwd, {...tuiOptions, start: 'create'});
+      return cli.tui.run(cli, cwd, {
+        ...tuiOptions,
+        start: 'create',
+        dir: args[0],
+      });
     }
 
     switch (command) {

@@ -22,10 +22,11 @@
     "typescript"
   ],
   "bin": {
-    "create-expresso-api": "./dist/main.js",
+    "create-expresso-api": "./bin/create-expresso-api.js",
     "eb": "./dist/main.js"
   },
   "files": [
+    "bin",
     "dist"
   ],
   "scripts": {

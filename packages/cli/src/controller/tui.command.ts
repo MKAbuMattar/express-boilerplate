@@ -8,7 +8,12 @@ export class TuiCommand {
   async run(
     cli: CliConfiguration,
     cwd: string,
-    options: {start?: 'create'; template?: string; ref?: string},
+    options: {
+      start?: 'create';
+      dir?: string;
+      template?: string;
+      ref?: string;
+    },
   ): Promise<void> {
     if (!cli.interactive) {
       throw new Error('The app needs a terminal; use a command (eb --help)');
@@ -18,6 +23,7 @@ export class TuiCommand {
         cli,
         cwd,
         start: options.start,
+        dir: options.dir,
         template: options.template,
         ref: options.ref,
         onExit: () => app.unmount(),
