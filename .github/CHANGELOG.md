@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.3 (2026-11-06)</small>
+
+* Merge pull request #847 from MKAbuMattar/fix/npm-create-entry ([758a6c8](https://github.com/MKAbuMattar/express-boilerplate/commit/758a6c8)), closes [#847](https://github.com/MKAbuMattar/express-boilerplate/issues/847)
+* chore(deps): update all non-major dependencies (#844) ([6b03cc8](https://github.com/MKAbuMattar/express-boilerplate/commit/6b03cc8)), closes [#844](https://github.com/MKAbuMattar/express-boilerplate/issues/844)
+* fix(cli): npm create runs the create command and opens the app ([7d3140c](https://github.com/MKAbuMattar/express-boilerplate/commit/7d3140c))
+
 ## <small>3.0.2 (2026-11-06)</small>
 
 * fix(cli): publish as create-expresso-api ([13262a6](https://github.com/MKAbuMattar/express-boilerplate/commit/13262a6))
