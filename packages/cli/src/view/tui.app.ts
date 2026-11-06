@@ -38,6 +38,8 @@ type Props = {
   cli: CliConfiguration;
   /** Open on this flow instead of the menu (npx create-expresso-api). */
   start?: 'create';
+  /** The folder given on the command line; the create flow skips asking. */
+  dir?: string;
   cwd: string;
   template?: string;
   ref?: string;
@@ -198,6 +200,7 @@ export class TuiApp extends Component<Props, State> {
             label: 'Where should the project go?',
             kind: 'text',
             placeholder: './my-api',
+            when: () => !this.props.dir,
             validate: (v) => CreateCommand.validName(basename(v)),
           },
           {
@@ -230,7 +233,7 @@ export class TuiApp extends Component<Props, State> {
 
   private createRun(manifest: FeatureManifest, a: Answers): Screen {
     const {projectService} = this.props.cli;
-    const folder = a.dir as string;
+    const folder = (a.dir as string | undefined) ?? this.props.dir ?? 'my-api';
     const target = `${this.props.cwd}/${folder}`.replace(/\/\.\//g, '/');
     const name = CreateCommand.packageName(basename(target));
     const enabled = manifest.resolve(
