@@ -1,0 +1,64 @@
+# Shared by both gateways (apache/apisix chart 2.17.0). Install twice:
+#   helm upgrade --install apisix apisix/apisix --version 2.17.0 -n apisix \
+#     --create-namespace -f values.yaml -f public.values.yaml
+#   helm upgrade --install apisix-private apisix/apisix --version 2.17.0 \
+#     -n apisix-private --create-namespace -f values.yaml -f private.values.yaml
+# then: kubectl apply -f defaults.yaml
+service:
+  type: LoadBalancer
+  http:
+    enabled: false # HTTPS only: no plaintext listener
+  tls:
+    servicePort: 443
+apisix:
+  enableServerTokens: false
+  ssl:
+    enabled: true
+    containerPort: 9443
+  prometheus:
+    enabled: true
+  nginx:
+    configurationSnippet:
+      # Same rules as deploy/apisix/config-dp.yaml: nothing the gateway
+      # answers itself carries a stock page or a product name.
+      httpSrv: |
+        more_clear_headers Server;
+        error_page 497 @to_https;
+        location @to_https {
+          internal;
+          content_by_lua_block {
+            ngx.status = 308
+            ngx.header["Location"] = "https://" .. ngx.var.host .. ngx.var.request_uri
+            ngx.header["Content-Type"] = "application/problem+json"
+            ngx.say('{"type":"about:blank","title":"Permanent Redirect","status":308,"detail":"This port speaks HTTPS only. Use https://."}')
+          }
+        }
+        error_page 400 @problem_400;
+        error_page 408 @problem_408;
+        error_page 413 @problem_413;
+        error_page 500 @problem_500;
+        error_page 502 @problem_502;
+        error_page 503 @problem_503;
+        error_page 504 @problem_504;
+        location @problem_400 { internal; default_type application/problem+json; return 400 '{"type":"about:blank","title":"Bad Request","status":400,"detail":"The request could not be read."}'; }
+        location @problem_408 { internal; default_type application/problem+json; return 408 '{"type":"about:blank","title":"Request Timeout","status":408,"detail":"The request took too long to arrive."}'; }
+        location @problem_413 { internal; default_type application/problem+json; return 413 '{"type":"about:blank","title":"Content Too Large","status":413,"detail":"The request body is too large."}'; }
+        location @problem_500 { internal; default_type application/problem+json; return 500 '{"type":"about:blank","title":"Internal Server Error","status":500,"detail":"The gateway failed to handle the request."}'; }
+        location @problem_502 { internal; default_type application/problem+json; return 502 '{"type":"about:blank","title":"Bad Gateway","status":502,"detail":"The service is not answering. Try again shortly."}'; }
+        location @problem_503 { internal; default_type application/problem+json; more_set_headers 'Retry-After: 5'; return 503 '{"type":"about:blank","title":"Service Unavailable","status":503,"detail":"The service is unavailable. Try again shortly."}'; }
+        location @problem_504 { internal; default_type application/problem+json; return 504 '{"type":"about:blank","title":"Gateway Timeout","status":504,"detail":"The service did not answer in time."}'; }
+etcd:
+  enabled: true
+  replicaCount: 1 # 3 in production
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/etcd
+    tag: 3.6.4-debian-12-r3
+  persistence:
+    enabled: false # true in production
+ingress-controller:
+  enabled: true
+  gatewayProxy:
+    createDefault: true
+    provider:
+      type: ControlPlane

@@ -88,10 +88,37 @@ migration Job (which may run before the ConfigMap exists).
   "TRUST_PROXY" (toString .Values.trustProxyHops)
   "DB_MIGRATIONS_RUN" (ternary "false" "true" .Values.migrations.enabled)
 -}}
+{{- if .Values.database.caSecret }}
+{{- $_ := set $base "DB_TLS_CA_FILE" "/etc/db-ca/ca.crt" }}
+{{- end }}
 {{- $env := merge (deepCopy (default (dict) .Values.config)) $base -}}
 {{- range $key := keys $env | sortAlpha }}
 {{ $key }}: {{ get $env $key | toString | quote }}
 {{- end -}}
+{{- end -}}
+
+{{/*
+The database server's CA (database.caSecret, key ca.crt), for databases on a
+private CA (in-cluster Postgres, AWS RDS bundle). Mounted in the app pods and
+the migration Job; DB_TLS_CA_FILE points at it.
+*/}}
+{{- define "eb.dbCaMount" -}}
+{{- if .Values.database.caSecret }}
+- name: db-ca
+  mountPath: /etc/db-ca
+  readOnly: true
+{{- end }}
+{{- end -}}
+
+{{- define "eb.dbCaVolume" -}}
+{{- if .Values.database.caSecret }}
+- name: db-ca
+  secret:
+    secretName: {{ .Values.database.caSecret }}
+    items:
+      - key: ca.crt
+        path: ca.crt
+{{- end }}
 {{- end -}}
 
 {{/* Restricted pod security context and the matching container context. */}}

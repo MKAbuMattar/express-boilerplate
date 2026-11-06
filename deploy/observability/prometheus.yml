@@ -17,4 +17,4 @@ scrape_configs:
   - job_name: apisix
     metrics_path: /apisix/prometheus/metrics
     static_configs:
-      - targets: ["apisix:9091"]
+      - targets: ["apisix:9091", "apisix-private:9091"]

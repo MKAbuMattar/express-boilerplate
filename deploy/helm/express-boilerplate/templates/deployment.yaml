@@ -126,6 +126,7 @@ spec:
             - name: tls
               mountPath: /etc/tls
               readOnly: true
+            {{- include "eb.dbCaMount" . | nindent 12 }}
       volumes:
         # Read-only root filesystem: /tmp is the only writable path.
         - name: tmp
@@ -134,6 +135,7 @@ spec:
         - name: tls
           secret:
             secretName: {{ include "eb.tlsSecretName" . }}
+        {{- include "eb.dbCaVolume" . | nindent 8 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

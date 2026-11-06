@@ -59,10 +59,13 @@
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
       "redirectUris": [
-        "https://localhost/auth/oidc/callback",
-        "https://localhost:8443/auth/oidc/callback"
+        "https://api.express-boilerplate.len/auth/oidc/callback",
+        "https://localhost/auth/oidc/callback"
       ],
-      "webOrigins": ["https://localhost"],
+      "webOrigins": [
+        "https://api.express-boilerplate.len",
+        "https://localhost"
+      ],
       "attributes": { "pkce.code.challenge.method": "S256" },
       "defaultClientScopes": ["profile", "email"]
     },

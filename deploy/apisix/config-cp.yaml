@@ -1,0 +1,31 @@
+# APISIX control plane, one per gateway (public, private): serves the Admin
+# API and writes that gateway's config under its own etcd prefix. Not
+# published to the host; apisix-seed reaches it inside the compose network.
+deployment:
+  role: control_plane
+  role_control_plane:
+    config_provider: etcd
+  admin:
+    admin_key_required: true
+    admin_key:
+      - name: admin
+        key: ${{APISIX_ADMIN_KEY}}
+        role: admin
+    allow_admin: ["0.0.0.0/0"]
+    admin_listen:
+      ip: 0.0.0.0
+      port: 9180
+  etcd:
+    host: ["https://etcd:2379"]
+    # /apisix-public or /apisix-private: each gateway has its own config.
+    prefix: ${{APISIX_ETCD_PREFIX}}
+    tls:
+      cert: /certs/etcd-client.crt
+      key: /certs/etcd-client.key
+      verify: true
+      sni: etcd
+
+apisix:
+  enable_server_tokens: false
+  ssl:
+    ssl_trusted_certificate: /certs/ca.crt

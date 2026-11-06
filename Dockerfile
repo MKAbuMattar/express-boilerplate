@@ -26,11 +26,13 @@ COPY apps/api/src ./apps/api/src
 RUN pnpm --filter "${APP}..." build
 
 # One-shot local cert generator used by compose (see compose.yml `certs`).
+# Keys are group-readable (640, group 1000) so APISIX and Prometheus,
+# which run as other users with group_add 1000, can read them. Dev only.
 FROM build AS certs
 RUN apk add --no-cache openssl
 COPY apps/api/scripts ./apps/api/scripts
 WORKDIR /app/apps/api
-ENTRYPOINT ["sh", "-c", "node_modules/.bin/tsx scripts/generate-certs.ts /certs && chown -R node:node /certs"]
+ENTRYPOINT ["sh", "-c", "node_modules/.bin/tsx scripts/generate-certs.ts /certs && chown -R node:node /certs && chmod 640 /certs/*.key"]
 
 FROM base AS prod-deps
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \

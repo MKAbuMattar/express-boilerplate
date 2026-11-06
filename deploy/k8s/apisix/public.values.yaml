@@ -1,0 +1,19 @@
+# Public gateway: what end users reach (the API, the login pages).
+# Ingresses use ingressClassName: apisix.
+apisix:
+  admin:
+    credentials:
+      admin: change-me-public-admin-key
+      viewer: change-me-public-viewer-key
+ingress-controller:
+  config:
+    controllerName: apisix.apache.org/apisix-ingress-controller
+    kubernetes:
+      ingressClass: apisix
+  gatewayProxy:
+    provider:
+      controlPlane:
+        service: { name: apisix-admin, port: 9180 }
+        auth:
+          type: AdminKey
+          adminKey: { value: change-me-public-admin-key }

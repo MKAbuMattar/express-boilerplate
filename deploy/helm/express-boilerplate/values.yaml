@@ -51,6 +51,12 @@ externalSecret:
   # Vault KV path, e.g. express-boilerplate/production
   remoteKey: ""
 
+# The database server's certificate authority, when it is not a public one
+# (in-cluster Postgres with cert-manager, the AWS RDS bundle): a Secret with
+# ca.crt. Mounted in the pods and the migration Job; sets DB_TLS_CA_FILE.
+database:
+  caSecret: ""
+
 # Database migrations as a Job before the new version rolls out.
 migrations:
   enabled: true
@@ -107,7 +113,12 @@ service:
 
 ingress:
   enabled: false
+  # "apisix" adds a BackendTrafficPolicy (HTTPS to the pods, Host passed
+  # through); ingress-nginx uses the annotations below instead.
   className: ""
+  apisix:
+    # Upstream timeouts, e.g. {connect: 5s, send: 30s, read: 30s}.
+    timeout: {}
   # Re-encrypt to the pod. These are ingress-nginx keys; other controllers
   # have their own.
   annotations:

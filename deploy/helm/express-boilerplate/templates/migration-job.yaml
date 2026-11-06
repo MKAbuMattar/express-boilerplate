@@ -6,8 +6,9 @@
 #            before the Deployment (1). Argo ignores helm.sh/hook when its own
 #            hook annotation is present.
 #   Helm:    a pre-install/pre-upgrade hook. Env is inline (not the
-#            ConfigMap, which does not exist yet), and the Secret must already
-#            exist (secrets.existingSecret).
+#            ConfigMap, which does not exist yet), the Secret must already
+#            exist (secrets.existingSecret), and it runs as its own
+#            ServiceAccount (migration-serviceaccount.yaml).
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -33,7 +34,7 @@ spec:
         app.kubernetes.io/component: migration
     spec:
       restartPolicy: Never
-      serviceAccountName: {{ include "eb.serviceAccountName" . }}
+      serviceAccountName: {{ include "eb.fullname" . }}-migrate
       automountServiceAccountToken: false
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -70,8 +71,10 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            {{- include "eb.dbCaMount" . | nindent 12 }}
       volumes:
         - name: tmp
           emptyDir:
             sizeLimit: 64Mi
+        {{- include "eb.dbCaVolume" . | nindent 8 }}
 {{- end }}

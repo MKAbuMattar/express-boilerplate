@@ -1,0 +1,77 @@
+# APISIX data plane, one per gateway: public (the API, the login pages) and
+# private (the operator tools). HTTPS (HTTP/1.1, HTTP/2, HTTP/3)
+# on 443, the same port inside and out: containers reach it by host name
+# (keycloak.<domain>) on 443, and no internal port leaks into Host headers. Routes and the wildcard
+# certificate come from etcd, written by the control plane (apisix-seed).
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: etcd
+  etcd:
+    host: ["https://etcd:2379"]
+    # Only this gateway's prefix: a public data plane never loads a private route.
+    prefix: ${{APISIX_ETCD_PREFIX}}
+    tls:
+      cert: /certs/etcd-client.crt
+      key: /certs/etcd-client.key
+      verify: true
+      sni: etcd
+
+apisix:
+  enable_server_tokens: false
+  # Plain HTTP stays inside the container network; compose never publishes it.
+  node_listen: 9080
+  ssl:
+    enable: true
+    listen:
+      - port: 443
+        enable_http3: true
+    # Verifies etcd and every HTTPS upstream (app, Keycloak).
+    ssl_trusted_certificate: /certs/ca.crt
+
+nginx_config:
+  http_server_configuration_snippet: |
+    proxy_ssl_verify on;
+    proxy_ssl_verify_depth 3;
+    # Tells browsers HTTP/3 is on the same port; they switch on the next request.
+    more_set_headers 'Alt-Svc: h3=":443"; ma=86400';
+    # No product name or version in any response.
+    more_clear_headers Server;
+    # Plain HTTP sent to this TLS port: send the client to HTTPS instead of
+    # the stock "plain HTTP request was sent to HTTPS port" page.
+    # Written in Lua: a plain nginx redirect always carries nginx's own page.
+    error_page 497 @to_https;
+    location @to_https {
+      internal;
+      content_by_lua_block {
+        ngx.status = 308
+        ngx.header["Location"] = "https://" .. ngx.var.host .. ngx.var.request_uri
+        ngx.header["Content-Type"] = "application/problem+json"
+        ngx.say('{"type":"about:blank","title":"Permanent Redirect","status":308,"detail":"This port speaks HTTPS only. Use https://."}')
+      }
+    }
+    # Errors the gateway itself produces are RFC 9457 problem details, like
+    # the app's. Upstream responses pass through untouched (the app already
+    # answers with problem details).
+    error_page 400 @problem_400;
+    error_page 408 @problem_408;
+    error_page 413 @problem_413;
+    error_page 500 @problem_500;
+    error_page 502 @problem_502;
+    error_page 503 @problem_503;
+    error_page 504 @problem_504;
+    location @problem_400 { internal; default_type application/problem+json; return 400 '{"type":"about:blank","title":"Bad Request","status":400,"detail":"The request could not be read."}'; }
+    location @problem_408 { internal; default_type application/problem+json; return 408 '{"type":"about:blank","title":"Request Timeout","status":408,"detail":"The request took too long to arrive."}'; }
+    location @problem_413 { internal; default_type application/problem+json; return 413 '{"type":"about:blank","title":"Content Too Large","status":413,"detail":"The request body is larger than 1 MB."}'; }
+    location @problem_500 { internal; default_type application/problem+json; return 500 '{"type":"about:blank","title":"Internal Server Error","status":500,"detail":"The gateway failed to handle the request."}'; }
+    location @problem_502 { internal; default_type application/problem+json; return 502 '{"type":"about:blank","title":"Bad Gateway","status":502,"detail":"The service is not answering. Try again shortly."}'; }
+    location @problem_503 { internal; default_type application/problem+json; more_set_headers 'Retry-After: 5'; return 503 '{"type":"about:blank","title":"Service Unavailable","status":503,"detail":"The service is unavailable. Try again shortly."}'; }
+    location @problem_504 { internal; default_type application/problem+json; return 504 '{"type":"about:blank","title":"Gateway Timeout","status":504,"detail":"The service did not answer in time."}'; }
+
+# @feature:metrics
+plugin_attr:
+  prometheus:
+    export_addr:
+      ip: 0.0.0.0
+      port: 9091
+# @end:metrics

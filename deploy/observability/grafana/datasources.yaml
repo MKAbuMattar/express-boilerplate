@@ -17,6 +17,7 @@ datasources:
           matcherRegex: '"requestId":"([^"]+)"'
           url: '{container="express-boilerplate"} |= "$${__value.raw}"'
           datasourceUid: loki
+  # @feature:tracing
   - name: Tempo
     uid: tempo
     type: tempo
@@ -24,3 +25,4 @@ datasources:
     jsonData:
       tracesToLogsV2:
         datasourceUid: loki
+  # @end:tracing
