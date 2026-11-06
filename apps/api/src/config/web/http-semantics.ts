@@ -7,9 +7,10 @@ import type {
   Response,
 } from 'express';
 
+/** A router layer: its route, and the matchers compiled from its path. */
 type RouteLayer = {
   route?: {methods: Record<string, boolean>};
-  match(path: string): boolean;
+  matchers: ((path: string) => unknown)[];
 };
 
 /**
@@ -35,7 +36,11 @@ export class HttpSemantics {
       (app as unknown as {router?: {stack: RouteLayer[]}}).router?.stack ?? [];
     const methods = new Set<string>();
     for (const layer of stack) {
-      if (!layer.route || !layer.match(path)) continue;
+      // The compiled matchers, not layer.match(): that one also writes the
+      // match into the shared layer's params and path.
+      if (!layer.route?.methods || !layer.matchers.some((m) => m(path))) {
+        continue;
+      }
       for (const [method, enabled] of Object.entries(layer.route.methods)) {
         if (!enabled) continue;
         // @All routes (used for QUERY) check their method themselves.

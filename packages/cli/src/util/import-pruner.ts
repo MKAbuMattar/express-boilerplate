@@ -13,7 +13,7 @@ export class ImportPruner {
     const used = (name: string) =>
       // Not a property (`a.name`), but a spread (`...name`) counts as a use.
       new RegExp(
-        `(?<![\\w$])(?<![^.]\\.)${name.replace(/\$/g, '\\$')}(?![\\w$])`,
+        `(?<![\\w$])(?<![^.]\\.)${RegExp.escape(name)}(?![\\w$])`,
       ).test(body);
     return source.replace(
       ImportPruner.IMPORT,
