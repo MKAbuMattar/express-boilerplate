@@ -41,7 +41,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- include "eb.podSecurityContext" . | nindent 8 }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: migrate
           image: {{ include "eb.image" . }}
@@ -67,7 +67,7 @@ spec:
           resources:
             {{- toYaml .Values.migrations.resources | nindent 12 }}
           securityContext:
-            {{- include "eb.containerSecurityContext" . | nindent 12 }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp

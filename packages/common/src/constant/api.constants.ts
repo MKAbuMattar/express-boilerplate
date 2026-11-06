@@ -37,6 +37,4 @@ export class ApiConstants {
   static readonly V1_QUEUES = `${ApiConstants.API_V1}/queues`;
 
   static readonly V2_USERS = `${ApiConstants.API_V2}/users`;
-
-  static readonly DOCS = '/docs';
 }

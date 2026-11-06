@@ -28,12 +28,9 @@ export class EventV1Resource {
   constructor(@inject(EventBus) private readonly eventBus: EventBus) {}
 
   @OasTag('Events')
-
   @OasSummary('Live event stream (text/event-stream)')
-
   @OasResponse(
     HttpStatusCode.OK,
-
     OpenApiConstants.raw(
       'One event per message: id, event (user.created...), data (JSON)',
 

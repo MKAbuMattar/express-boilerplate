@@ -1,28 +1,12 @@
 import {readFileSync} from 'node:fs';
-import type http from 'node:http';
 import https from 'node:https';
 import type {AddressInfo} from 'node:net';
 import {join} from 'node:path';
 import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import {TlsConfig} from '@express-boilerplate/common/config/tls.config.js';
 import type express from 'express';
+import {HttpsClient, type HttpsResult} from './https-client.js';
 import {TestApp} from './test-app.js';
-
-export class RawResult {
-  constructor(
-    readonly status: number,
-    readonly headers: http.IncomingHttpHeaders,
-    readonly text: string,
-  ) {}
-
-  get json(): any {
-    try {
-      return JSON.parse(this.text);
-    } catch {
-      return undefined;
-    }
-  }
-}
 
 /**
  * HTTPS server around the app, built with the production TLS options, for
@@ -64,36 +48,11 @@ export class RawHttp {
     path: string,
     body?: string,
     headers: Record<string, string> = {},
-  ): Promise<RawResult> {
-    return new Promise((resolve, reject) => {
-      const request = https.request(
-        {
-          host: '127.0.0.1',
-          ca: this.ca,
-          port: this.port,
-          method,
-          path,
-          headers: {
-            ...(body !== undefined && {
-              'content-type': 'application/json',
-              'content-length': String(Buffer.byteLength(body)),
-            }),
-            ...headers,
-          },
-        },
-        (response) => {
-          let text = '';
-          response.on('data', (chunk) => (text += chunk));
-          response.on('end', () =>
-            resolve(
-              new RawResult(response.statusCode ?? 0, response.headers, text),
-            ),
-          );
-        },
-      );
-      request.on('error', reject);
-      if (body !== undefined) request.write(body);
-      request.end();
+  ): Promise<HttpsResult> {
+    return new HttpsClient(TestApp.certs(), this.port).request(method, path, {
+      body,
+      headers,
+      host: '127.0.0.1',
     });
   }
 

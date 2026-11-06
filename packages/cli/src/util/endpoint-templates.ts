@@ -65,13 +65,12 @@ export class EndpointTemplates {
         ];
     const call = e.service
       ? `await this.service.${e.action}(${EndpointTemplates.args(e)})`
-      : `{${[...e.params, ...(e.hasBody ? ['input: body'] : [])].join(', ')}}`;
+      : EndpointTemplates.echo(e);
     const who = e.isPublic
       ? 'public'
       : e.auth.label + (e.scope ? `, ${e.scope.value}` : '');
     return `
   @OasTag('${tag}')
-
   @OasSummary('${e.action} (${who})')
 ${e.params.map((p) => `  @OasParameter({name: '${p}', in: 'path', required: true, schema: {type: 'string'}})`).join('\n')}
   @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('${e.action} done'))
@@ -95,37 +94,41 @@ ${params.join('\n')}
 
   /** The service contract's abstract method. */
   static contract(e: Endpoint): string {
-    const params = [
-      ...e.params.map((p) => `${p}: string`),
-      ...(e.hasBody ? ['body: unknown'] : []),
-    ].join(', ');
     return `
   /** ${e.method} ${e.path}. */
-  abstract ${e.action}(${params}): Promise<Record<string, unknown>>;
+  abstract ${e.action}(${EndpointTemplates.typed(e)}): Promise<Record<string, unknown>>;
 `;
   }
 
   /** The implementation stub: where the business logic goes. */
   static impl(e: Endpoint): string {
-    const params = [
-      ...e.params.map((p) => `${p}: string`),
-      ...(e.hasBody ? ['body: unknown'] : []),
-    ].join(', ');
     return `
-  async ${e.action}(${params}): Promise<Record<string, unknown>> {
+  async ${e.action}(${EndpointTemplates.typed(e)}): Promise<Record<string, unknown>> {
     // Business logic for ${e.method} ${e.path}: validate, load through the
     // repository, change, save. Throw NotFoundException, ConflictException
     // or ValidationException; the error filter turns them into 404/409/400.
-    return {${[...e.params, ...(e.hasBody ? ['input: body'] : [])].join(', ')}};
+    return ${EndpointTemplates.echo(e)};
   }
 `;
+  }
+
+  /** The method's parameters: path params, then the body. */
+  private static typed(e: Endpoint): string {
+    return [
+      ...e.params.map((p) => `${p}: string`),
+      ...(e.hasBody ? ['body: unknown'] : []),
+    ].join(', ');
+  }
+
+  /** What a stub returns: its inputs, so the route works before the logic. */
+  private static echo(e: Endpoint): string {
+    return `{${[...e.params, ...(e.hasBody ? ['input: body'] : [])].join(', ')}}`;
   }
 
   static test(e: Endpoint, scope: string, base: string): string {
     const url = `${base}${e.path.replace(/:[a-zA-Z]\w*/g, '00000000-0000-0000-0000-000000000001')}`;
     const verb = e.method.toLowerCase();
-    const anonymous =
-      e.auth.kind === 'jwt' || e.auth.kind === 'hmac' ? '[401]' : '[401, 501]';
+    const anonymous = AuthTemplates.anonymousStatuses(e.auth);
     const body = e.hasBody ? '{note: "x"}' : 'undefined';
     if (e.isPublic) {
       return `import request from 'supertest';

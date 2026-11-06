@@ -109,17 +109,22 @@ export class CliView {
     );
   }
 
-  static summary(title: string, lines: string[]): ReactElement {
+  static summary(
+    title: string,
+    lines: string[],
+    color = 'cyan',
+    margin: 'marginTop' | 'marginBottom' = 'marginTop',
+  ): ReactElement {
     return h(
       Box,
       {
         flexDirection: 'column',
         borderStyle: 'round',
-        borderColor: 'cyan',
+        borderColor: color,
         paddingX: 1,
-        marginTop: 1,
+        [margin]: 1,
       },
-      h(Text, {bold: true, color: 'cyan'}, title),
+      h(Text, {bold: true, color}, title),
       ...lines.map((line, i) => h(Text, {key: i}, line)),
     );
   }

@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
 import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
 import {Application} from '../src/application.js';
@@ -14,9 +13,7 @@ export class IssueJwt {
     expiresIn = '1h',
     scope = ScopeConstants.ALL.join(' '),
   ): Promise<void> {
-    const tokens = new Application(new AppConfig()).beans.getBean(
-      TokenProvider,
-    );
+    const tokens = new Application().beans.getBean(TokenProvider);
     const token = await tokens.createToken(subject, {scope}, expiresIn);
     console.log(token);
   }

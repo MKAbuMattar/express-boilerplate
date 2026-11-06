@@ -35,7 +35,6 @@ export class QueueV1Resource {
   constructor(@inject(QueueBroker) private readonly broker: QueueBroker) {}
 
   @OasTag('Queues')
-
   @OasSummary('List queues (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasResponse(
@@ -51,7 +50,6 @@ export class QueueV1Resource {
   }
 
   @OasTag('Queues')
-
   @OasSummary('Enqueue a job (JWT); 202, processed in the background')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.QUEUE_PATH_PARAM)
@@ -85,7 +83,6 @@ export class QueueV1Resource {
   }
 
   @OasTag('Queues')
-
   @OasSummary('Dead letters of a queue (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.QUEUE_PATH_PARAM)
@@ -102,7 +99,6 @@ export class QueueV1Resource {
   }
 
   @OasTag('Queues')
-
   @OasSummary('Replay a dead letter (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.QUEUE_PATH_PARAM)

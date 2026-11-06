@@ -17,12 +17,10 @@ class ApisixSeed {
     private: ApisixSeed.env('APISIX_PRIVATE_ADMIN_KEY') ?? '',
   };
   static DOMAIN = ApisixSeed.env('DEV_DOMAIN') ?? 'express-boilerplate.len';
+  /** Each gateway's control plane, on the compose network. */
   static ADMIN = {
-    public:
-      ApisixSeed.env('APISIX_PUBLIC_ADMIN_URL') ?? 'http://apisix-cp:9180',
-    private:
-      ApisixSeed.env('APISIX_PRIVATE_ADMIN_URL') ??
-      'http://apisix-private-cp:9180',
+    public: 'http://apisix-cp:9180',
+    private: 'http://apisix-private-cp:9180',
   };
 
   static pem(file) {

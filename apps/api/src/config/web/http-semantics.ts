@@ -48,11 +48,11 @@ export class HttpSemantics {
     return [...methods].sort();
   }
 
-  static options(app: () => Application): RequestHandler {
+  static options(): RequestHandler {
     return (request, response, next) => {
       const preflight = request.headers['access-control-request-method'];
       if (request.method !== 'OPTIONS' || preflight) return next();
-      const allowed = HttpSemantics.allowedMethods(app(), request.path);
+      const allowed = HttpSemantics.allowedMethods(request.app, request.path);
       if (allowed.length === 0) return next();
       response.set('Allow', allowed.join(', ')).status(204).end();
     };
@@ -73,7 +73,6 @@ export class HttpSemantics {
           response,
           415,
           'Send the body as application/json',
-          request.originalUrl,
           {
             'Accept-Post': 'application/json',
             'Accept-Patch': 'application/json, application/merge-patch+json',
@@ -118,20 +117,19 @@ export class HttpSemantics {
   }
 
   /** Last route handler: 405 when the path exists with other methods, else 404. */
-  static notFound(app: () => Application): RequestHandler {
+  static notFound(): RequestHandler {
     return (request, response) => {
-      const allowed = HttpSemantics.allowedMethods(app(), request.path);
+      const allowed = HttpSemantics.allowedMethods(request.app, request.path);
       if (allowed.length > 0) {
         ProblemDetails.send(
           response,
           405,
           `${request.method} is not supported here`,
-          request.originalUrl,
           {Allow: allowed.join(', ')},
         );
         return;
       }
-      ProblemDetails.send(response, 404, 'Not Found', request.originalUrl);
+      ProblemDetails.send(response, 404, 'Not Found');
     };
   }
 
@@ -139,7 +137,7 @@ export class HttpSemantics {
   static errorHandler() {
     return (
       error: {status?: number; statusCode?: number; type?: string},
-      request: Request,
+      _request: Request,
       response: Response,
       _next: NextFunction,
     ) => {
@@ -152,7 +150,7 @@ export class HttpSemantics {
             : status < 500
               ? 'Invalid request'
               : 'Internal Server Error';
-      ProblemDetails.send(response, status, detail, request.originalUrl);
+      ProblemDetails.send(response, status, detail);
     };
   }
 }

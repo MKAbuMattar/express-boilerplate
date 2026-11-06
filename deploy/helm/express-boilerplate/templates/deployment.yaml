@@ -47,7 +47,7 @@ spec:
       priorityClassName: {{ . }}
       {{- end }}
       securityContext:
-        {{- include "eb.podSecurityContext" . | nindent 8 }}
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       # The app closes connections and exits within 10 s; preStop adds 5 s.
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       {{- if .Values.topologySpread.enabled }}
@@ -119,7 +119,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           securityContext:
-            {{- include "eb.containerSecurityContext" . | nindent 12 }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp

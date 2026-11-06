@@ -120,12 +120,3 @@ the migration Job; DB_TLS_CA_FILE points at it.
         path: ca.crt
 {{- end }}
 {{- end -}}
-
-{{/* Restricted pod security context and the matching container context. */}}
-{{- define "eb.podSecurityContext" -}}
-{{- toYaml .Values.podSecurityContext -}}
-{{- end -}}
-
-{{- define "eb.containerSecurityContext" -}}
-{{- toYaml .Values.securityContext -}}
-{{- end -}}

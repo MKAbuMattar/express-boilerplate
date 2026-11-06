@@ -1,11 +1,5 @@
 import {execFileSync} from 'node:child_process';
-import {
-  existsSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-} from 'node:fs';
+import {existsSync, mkdtempSync, readdirSync, readFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -71,12 +65,10 @@ export class TemplateServiceImpl extends TemplateService {
       );
     }
     const dir = mkdtempSync(join(tmpdir(), 'express-boilerplate-'));
-    const archive = join(dir, 'template.tar.gz');
-    writeFileSync(archive, Buffer.from(await response.arrayBuffer()));
-    execFileSync('tar', ['-xzf', archive, '-C', dir]);
-    const [root] = readdirSync(dir).filter(
-      (entry) => entry !== 'template.tar.gz',
-    );
+    execFileSync('tar', ['-xz', '-C', dir], {
+      input: Buffer.from(await response.arrayBuffer()),
+    });
+    const [root] = readdirSync(dir);
     return TemplateServiceImpl.checked(join(dir, root ?? ''));
   }
 

@@ -47,6 +47,61 @@
 # @feature:redis
 #   CACHE_URL=redis://valkey:6379                                   + --profile valkey
 # @end:redis
+# Every image, pinned by digest, in one place. Bump a version here.
+x-images:
+  etcd: &etcd-image quay.io/coreos/etcd:v3.6.8@sha256:b88bf32c663e2599bd3742ded6cd9106431288528c0d2c9425fb03f348f59419
+  # The control and data planes must run the same APISIX.
+  apisix: &apisix-image apache/apisix:3.19.0-debian@sha256:9a7e45dc943fbf10ec916d1232bae4cda9302ae28a4696cfb83c2da01d261141
+  apisix-dashboard: &apisix-dashboard-image apache/apisix-dashboard:3.0.1-alpine@sha256:b5fafc11b76f998269375192ac33efc992d72aa69bfd7f3eb2ca377906cdbb6d
+  node: &node-image node:26-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216
+  postgres: &postgres-image postgres:18-alpine@sha256:eaef288f54a90a909e49f0121d5d047a5e974e922699de4249625cf7cde34f36
+  # @feature:redis
+  redis: &redis-image redis:8-alpine@sha256:21090af93f8324db2f0f0f4f38a7c60369d47d917e000c3423d89d2ae2883537
+  valkey: &valkey-image valkey/valkey:9-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b
+  # @end:redis
+  # @feature:db-mysql
+  mysql: &mysql-image mysql:9@sha256:df90258da46f6e7ff8574ff84f17618aba0765cac749928299c69fd4e7cb8ad8
+  mariadb: &mariadb-image mariadb:12@sha256:d46e102fa8b9b72bfcdeb56f9dd538742092119dc8b11f31fe662605cd234cd9
+  # @end:db-mysql
+  # @feature:db-mongodb
+  mongodb: &mongodb-image mongo:7@sha256:8bb4442761a63a8dda452744082cdac9644b429807eb977b42324a63cef59ca4 # 8.0+ fails on kernel 6.19+ (SERVER-121912)
+  # @end:db-mongodb
+  # @feature:idp
+  keycloak: &keycloak-image quay.io/keycloak/keycloak:26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b
+  # @end:idp
+  # @feature:vault
+  vault: &vault-image hashicorp/vault:2.2.1@sha256:962a92876e168d68eaaa24b0b8b49bbce1cb63024060a67bba95cd158a366fc2
+  # @end:vault
+  # @feature:metrics
+  prometheus: &prometheus-image prom/prometheus:v3.16.0@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
+  loki: &loki-image grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28
+  alloy: &alloy-image grafana/alloy:v1.21.3@sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4
+  grafana: &grafana-image grafana/grafana:13.3.0@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205
+  # @end:metrics
+  # @feature:tracing
+  tempo: &tempo-image grafana/tempo:3.1.1@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044
+  # @end:tracing
+  # @feature:mail
+  mailpit: &mailpit-image axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
+  # @end:mail
+# What every APISIX plane (two control, two data) shares.
+x-apisix: &apisix
+  image: *apisix-image
+  restart: unless-stopped
+  group_add: ["1000"] # reads the cert keys (group 1000, mode 640)
+
+# One dashboard per gateway, both reached through the private gateway.
+x-apisix-dashboard: &apisix-dashboard
+  image: *apisix-dashboard-image
+  restart: unless-stopped
+  depends_on:
+    etcd: { condition: service_healthy }
+
+# How often a dependency is probed before others start.
+x-healthcheck: &healthcheck
+  interval: 3s
+  retries: 20
+
 services:
   certs:
     build: { context: ., target: certs }
@@ -61,7 +116,7 @@ services:
   # (apisix-seed, the dashboard); the data plane reads it and serves 443.
   # Every etcd connection is TLS with a client certificate.
   etcd:
-    image: quay.io/coreos/etcd:v3.6.8@sha256:b88bf32c663e2599bd3742ded6cd9106431288528c0d2c9425fb03f348f59419
+    image: *etcd-image
     restart: unless-stopped
     command:
       - etcd
@@ -99,8 +154,7 @@ services:
   # 127.0.0.2 is loopback on Linux; on macOS add it once:
   #   sudo ifconfig lo0 alias 127.0.0.2
   apisix-cp:
-    image: apache/apisix:3.19.0-debian@sha256:9a7e45dc943fbf10ec916d1232bae4cda9302ae28a4696cfb83c2da01d261141
-    restart: unless-stopped
+    <<: *apisix
     environment:
       APISIX_ADMIN_KEY: ${APISIX_ADMIN_KEY:-dev-admin-key-change-me}
       APISIX_ETCD_PREFIX: /apisix-public
@@ -108,25 +162,22 @@ services:
     volumes:
       - ./deploy/apisix/config-cp.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./certs:/certs:ro
-    group_add: ["1000"] # reads the cert keys (group 1000, mode 640)
     depends_on:
       etcd: { condition: service_healthy }
 
   apisix-private-cp:
-    image: apache/apisix:3.19.0-debian@sha256:9a7e45dc943fbf10ec916d1232bae4cda9302ae28a4696cfb83c2da01d261141
-    restart: unless-stopped
+    <<: *apisix
     environment:
       APISIX_ADMIN_KEY: ${APISIX_PRIVATE_ADMIN_KEY:-dev-private-admin-key-change-me}
       APISIX_ETCD_PREFIX: /apisix-private
     volumes:
       - ./deploy/apisix/config-cp.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./certs:/certs:ro
-    group_add: ["1000"]
     depends_on:
       etcd: { condition: service_healthy }
 
   apisix-seed:
-    image: node:26-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216
+    image: *node-image
     environment:
       APISIX_ADMIN_KEY: ${APISIX_ADMIN_KEY:-dev-admin-key-change-me}
       APISIX_PRIVATE_ADMIN_KEY: ${APISIX_PRIVATE_ADMIN_KEY:-dev-private-admin-key-change-me}
@@ -141,8 +192,7 @@ services:
       apisix-private-cp: { condition: service_started }
 
   apisix:
-    image: apache/apisix:3.19.0-debian@sha256:9a7e45dc943fbf10ec916d1232bae4cda9302ae28a4696cfb83c2da01d261141
-    restart: unless-stopped
+    <<: *apisix
     environment:
       APISIX_ETCD_PREFIX: /apisix-public
     ports:
@@ -154,7 +204,6 @@ services:
     volumes:
       - ./deploy/apisix/config-dp.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./certs:/certs:ro
-    group_add: ["1000"]
     # @feature:idp
     networks:
       default:
@@ -167,8 +216,7 @@ services:
       apisix-seed: { condition: service_completed_successfully }
 
   apisix-private:
-    image: apache/apisix:3.19.0-debian@sha256:9a7e45dc943fbf10ec916d1232bae4cda9302ae28a4696cfb83c2da01d261141
-    restart: unless-stopped
+    <<: *apisix
     environment:
       APISIX_ETCD_PREFIX: /apisix-private
     ports:
@@ -179,31 +227,23 @@ services:
     volumes:
       - ./deploy/apisix/config-dp.yaml:/usr/local/apisix/conf/config.yaml:ro
       - ./certs:/certs:ro
-    group_add: ["1000"]
     depends_on:
       etcd: { condition: service_healthy }
       apisix-seed: { condition: service_completed_successfully }
 
-  # One dashboard per gateway, both reached through the private gateway.
   apisix-dashboard:
-    image: apache/apisix-dashboard:3.0.1-alpine@sha256:b5fafc11b76f998269375192ac33efc992d72aa69bfd7f3eb2ca377906cdbb6d
-    restart: unless-stopped
+    <<: *apisix-dashboard
     # https://dashboard-public.express-boilerplate.len (admin/admin)
     volumes:
       - ./deploy/apisix/dashboard-public.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
       - ./certs:/certs:ro
-    depends_on:
-      etcd: { condition: service_healthy }
 
   apisix-private-dashboard:
-    image: apache/apisix-dashboard:3.0.1-alpine@sha256:b5fafc11b76f998269375192ac33efc992d72aa69bfd7f3eb2ca377906cdbb6d
-    restart: unless-stopped
+    <<: *apisix-dashboard
     # https://dashboard.express-boilerplate.len (admin/admin)
     volumes:
       - ./deploy/apisix/dashboard-private.yaml:/usr/local/apisix-dashboard/conf/conf.yaml:ro
       - ./certs:/certs:ro
-    depends_on:
-      etcd: { condition: service_healthy }
 
   app:
     build: { context: ., target: runtime }
@@ -288,7 +328,7 @@ services:
       # @end:idp
 
   postgres:
-    image: postgres:18-alpine@sha256:eaef288f54a90a909e49f0121d5d047a5e974e922699de4249625cf7cde34f36
+    image: *postgres-image
     environment:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
@@ -299,22 +339,20 @@ services:
       # Over TCP: the first-start init server listens on the socket only and
       # then restarts, so a socket check says ready too early.
       test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U app -d app"]
-      interval: 3s
-      retries: 20
+      <<: *healthcheck
 
   # @feature:redis
   redis:
-    image: redis:8-alpine@sha256:21090af93f8324db2f0f0f4f38a7c60369d47d917e000c3423d89d2ae2883537
+    image: *redis-image
     ports: ["6379:6379"]
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 3s
-      retries: 20
+      <<: *healthcheck
   # @end:redis
 
   # @feature:db-mysql
   mysql:
-    image: mysql:9@sha256:df90258da46f6e7ff8574ff84f17618aba0765cac749928299c69fd4e7cb8ad8
+    image: *mysql-image
     profiles: [mysql]
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -326,13 +364,13 @@ services:
     healthcheck:
       # 127.0.0.1, not localhost (the socket): the init server skips networking.
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uapp", "-papp"]
-      interval: 3s
+      <<: *healthcheck
       retries: 40
   # @end:db-mysql
 
   # @feature:db-mysql
   mariadb:
-    image: mariadb:12@sha256:d46e102fa8b9b72bfcdeb56f9dd538742092119dc8b11f31fe662605cd234cd9
+    image: *mariadb-image
     profiles: [mariadb]
     environment:
       MARIADB_ROOT_PASSWORD: root
@@ -343,13 +381,13 @@ services:
     volumes: [mariadb-data:/var/lib/mysql]
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      interval: 3s
+      <<: *healthcheck
       retries: 40
   # @end:db-mysql
 
   # @feature:db-mongodb
   mongodb:
-    image: mongo:7@sha256:8bb4442761a63a8dda452744082cdac9644b429807eb977b42324a63cef59ca4 # 8.0+ fails on kernel 6.19+ (SERVER-121912)
+    image: *mongodb-image
     profiles: [mongodb]
     environment:
       MONGO_INITDB_ROOT_USERNAME: app
@@ -358,25 +396,24 @@ services:
     volumes: [mongodb-data:/data/db]
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
-      interval: 3s
+      <<: *healthcheck
       retries: 40
   # @end:db-mongodb
 
   # @feature:redis
   valkey:
-    image: valkey/valkey:9-alpine@sha256:bf09d58e96d6b4524a15396b65b242bbe18beebbcc15a04d8ee75ddac62fae0b
+    image: *valkey-image
     profiles: [valkey]
     ports: ["6380:6379"]
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
-      interval: 3s
-      retries: 20
+      <<: *healthcheck
   # @end:redis
 
   # @feature:idp
   # --- Identity provider ---------------------------------------------------
   keycloak:
-    image: quay.io/keycloak/keycloak:26.8.2@sha256:3879c623248408de29a5303178b5816c77e8dfef3890c361f8c0bbeaa979ba3b
+    image: *keycloak-image
     profiles: [idp, full]
     command: ["start-dev", "--import-realm"]
     environment:
@@ -402,7 +439,7 @@ services:
   # @feature:vault
   # --- Secrets ---------------------------------------------------------------
   vault:
-    image: hashicorp/vault:2.2.1@sha256:962a92876e168d68eaaa24b0b8b49bbce1cb63024060a67bba95cd158a366fc2
+    image: *vault-image
     profiles: [vault, full]
     # Dev mode: in-memory, unsealed, KV v2 at secret/. Never for production.
     command: ["server", "-dev", "-dev-listen-address=0.0.0.0:8200"]
@@ -411,13 +448,12 @@ services:
     cap_add: [IPC_LOCK]
     healthcheck:
       test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
-      interval: 3s
-      retries: 20
+      <<: *healthcheck
   # @end:vault
 
   # @feature:vault
   vault-seed:
-    image: hashicorp/vault:2.2.1@sha256:962a92876e168d68eaaa24b0b8b49bbce1cb63024060a67bba95cd158a366fc2
+    image: *vault-image
     profiles: [vault, full]
     environment:
       VAULT_ADDR: http://vault:8200
@@ -440,7 +476,7 @@ services:
   # @feature:metrics
   # --- Observability -------------------------------------------------------
   prometheus:
-    image: prom/prometheus:v3.16.0@sha256:e04987641b57704f408e31f6373ba4138ecf27cb4a165d24aabb6c38fddd0f06
+    image: *prometheus-image
     profiles: [observability, full]
     volumes:
       - ./deploy/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
@@ -450,14 +486,14 @@ services:
 
   # @feature:metrics
   loki:
-    image: grafana/loki:3.7.9@sha256:0db216b630ae1f348a1584c67f3cead8b4c1fc839169a39501db664744158e28
+    image: *loki-image
     profiles: [observability, full]
     command: ["-config.file=/etc/loki/local-config.yaml"]
   # @end:metrics
 
   # @feature:tracing
   tempo:
-    image: grafana/tempo:3.1.1@sha256:64e2fbd56d9c2b3412a4b430a58ea59e91a670b1e75f920a0c702213ad145044
+    image: *tempo-image
     profiles: [observability, full]
     command: ["-config.file=/etc/tempo.yaml"]
     volumes:
@@ -466,7 +502,7 @@ services:
 
   # @feature:metrics
   alloy:
-    image: grafana/alloy:v1.21.3@sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4
+    image: *alloy-image
     profiles: [observability, full]
     command: ["run", "/etc/alloy/config.alloy"]
     volumes:
@@ -477,7 +513,7 @@ services:
 
   # @feature:metrics
   grafana:
-    image: grafana/grafana:13.3.0@sha256:488984b716c0862639f91a698adbe2862677a5a07bad42da5f03f3030883b205
+    image: *grafana-image
     profiles: [observability, full]
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
@@ -491,7 +527,7 @@ services:
   # @feature:mail
   # --- Mail ------------------------------------------------------------------
   mailpit:
-    image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
+    image: *mailpit-image
     profiles: [mail, full]
   # @end:mail
 

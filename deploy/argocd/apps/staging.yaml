@@ -39,9 +39,3 @@ spec:
         duration: 10s
         factor: 2
         maxDuration: 3m
-  # The HPA owns replicas; do not report them as drift.
-  ignoreDifferences:
-    - group: apps
-      kind: Deployment
-      jsonPointers:
-        - /spec/replicas

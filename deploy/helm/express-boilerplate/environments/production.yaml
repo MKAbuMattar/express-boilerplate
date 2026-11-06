@@ -1,9 +1,6 @@
 # Production: autoscaled, spread across zones, synced by hand in Argo CD.
-image:
-  # Pin an immutable digest for production, never a moving tag.
-  tag: ""
-  digest: ""
-
+# Set image.digest from your release pipeline: an immutable digest, never a
+# moving tag. Every other value not set here is the chart default.
 config:
   PUBLIC_URL: https://api.example.com
   CORS_ORIGINS: https://app.example.com
@@ -20,8 +17,6 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts: [api.example.com]
   tls:
     - secretName: express-boilerplate-production-tls
@@ -39,12 +34,6 @@ autoscaling:
   minReplicas: 3
   maxReplicas: 20
   targetCPUUtilizationPercentage: 65
-
-podDisruptionBudget:
-  enabled: true
-  maxUnavailable: 1
-
-priorityClassName: ""
 
 networkPolicy:
   enabled: true

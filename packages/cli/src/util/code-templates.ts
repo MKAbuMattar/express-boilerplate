@@ -1,6 +1,7 @@
 import type {AuthSpec} from '../model/auth.ts';
 import type {Field} from '../model/field.ts';
 import type {Names} from '../model/names.ts';
+import {AuthTemplates} from './auth-templates.ts';
 
 /** Kind of migration a name like create_orders_table asks for. */
 export type MigrationIntent =
@@ -23,8 +24,7 @@ export class CodeTemplates {
   }
 
   /** create_x_table, add_y_to_x, drop_y_from_x; anything else is blank. */
-  static migrationIntent(name: string): MigrationIntent {
-    const snake = name.replace(/-/g, '_');
+  static migrationIntent(snake: string): MigrationIntent {
     const create = /^create_([a-z0-9_]+)_table$/.exec(snake);
     if (create) return {kind: 'create', table: create[1]!};
     const add = /^add_([a-z0-9_]+?)_to_([a-z0-9_]+?)(?:_table)?$/.exec(snake);
@@ -186,7 +186,6 @@ import {
 @Controller(ApiConstants.V1_${n.constant})
 export class ${n.pascal}V1Resource {
   @OasTag('${n.pluralPascal}')
-
   @OasSummary('${n.pluralPascal} (JWT)')
   @OasResponse(HttpStatusCode.OK, OpenApiConstants.json('${n.pluralPascal}'))
   @OasResponse(
@@ -205,8 +204,7 @@ export class ${n.pascal}V1Resource {
 
   controllerTest(spec: AuthSpec, publicReads: boolean): string {
     const {n, scope} = this;
-    const anonymous =
-      spec.kind === 'jwt' || spec.kind === 'hmac' ? '[401]' : '[401, 501]';
+    const anonymous = AuthTemplates.anonymousStatuses(spec);
     if (publicReads || spec.kind !== 'jwt') {
       return `import request from 'supertest';
 import {describe, expect, it} from 'vitest';

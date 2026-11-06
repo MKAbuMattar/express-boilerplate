@@ -53,7 +53,6 @@ export class AuthenticationController {
 
   // @feature:auth-oidc
   @OasTag('Authentication')
-
   @OasSummary('Start OIDC login (redirects to the IdP)')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
@@ -78,7 +77,6 @@ export class AuthenticationController {
 
   // @feature:auth-oidc
   @OasTag('Authentication')
-
   @OasSummary('OIDC redirect URI')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
@@ -115,7 +113,6 @@ export class AuthenticationController {
 
   // @feature:auth-saml
   @OasTag('Authentication')
-
   @OasSummary('Start SAML login (redirects to the IdP)')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
@@ -130,7 +127,6 @@ export class AuthenticationController {
 
   // @feature:auth-saml
   @OasTag('Authentication')
-
   @OasSummary('SAML assertion consumer service (HTTP-POST)')
   @OasResponse(HttpStatusCode.FOUND, OpenApiConstants.REDIRECT)
   @OasResponse(
@@ -150,7 +146,6 @@ export class AuthenticationController {
 
   // @feature:auth-saml
   @OasTag('Authentication')
-
   @OasSummary('SAML service provider metadata')
   @OasResponse(HttpStatusCode.OK, OpenApiConstants.XML)
   @OasResponse(
@@ -165,15 +160,8 @@ export class AuthenticationController {
 
   // @feature:sso
   @OasTag('Authentication')
-
   @OasSummary('Current SSO session (OIDC or SAML)')
-  @OasResponse(
-    HttpStatusCode.OK,
-    OpenApiConstants.json(
-      'Authenticated principal',
-      OpenApiConstants.ref('Principal'),
-    ),
-  )
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.PRINCIPAL)
   @OasResponse(
     HttpStatusCode.UNAUTHORIZED,
     OpenApiConstants.problem('No session'),
@@ -187,7 +175,6 @@ export class AuthenticationController {
 
   // @feature:sso
   @OasTag('Authentication')
-
   @OasSummary('End the SSO session')
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
   @Post(ApiConstants.AUTH_LOGOUT)
@@ -201,7 +188,6 @@ export class AuthenticationController {
   // @end:sso
 
   @OasTag('Authentication')
-
   @OasSummary('Revoke the bearer JWT used for this call (API logout)')
   @OasSecurity({bearerAuth: []})
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)

@@ -5,7 +5,6 @@ import {
   readdirSync,
   readFileSync,
   rmSync,
-  statSync,
   writeFileSync,
 } from 'node:fs';
 import {basename, join, relative} from 'node:path';
@@ -87,7 +86,12 @@ export class ProjectServiceImpl extends ProjectService {
     enabled: Set<string>,
     name: string,
   ): void {
-    for (const file of ProjectServiceImpl.walk(root)) {
+    for (const entry of readdirSync(root, {
+      recursive: true,
+      withFileTypes: true,
+    })) {
+      if (!entry.isFile()) continue;
+      const file = join(entry.parentPath, entry.name);
       // The CLI's own source names the template it renames: leave it as is.
       if (
         CliConstants.UNTOUCHED.some((dir) =>
@@ -120,35 +124,33 @@ export class ProjectServiceImpl extends ProjectService {
   private static dropDependencies(folder: string, names: string[]): void {
     const file = join(folder, 'package.json');
     if (!existsSync(file)) return;
-    const pkg = JSON.parse(readFileSync(file, 'utf8')) as Record<
-      string,
-      Record<string, string> | undefined
-    >;
-    for (const field of ['dependencies', 'devDependencies']) {
-      for (const dependency of names) delete pkg[field]?.[dependency];
-    }
-    writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
+    ProjectServiceImpl.editJson(file, (pkg) => {
+      for (const field of ['dependencies', 'devDependencies']) {
+        const deps = pkg[field] as Record<string, string> | undefined;
+        for (const dependency of names) delete deps?.[dependency];
+      }
+    });
   }
 
   private static finishPackageJson(root: string, name: string): void {
-    const file = join(root, 'package.json');
-    const pkg = JSON.parse(readFileSync(file, 'utf8')) as Record<
+    ProjectServiceImpl.editJson(join(root, 'package.json'), (pkg) => {
+      pkg.name = name;
+      // Template links point at the template's repository, not this project.
+      for (const field of ['homepage', 'repository', 'bugs', 'author']) {
+        delete pkg[field];
+      }
+    });
+  }
+
+  private static editJson(
+    file: string,
+    change: (json: Record<string, unknown>) => void,
+  ): void {
+    const json = JSON.parse(readFileSync(file, 'utf8')) as Record<
       string,
       unknown
     >;
-    pkg.name = name;
-    // Template links point at the template's repository, not this project.
-    for (const field of ['homepage', 'repository', 'bugs', 'author']) {
-      delete pkg[field];
-    }
-    writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
-  }
-
-  private static *walk(dir: string): Generator<string> {
-    for (const entry of readdirSync(dir)) {
-      const path = join(dir, entry);
-      if (statSync(path).isDirectory()) yield* ProjectServiceImpl.walk(path);
-      else yield path;
-    }
+    change(json);
+    writeFileSync(file, `${JSON.stringify(json, null, 2)}\n`);
   }
 }

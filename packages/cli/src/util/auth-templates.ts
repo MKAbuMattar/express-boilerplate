@@ -50,6 +50,11 @@ export class AuthTemplates {
     return spec.kind === 'jwt' || spec.kind === 'hmac';
   }
 
+  /** What a caller without credentials gets: 501 where the method needs setup. */
+  static anonymousStatuses(spec: AuthSpec): string {
+    return AuthTemplates.canCall(spec) ? '[401]' : '[401, 501]';
+  }
+
   /**
    * Test setup for an authenticated caller holding `scopeExpr` (a TS
    * expression). Defines `as(scopes)` returning headers for a request.

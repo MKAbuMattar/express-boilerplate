@@ -33,7 +33,6 @@ export class NetworkV1Resource {
   ) {}
 
   @OasTag('Network')
-
   @OasSummary('ICMP ping a host (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasRequestBody({

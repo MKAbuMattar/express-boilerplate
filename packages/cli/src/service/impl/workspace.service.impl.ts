@@ -108,10 +108,7 @@ export class WorkspaceServiceImpl extends WorkspaceService {
       }
       if (where === 'import') {
         if (result.includes(what as string)) continue;
-        const imports = [...result.matchAll(/^import [\s\S]*?;\n/gm)];
-        const end = imports.at(-1);
-        const at = end ? end.index + end[0].length : 0;
-        result = `${result.slice(0, at)}${what as string}\n${result.slice(at)}`;
+        result = WorkspaceServiceImpl.afterImports(result, what as string);
         continue;
       }
       if (!where.test(result)) {
@@ -131,18 +128,26 @@ export class WorkspaceServiceImpl extends WorkspaceService {
     return result;
   }
 
+  /** Puts line after the last import, or at the top when there is none. */
+  private static afterImports(text: string, line: string): string {
+    const end = [...text.matchAll(/^import [\s\S]*?;\n/gm)].at(-1);
+    const at = end ? end.index + end[0].length : 0;
+    return `${text.slice(0, at)}${line}\n${text.slice(at)}`;
+  }
+
   /** Merges names into `import {...} from 'module'`, or adds that import. */
   private static named(text: string, spec: string): string {
     const [module = '', list = ''] = spec.split('|');
     const names = list.split(',').filter(Boolean);
-    const escaped = module.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
-    const pattern = new RegExp(`import \\{([^}]*)\\} from '${escaped}';`);
+    const pattern = new RegExp(
+      `import \\{([^}]*)\\} from '${RegExp.escape(module)}';`,
+    );
     const found = pattern.exec(text);
     if (!found) {
-      const imports = [...text.matchAll(/^import [\s\S]*?;\n/gm)];
-      const end = imports.at(-1);
-      const at = end ? end.index + end[0].length : 0;
-      return `${text.slice(0, at)}import {${names.join(', ')}} from '${module}';\n${text.slice(at)}`;
+      return WorkspaceServiceImpl.afterImports(
+        text,
+        `import {${names.join(', ')}} from '${module}';`,
+      );
     }
     const have = found[1]!
       .split(',')

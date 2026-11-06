@@ -4,18 +4,12 @@ import type {
   OpenApi3Dot1ResponseObject,
   OpenApi3Dot1SchemaObject,
 } from '@inversifyjs/open-api-types/v3Dot1';
+import {AuthStrategy} from '../enumeration/auth-strategy.enum.js';
+import {HealthStatus} from '../enumeration/health-status.enum.js';
+import {QueueConstants} from './queue.constants.js';
 
 /** Reusable OpenAPI blocks. Swagger UI shows no response panel without them. */
 export class OpenApiConstants {
-  static readonly ENVELOPE: OpenApi3Dot1SchemaObject = {
-    type: 'object',
-    properties: {
-      success: {type: 'boolean'},
-      message: {type: 'string'},
-      data: {},
-    },
-  };
-
   /** Reusable schemas, published under components.schemas. */
   static readonly SCHEMAS: Record<string, OpenApi3Dot1SchemaObject> = {
     Problem: {
@@ -95,26 +89,7 @@ export class OpenApiConstants {
       type: 'object',
       description: 'The authenticated caller.',
       properties: {
-        strategy: {
-          enum: [
-            // @feature:auth-mtls
-            'mtls',
-            // @end:auth-mtls
-            // @feature:auth-hmac
-            'hmac',
-            // @end:auth-hmac
-            'jwt',
-            // @feature:auth-oauth2
-            'oauth2',
-            // @end:auth-oauth2
-            // @feature:auth-oidc
-            'oidc',
-            // @end:auth-oidc
-            // @feature:auth-saml
-            'saml',
-            // @end:auth-saml
-          ],
-        },
+        strategy: {enum: Object.values(AuthStrategy)},
         subject: {type: 'string'},
         claims: {type: 'object', additionalProperties: true},
       },
@@ -130,13 +105,13 @@ export class OpenApiConstants {
       type: 'object',
       description: 'Health of the service and its dependencies.',
       properties: {
-        status: {enum: ['UP', 'DOWN', 'OUT_OF_SERVICE', 'UNKNOWN']},
+        status: {enum: Object.values(HealthStatus)},
         components: {
           type: 'object',
           additionalProperties: {
             type: 'object',
             properties: {
-              status: {enum: ['UP', 'DOWN', 'OUT_OF_SERVICE', 'UNKNOWN']},
+              status: {enum: Object.values(HealthStatus)},
               details: {type: 'object', additionalProperties: true},
             },
           },
@@ -271,12 +246,7 @@ export class OpenApiConstants {
     required: true,
     schema: {
       type: 'string',
-      enum: [
-        // @feature:mail
-        'welcome-email',
-        // @end:mail
-        'demo',
-      ],
+      enum: [...QueueConstants.NAMES],
     },
   };
 
@@ -300,42 +270,32 @@ export class OpenApiConstants {
     };
   }
 
-  static readonly CREATE_USER_BODY: OpenApi3Dot1RequestBodyObject = {
-    required: true,
-    content: {
-      'application/json': {
-        schema: {
-          type: 'object',
-          required: ['name', 'email', 'age'],
-          properties: {
-            name: {type: 'string', example: 'Alice'},
-            email: {
-              type: 'string',
-              format: 'email',
-              example: 'alice@example.com',
-            },
-            age: {type: 'integer', minimum: 0, maximum: 150, example: 42},
-          },
-        },
-      },
+  private static readonly CREATE_USER_SCHEMA: OpenApi3Dot1SchemaObject = {
+    type: 'object',
+    required: ['name', 'email', 'age'],
+    properties: {
+      name: {type: 'string', example: 'Alice'},
+      email: {type: 'string', format: 'email', example: 'alice@example.com'},
+      age: {type: 'integer', minimum: 0, maximum: 150, example: 42},
     },
   };
 
+  static readonly CREATE_USER_BODY: OpenApi3Dot1RequestBodyObject = {
+    required: true,
+    content: {
+      'application/json': {schema: OpenApiConstants.CREATE_USER_SCHEMA},
+    },
+  };
+
+  /** v2 adds an optional phone. */
   static readonly CREATE_USER_V2_BODY: OpenApi3Dot1RequestBodyObject = {
     required: true,
     content: {
       'application/json': {
         schema: {
-          type: 'object',
-          required: ['name', 'email', 'age'],
+          ...OpenApiConstants.CREATE_USER_SCHEMA,
           properties: {
-            name: {type: 'string', example: 'Alice'},
-            email: {
-              type: 'string',
-              format: 'email',
-              example: 'alice@example.com',
-            },
-            age: {type: 'integer', minimum: 0, maximum: 150, example: 42},
+            ...OpenApiConstants.CREATE_USER_SCHEMA.properties,
             phone: {type: 'string', example: '+962 7 9123 4567'},
           },
         },
@@ -348,4 +308,16 @@ export class OpenApiConstants {
       'application/json': {schema: {type: 'object', example: {amount: 10}}},
     },
   };
+
+  /** The three answers of every authenticated example route. */
+  static readonly PRINCIPAL = OpenApiConstants.json(
+    'Authenticated principal',
+    OpenApiConstants.ref('Principal'),
+  );
+  static readonly BAD_CREDENTIALS = OpenApiConstants.problem(
+    'Missing or invalid credentials',
+  );
+  static readonly NOT_CONFIGURED = OpenApiConstants.problem(
+    'Strategy not configured',
+  );
 }

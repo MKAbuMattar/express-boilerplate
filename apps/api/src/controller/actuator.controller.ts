@@ -23,6 +23,18 @@ import {inject} from 'inversify';
  *   /actuator/prometheus                    = /metrics (ops networks only)
  */
 class ActuatorResponses {
+  /** OpenAPI: a health group answering UP (200) or DOWN (503). */
+  static readonly UP = OpenApiConstants.raw(
+    'UP',
+    ActuatorConstants.MEDIA_TYPE,
+    OpenApiConstants.ref('ActuatorHealth'),
+  );
+  static readonly DOWN = OpenApiConstants.raw(
+    'DOWN',
+    ActuatorConstants.MEDIA_TYPE,
+    OpenApiConstants.ref('ActuatorHealth'),
+  );
+
   static send(response: ExpressResponse, body: object, status = 200): void {
     response
       .status(status)
@@ -50,56 +62,18 @@ export class ActuatorController {
   ) {}
 
   @OasTag('Actuator')
-
   @OasSummary('Actuator health: every indicator')
-
-  @OasResponse(
-    HttpStatusCode.OK,
-
-    OpenApiConstants.raw(
-      'UP',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
-
-  @OasResponse(
-    HttpStatusCode.SERVICE_UNAVAILABLE,
-
-    OpenApiConstants.raw(
-      'DOWN',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
+  @OasResponse(HttpStatusCode.OK, ActuatorResponses.UP)
+  @OasResponse(HttpStatusCode.SERVICE_UNAVAILABLE, ActuatorResponses.DOWN)
   @Get('/health')
   async health(@Response() response: ExpressResponse): Promise<void> {
     ActuatorResponses.health(response, await this.healthService.health('all'));
   }
 
   @OasTag('Actuator')
-
   @OasSummary('Actuator liveness group')
-
-  @OasResponse(
-    HttpStatusCode.OK,
-
-    OpenApiConstants.raw(
-      'UP',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
-
-  @OasResponse(
-    HttpStatusCode.SERVICE_UNAVAILABLE,
-
-    OpenApiConstants.raw(
-      'DOWN',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
+  @OasResponse(HttpStatusCode.OK, ActuatorResponses.UP)
+  @OasResponse(HttpStatusCode.SERVICE_UNAVAILABLE, ActuatorResponses.DOWN)
   @Get('/health/liveness')
   async liveness(@Response() response: ExpressResponse): Promise<void> {
     ActuatorResponses.health(
@@ -109,28 +83,9 @@ export class ActuatorController {
   }
 
   @OasTag('Actuator')
-
   @OasSummary('Actuator readiness group')
-
-  @OasResponse(
-    HttpStatusCode.OK,
-
-    OpenApiConstants.raw(
-      'UP',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
-
-  @OasResponse(
-    HttpStatusCode.SERVICE_UNAVAILABLE,
-
-    OpenApiConstants.raw(
-      'DOWN',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
+  @OasResponse(HttpStatusCode.OK, ActuatorResponses.UP)
+  @OasResponse(HttpStatusCode.SERVICE_UNAVAILABLE, ActuatorResponses.DOWN)
   @Get('/health/readiness')
   async readiness(@Response() response: ExpressResponse): Promise<void> {
     ActuatorResponses.health(
@@ -140,19 +95,15 @@ export class ActuatorController {
   }
 
   @OasTag('Actuator')
-
   @OasSummary('Actuator info: application and runtime')
-
   @OasResponse(
     HttpStatusCode.OK,
-
     OpenApiConstants.raw(
       'Application and runtime',
       ActuatorConstants.MEDIA_TYPE,
       {type: 'object'},
     ),
   )
-
   @OasResponse(
     HttpStatusCode.FORBIDDEN,
     OpenApiConstants.problem('Not an ops network'),
@@ -194,56 +145,18 @@ export class ProbeController {
   ) {}
 
   @OasTag('Actuator')
-
   @OasSummary('Health (alias of /actuator/health)')
-
-  @OasResponse(
-    HttpStatusCode.OK,
-
-    OpenApiConstants.raw(
-      'UP',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
-
-  @OasResponse(
-    HttpStatusCode.SERVICE_UNAVAILABLE,
-
-    OpenApiConstants.raw(
-      'DOWN',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
+  @OasResponse(HttpStatusCode.OK, ActuatorResponses.UP)
+  @OasResponse(HttpStatusCode.SERVICE_UNAVAILABLE, ActuatorResponses.DOWN)
   @Get('/healthz')
   async healthz(@Response() response: ExpressResponse): Promise<void> {
     ActuatorResponses.health(response, await this.healthService.health('all'));
   }
 
   @OasTag('Actuator')
-
   @OasSummary('Liveness probe (alias of /actuator/health/liveness)')
-
-  @OasResponse(
-    HttpStatusCode.OK,
-
-    OpenApiConstants.raw(
-      'UP',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
-
-  @OasResponse(
-    HttpStatusCode.SERVICE_UNAVAILABLE,
-
-    OpenApiConstants.raw(
-      'DOWN',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
+  @OasResponse(HttpStatusCode.OK, ActuatorResponses.UP)
+  @OasResponse(HttpStatusCode.SERVICE_UNAVAILABLE, ActuatorResponses.DOWN)
   @Get('/livez')
   async livez(@Response() response: ExpressResponse): Promise<void> {
     ActuatorResponses.health(
@@ -253,28 +166,9 @@ export class ProbeController {
   }
 
   @OasTag('Actuator')
-
   @OasSummary('Readiness probe (alias of /actuator/health/readiness)')
-
-  @OasResponse(
-    HttpStatusCode.OK,
-
-    OpenApiConstants.raw(
-      'UP',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
-
-  @OasResponse(
-    HttpStatusCode.SERVICE_UNAVAILABLE,
-
-    OpenApiConstants.raw(
-      'DOWN',
-      ActuatorConstants.MEDIA_TYPE,
-      OpenApiConstants.ref('ActuatorHealth'),
-    ),
-  )
+  @OasResponse(HttpStatusCode.OK, ActuatorResponses.UP)
+  @OasResponse(HttpStatusCode.SERVICE_UNAVAILABLE, ActuatorResponses.DOWN)
   @Get('/readyz')
   async readyz(@Response() response: ExpressResponse): Promise<void> {
     ActuatorResponses.health(

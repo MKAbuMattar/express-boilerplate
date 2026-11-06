@@ -7,7 +7,6 @@ import {
   readdirSync,
   readFileSync,
   rmSync,
-  statSync,
 } from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join, relative} from 'node:path';
@@ -115,8 +114,8 @@ export class FeatureServiceImpl extends FeatureService {
     next: string,
   ): FeatureFileChange[] {
     const paths = new Set([
-      ...FeatureServiceImpl.walk(base, base),
-      ...FeatureServiceImpl.walk(next, next),
+      ...FeatureServiceImpl.walk(base),
+      ...FeatureServiceImpl.walk(next),
     ]);
     const read = (dir: string, path: string) =>
       existsSync(join(dir, path)) ? readFileSync(join(dir, path)) : null;
@@ -127,9 +126,7 @@ export class FeatureServiceImpl extends FeatureService {
       const to = read(next, path);
       if (from && to && from.equals(to)) continue;
       const mine = read(root, path);
-      if (!from) {
-        result.push({path, action: mine ? 'merge' : 'create'});
-      } else if (!to) {
+      if (from && !to) {
         // Delete only what you never touched.
         result.push({path, action: mine?.equals(from) ? 'delete' : 'keep'});
       } else {
@@ -199,13 +196,10 @@ export class FeatureServiceImpl extends FeatureService {
     });
   }
 
-  private static *walk(dir: string, top: string): Generator<string> {
-    for (const entry of readdirSync(dir)) {
-      if (entry === 'node_modules') continue;
-      const path = join(dir, entry);
-      if (statSync(path).isDirectory())
-        yield* FeatureServiceImpl.walk(path, top);
-      else yield relative(top, path);
-    }
+  /** Every file under dir, relative to it (copies hold no node_modules). */
+  private static walk(dir: string): string[] {
+    return readdirSync(dir, {recursive: true, withFileTypes: true})
+      .filter((entry) => entry.isFile())
+      .map((entry) => relative(dir, join(entry.parentPath, entry.name)));
   }
 }

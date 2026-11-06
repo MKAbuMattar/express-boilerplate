@@ -16,7 +16,6 @@ export class WellKnownController {
   constructor(@inject(JwtKeys) private readonly keys: JwtKeys) {}
 
   @OasTag('Discovery')
-
   @OasSummary('Public keys that verify this service JWTs (ES256 only)')
   @OasResponse(
     HttpStatusCode.OK,

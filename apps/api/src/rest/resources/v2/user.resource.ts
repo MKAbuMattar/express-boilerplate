@@ -62,7 +62,6 @@ export class UserV2Resource {
   constructor(@inject(UserService) private readonly userService: UserService) {}
 
   @OasTag('Users v2')
-
   @OasSummary('List users, paged and searchable (public)')
   @OasParameter({
     name: 'page',
@@ -110,7 +109,6 @@ export class UserV2Resource {
   }
 
   @OasTag('Users v2')
-
   @OasSummary('QUERY: search with criteria in the body (safe, idempotent)')
   @OasRequestBody({
     content: {
@@ -152,7 +150,6 @@ export class UserV2Resource {
   }
 
   @OasTag('Users v2')
-
   @OasSummary('Get a user by id (public)')
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasResponse(
@@ -174,7 +171,6 @@ export class UserV2Resource {
   }
 
   @OasTag('Users v2')
-
   @OasSummary('Create a user with an optional phone (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasRequestBody(OpenApiConstants.CREATE_USER_V2_BODY)
@@ -204,7 +200,6 @@ export class UserV2Resource {
   }
 
   @OasTag('Users v2')
-
   @OasSummary('Replace a user, or create it at this id (JWT, idempotent)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
@@ -246,7 +241,6 @@ export class UserV2Resource {
   }
 
   @OasTag('Users v2')
-
   @OasSummary('Change some fields of a user (JWT)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
@@ -286,7 +280,6 @@ export class UserV2Resource {
   }
 
   @OasTag('Users v2')
-
   @OasSummary('Delete a user (JWT, idempotent)')
   @OasSecurity({bearerAuth: []})
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)

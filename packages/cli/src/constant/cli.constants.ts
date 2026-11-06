@@ -106,6 +106,13 @@ Create options:
 
   static readonly DEFAULT_PRESET = 'standard';
   static readonly DEFAULT_FIELDS = 'name:string';
+  /** The create wizard's first question, in the CLI and the app. */
+  static readonly PRESET_CHOICES = [
+    {label: 'standard (recommended)', value: 'standard'},
+    {label: 'minimal: core only', value: 'minimal'},
+    {label: 'full: everything', value: 'full'},
+    {label: 'custom: pick each one', value: 'custom'},
+  ];
   static readonly FIELD_TYPES = ['string', 'text', 'int', 'boolean'] as const;
   static readonly RESERVED_FIELDS: readonly string[] = [
     'id',

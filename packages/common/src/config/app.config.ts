@@ -12,6 +12,8 @@ export class AppConfig {
   readonly hmacClients: ReadonlyMap<string, string>;
   // @end:auth-hmac
   readonly corsOrigins: string[];
+  /** Origins that may send credentials: PUBLIC_URL's and CORS_ORIGINS. */
+  readonly allowedOrigins: ReadonlySet<string>;
   // @feature:experiments
   readonly experiments: ReadonlyMap<string, number>;
   // @end:experiments
@@ -27,6 +29,10 @@ export class AppConfig {
   constructor(source: NodeJS.ProcessEnv = process.env) {
     this.env = AppConfig.read(source);
     this.corsOrigins = AppConfig.list(this.env.CORS_ORIGINS);
+    this.allowedOrigins = new Set([
+      new URL(this.env.PUBLIC_URL).origin,
+      ...this.corsOrigins,
+    ]);
     // @feature:auth-hmac
     this.hmacClientScopes = AppConfig.scopeMap(this.env.HMAC_CLIENT_SCOPES);
     // @end:auth-hmac

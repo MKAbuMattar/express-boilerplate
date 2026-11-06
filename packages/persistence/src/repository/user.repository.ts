@@ -57,7 +57,7 @@ export class UserRepository {
   private searchWhere(search: string): FindOptionsWhere<UserEntity>[] {
     // @feature:db-mongodb
     if (EntityIds.isMongo) {
-      const pattern = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = RegExp.escape(search);
       return [
         {name: {$regex: pattern, $options: 'i'}},
         {email: {$regex: pattern, $options: 'i'}},

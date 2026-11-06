@@ -46,6 +46,15 @@ export class FeatureManifest {
     return new FeatureManifest(file);
   }
 
+  /** The features a person picks from; internal ones come with others. */
+  choices(
+    keep: (feature: Feature) => boolean = () => true,
+  ): {value: string; label: string}[] {
+    return this.features
+      .filter((f) => f.group !== 'internal' && keep(f))
+      .map((f) => ({value: f.id, label: `${f.group.padEnd(9)} ${f.title}`}));
+  }
+
   get(id: string): Feature {
     const feature = this.features.find((f) => f.id === id);
     if (!feature) {

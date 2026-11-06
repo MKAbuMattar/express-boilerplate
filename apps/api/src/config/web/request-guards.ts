@@ -3,7 +3,7 @@ import {BlockList, isIPv4, isIPv6} from 'node:net';
 import type {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import type {CacheStore} from '@express-boilerplate/common/config/cache/cache-store.js';
 import {ProblemDetails} from '@express-boilerplate/common/exceptions/problem-details.js';
-import type {Request, RequestHandler, Response} from 'express';
+import type {RequestHandler, Response} from 'express';
 import type {Logger} from 'pino';
 
 /**
@@ -63,7 +63,6 @@ export class RequestGuards {
         response,
         host ? 421 : 400,
         host ? 'Unknown host' : 'Missing Host header',
-        request.originalUrl,
       );
     };
   }
@@ -76,10 +75,7 @@ export class RequestGuards {
    * is exempt: the IdP posts to it cross-site by design.
    */
   static crossSite(config: AppConfig): RequestHandler {
-    const allowed = new Set([
-      new URL(config.env.PUBLIC_URL).origin,
-      ...config.corsOrigins,
-    ]);
+    const allowed = config.allowedOrigins;
     return (request, response, next) => {
       if (RequestGuards.SAFE_METHODS.has(request.method)) return next();
       // @feature:auth-saml
@@ -96,12 +92,7 @@ export class RequestGuards {
             !originAllowed &&
             request.headers.cookie !== undefined;
       if (!crossSite) return next();
-      ProblemDetails.send(
-        response,
-        403,
-        'Cross-site request blocked',
-        request.originalUrl,
-      );
+      ProblemDetails.send(response, 403, 'Cross-site request blocked');
     };
   }
 
@@ -130,12 +121,7 @@ export class RequestGuards {
       );
       const type = isIPv4(ip) ? 'ipv4' : 'ipv6';
       if (ip && list.check(ip, type)) return next();
-      ProblemDetails.send(
-        response,
-        403,
-        'Not allowed from this network',
-        request.originalUrl,
-      );
+      ProblemDetails.send(response, 403, 'Not allowed from this network');
     };
   }
 
@@ -157,7 +143,6 @@ export class RequestGuards {
             response,
             400,
             `JSON too complex (max depth ${JSON_MAX_DEPTH}, max ${JSON_MAX_NODES} values)`,
-            request.originalUrl,
           );
           return;
         }
@@ -177,18 +162,14 @@ export class RequestGuards {
    */
   static deadline(config: AppConfig): RequestHandler {
     const ms = config.env.HTTP_HANDLER_TIMEOUT_MS;
-    return (request, response, next) => {
+    // _request: with SSE cut by the generator, nothing else reads it.
+    return (_request, response, next) => {
       // @feature:sse
-      if (String(request.headers.accept).includes('text/event-stream'))
+      if (String(response.req.headers.accept).includes('text/event-stream'))
         return next();
       // @end:sse
       const timer = setTimeout(() => {
-        ProblemDetails.send(
-          response,
-          503,
-          'Request timed out',
-          request.originalUrl,
-        );
+        ProblemDetails.send(response, 503, 'Request timed out');
       }, ms);
       const clear = () => clearTimeout(timer);
       response.on('finish', clear);
@@ -276,7 +257,6 @@ export class RequestGuards {
           response,
           400,
           'Idempotency-Key must be 1 to 255 visible characters',
-          request.originalUrl,
         );
         return;
       }
@@ -294,12 +274,7 @@ export class RequestGuards {
       try {
         const saved = await store.get(storeKey);
         if (saved) {
-          RequestGuards.replay(
-            request,
-            response,
-            JSON.parse(saved),
-            fingerprint,
-          );
+          RequestGuards.replay(response, JSON.parse(saved), fingerprint);
           return;
         }
         if (!(await store.setIfAbsent(`${storeKey}:lock`, '1', 60))) {
@@ -307,7 +282,6 @@ export class RequestGuards {
             response,
             409,
             'A request with this Idempotency-Key is in progress',
-            request.originalUrl,
           );
           return;
         }
@@ -316,7 +290,6 @@ export class RequestGuards {
           response,
           503,
           'Idempotency store unavailable, retry later',
-          request.originalUrl,
         );
         return;
       }
@@ -355,7 +328,6 @@ export class RequestGuards {
   }
 
   private static replay(
-    request: Request,
     response: Response,
     saved: {
       fingerprint: string;
@@ -370,7 +342,6 @@ export class RequestGuards {
         response,
         422,
         'Idempotency-Key was already used for a different request',
-        request.originalUrl,
       );
       return;
     }

@@ -32,11 +32,7 @@ export class GeneratorServiceImpl extends GeneratorService {
     this.workspace = workspace;
   }
 
-  /** The project being planned for; set at the start of each plan(). */
-  private root = '';
-
   plan(kind: string, root: string, options: GenerateOptions): Plan {
-    this.root = root;
     if (!(kind in CliConstants.GENERATORS)) {
       const kinds = Object.keys(CliConstants.GENERATORS).join(', ');
       throw new Error(`Unknown kind "${kind}". Kinds: ${kinds}`);
@@ -54,7 +50,7 @@ export class GeneratorServiceImpl extends GeneratorService {
 
     switch (kind) {
       case 'resource':
-        this.entity(plan, r, n, true);
+        this.entity(plan, root, r, n, true);
         plan.create(`${P}/repository/${n.kebab}.repository.ts`, r.repository());
         plan.create(`${S}/dto/create-${n.kebab}.dto.ts`, r.createDto());
         this.service(plan, n, r.contract(), r.impl());
@@ -90,7 +86,7 @@ export class GeneratorServiceImpl extends GeneratorService {
         );
         break;
       case 'entity':
-        this.entity(plan, r, n, options.migration);
+        this.entity(plan, root, r, n, options.migration);
         if (options.repository) {
           plan.create(
             `${P}/repository/${n.kebab}.repository.ts`,
@@ -301,24 +297,12 @@ export class GeneratorServiceImpl extends GeneratorService {
     if (options.scope && !isPublic) {
       const value = options.scope;
       const existing = new RegExp(
-        `static readonly (\\w+) = '${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}';`,
+        `static readonly (\\w+) = '${RegExp.escape(value)}';`,
       ).exec(scopeConstants);
       const constant =
         existing?.[1] ?? value.toUpperCase().replace(/[^A-Z0-9]+/g, '_');
       scopeRef = {value, constant};
-      if (!existing) {
-        plan.edit(
-          `${C}/constant/scope.constants.ts`,
-          [
-            /(\n {2}static readonly USERS_WRITE = [^\n]*)/,
-            (m) => `${m}\n  static readonly ${constant} = '${value}';`,
-          ],
-          [
-            /(\n {4}ScopeConstants\.USERS_WRITE,)/,
-            (m) => `${m}\n    ScopeConstants.${constant},`,
-          ],
-        );
-      }
+      if (!existing) GeneratorServiceImpl.addScope(plan, constant, value);
     }
     const e: Endpoint = {
       action,
@@ -406,6 +390,7 @@ export class GeneratorServiceImpl extends GeneratorService {
 
   private entity(
     plan: Plan,
+    root: string,
     r: ResourceTemplates,
     n: Names,
     withMigration: boolean,
@@ -435,7 +420,7 @@ export class GeneratorServiceImpl extends GeneratorService {
     // create-table migration for the same table would fail.
     if (
       withMigration &&
-      this.workspace.exists(this.root, `${P}/model/${n.kebab}.entity.ts`)
+      this.workspace.exists(root, `${P}/model/${n.kebab}.entity.ts`)
     ) {
       plan.note(
         'Kept the existing migration; add one with eb g migration if the columns changed.',
@@ -534,17 +519,10 @@ export class GeneratorServiceImpl extends GeneratorService {
         `${m}\n  static readonly V1_${n.constant} = \`\${ApiConstants.API_V1}/${n.plural}\`;`,
     ]);
     if (withScope) {
-      plan.edit(
-        `${C}/constant/scope.constants.ts`,
-        [
-          /(\n {2}static readonly USERS_WRITE = [^\n]*)/,
-          (m) =>
-            `${m}\n  static readonly ${n.constant}_WRITE = '${n.plural}:write';`,
-        ],
-        [
-          /(\n {4}ScopeConstants\.USERS_WRITE,)/,
-          (m) => `${m}\n    ScopeConstants.${n.constant}_WRITE,`,
-        ],
+      GeneratorServiceImpl.addScope(
+        plan,
+        `${n.constant}_WRITE`,
+        `${n.plural}:write`,
       );
     }
     plan.edit(`${A}/config/openapi.config.ts`, [
@@ -552,5 +530,20 @@ export class GeneratorServiceImpl extends GeneratorService {
       (m) =>
         `${m}\n    {name: '${n.pluralPascal}', description: '${n.pluralPascal} (generated).'},`,
     ]);
+  }
+
+  /** A scope constant, and its place in ScopeConstants.ALL. */
+  private static addScope(plan: Plan, constant: string, value: string): void {
+    plan.edit(
+      `${GeneratorServiceImpl.C}/constant/scope.constants.ts`,
+      [
+        /(\n {2}static readonly USERS_WRITE = [^\n]*)/,
+        (m) => `${m}\n  static readonly ${constant} = '${value}';`,
+      ],
+      [
+        /(\n {4}ScopeConstants\.USERS_WRITE,)/,
+        (m) => `${m}\n    ScopeConstants.${constant},`,
+      ],
+    );
   }
 }

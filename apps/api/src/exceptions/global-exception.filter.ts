@@ -44,25 +44,16 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
   ) {}
 
   catch(error: unknown, request: Request, response: Response): void {
-    const instance = request.originalUrl;
     if (isHttpResponse(error)) {
       const headers = (error as {headers?: Record<string, string>}).headers;
-      ProblemDetails.send(
-        response,
-        error.statusCode,
-        error.body,
-        instance,
-        headers,
-      );
+      ProblemDetails.send(response, error.statusCode, error.body, headers);
       return;
     }
     if (error instanceof DomainException) {
-      ProblemDetails.send(
-        response,
-        GlobalErrorFilter.domainStatus(error),
-        {message: error.message, data: error.fields},
-        instance,
-      );
+      ProblemDetails.send(response, GlobalErrorFilter.domainStatus(error), {
+        message: error.message,
+        data: error.fields,
+      });
       return;
     }
     this.appLogger.logger.error(
@@ -70,10 +61,10 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
       'Unhandled error',
     );
     if (this.isUnavailable(error)) {
-      ProblemDetails.send(response, 503, 'Service Unavailable', instance);
+      ProblemDetails.send(response, 503, 'Service Unavailable');
       return;
     }
-    ProblemDetails.send(response, 500, 'Internal Server Error', instance);
+    ProblemDetails.send(response, 500, 'Internal Server Error');
   }
 
   /** instanceof, so a subclass such as OrderNotFound maps like its parent. */

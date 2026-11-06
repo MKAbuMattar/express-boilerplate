@@ -86,7 +86,6 @@ export class Application {
     await this.beans.getBean(JobRegistry).start();
 
     const app = express();
-    let built: express.Application = app;
     app.disable('x-powered-by');
     app.set('trust proxy', config.trustProxy);
     // Flat query strings only: no nested objects, so no qs prototype tricks.
@@ -134,7 +133,7 @@ export class Application {
     // @end:metrics
     app.use(RequestGuards.hostValidation(config));
     app.use(RateLimiter.middleware(config, store));
-    app.use(HttpSemantics.options(() => built));
+    app.use(HttpSemantics.options());
     app.use(
       cors({
         origin: config.corsOrigins.length > 0 ? config.corsOrigins : false,
@@ -177,8 +176,8 @@ export class Application {
       app,
     );
     adapter.useGlobalFilters(GlobalErrorFilter);
-    built = await adapter.build();
-    built.use(HttpSemantics.notFound(() => built));
+    const built = await adapter.build();
+    built.use(HttpSemantics.notFound());
     built.use(HttpSemantics.errorHandler());
     return built;
   }

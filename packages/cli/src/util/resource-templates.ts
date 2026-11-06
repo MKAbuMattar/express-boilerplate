@@ -271,10 +271,6 @@ ${this.fields.map((f) => `      entity.${f.name},`).join('\n')}
       new Date(entity.updatedAt).toISOString(),
     );
   }
-
-  static toDtoList(entities: ${n.pascal}Entity[]): ${n.pascal}V1Dto[] {
-    return entities.map((entity) => ${n.pascal}Converter.toDto(entity));
-  }
 }
 `;
   }
@@ -331,7 +327,7 @@ export class ${n.pascal}V1Resource {
     type: 'object',
     properties: {
       id: {type: 'string', format: 'uuid'},
-${properties.replace(/^ {6}/gm, '      ')}
+${properties}
       createdAt: {type: 'string', format: 'date-time'},
       updatedAt: {type: 'string', format: 'date-time'},
     },
@@ -356,7 +352,6 @@ ${properties.replace(/^ {6}/gm, '            ')}
   ) {}
 
   @OasTag('${tag}')
-
   @OasSummary('List ${n.plural} (JWT)')
   @OasResponse(
     HttpStatusCode.OK,
@@ -374,11 +369,10 @@ ${properties.replace(/^ {6}/gm, '            ')}
   @Get()
   async list(): Promise<ApiResponse<${n.pascal}V1Dto[]>> {
     const all = await this.service.findAll();
-    return ApiResponse.ok('${tag} found', ${n.pascal}Converter.toDtoList(all));
+    return ApiResponse.ok('${tag} found', all.map((e) => ${n.pascal}Converter.toDto(e)));
   }
 
   @OasTag('${tag}')
-
   @OasSummary('Get a ${n.kebab} by id (JWT)')
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasResponse(
@@ -400,7 +394,6 @@ ${properties.replace(/^ {6}/gm, '            ')}
   }
 
   @OasTag('${tag}')
-
   @OasSummary('Create a ${n.kebab} (JWT, ${n.plural}:write)')
   @OasRequestBody(${n.pascal}V1Resource.BODY)
   @OasResponse(
@@ -422,7 +415,6 @@ ${properties.replace(/^ {6}/gm, '            ')}
   }
 
   @OasTag('${tag}')
-
   @OasSummary('Replace a ${n.kebab} (JWT, ${n.plural}:write)')
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasRequestBody(${n.pascal}V1Resource.BODY)
@@ -446,7 +438,6 @@ ${properties.replace(/^ {6}/gm, '            ')}
   }
 
   @OasTag('${tag}')
-
   @OasSummary('Delete a ${n.kebab} (JWT, ${n.plural}:write)')
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
@@ -486,8 +477,7 @@ ${properties.replace(/^ {6}/gm, '            ')}
     const body = (v: number) =>
       `{${this.fields.map((f) => `${f.name}: ${this.sample(f, v)}`).join(', ')}}`;
     const first = this.fields[0]!;
-    const anonymous =
-      spec.kind === 'jwt' || spec.kind === 'hmac' ? '[401]' : '[401, 501]';
+    const anonymous = AuthTemplates.anonymousStatuses(spec);
     const head = `import {ScopeConstants} from '${scope}/common/constant/scope.constants.js';
 ${AuthTemplates.canCall(spec) ? AuthTemplates.testSetup(spec, scope, write).imports : ''}
 import type express from 'express';

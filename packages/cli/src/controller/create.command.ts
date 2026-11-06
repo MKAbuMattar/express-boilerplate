@@ -1,9 +1,9 @@
 import {readFileSync} from 'node:fs';
 import {basename, resolve} from 'node:path';
 import {CliConstants} from '../constant/cli.constants.ts';
-import type {CreateConfig} from '../model/create-options.ts';
+import type {CreateConfig, CreateOptions} from '../model/create-options.ts';
 import {FeatureManifest} from '../model/feature-manifest.ts';
-import type {ProgressService} from '../service/progress.service.ts';
+import type {ProgressService, Task} from '../service/progress.service.ts';
 import type {ProjectService} from '../service/project.service.ts';
 import type {PromptService} from '../service/prompt.service.ts';
 import type {TemplateService} from '../service/template.service.ts';
@@ -89,24 +89,48 @@ export class CreateCommand {
       return;
     }
 
-    await this.progress.run([
+    const project = {source, target, name, enabled, manifest};
+    await this.progress.run(
+      CreateCommand.tasks(this.projects, project, folder, install),
+    );
+    this.progress.summary(
+      `Created ${name}`,
+      CreateCommand.nextSteps(project, folder, install),
+    );
+  }
+
+  /** Write, then install and format unless told not to. */
+  static tasks(
+    projects: ProjectService,
+    project: CreateOptions,
+    folder: string,
+    install: boolean,
+  ): Task[] {
+    const {target} = project;
+    return [
       {
-        title: `Write ${folder} (${enabled.size} features)`,
-        run: () =>
-          this.projects.create({source, target, name, enabled, manifest}),
+        title: `Write ${folder} (${project.enabled.size} features)`,
+        run: () => projects.create(project),
       },
       ...(install
         ? [
             {
               title: 'Install dependencies',
-              run: () => this.projects.install(target),
+              run: () => projects.install(target),
             },
-            {title: 'Format', run: () => this.projects.format(target)},
+            {title: 'Format', run: () => projects.format(target)},
           ]
         : []),
-    ]);
-    this.progress.summary(`Created ${name}`, [
-      `Features: ${chosen}`,
+    ];
+  }
+
+  static nextSteps(
+    {name, enabled}: CreateOptions,
+    folder: string,
+    install: boolean,
+  ): string[] {
+    return [
+      `Features: ${[...enabled].sort().join(', ') || 'core only'}`,
       '',
       `cd ${folder}`,
       ...(install
@@ -114,8 +138,8 @@ export class CreateCommand {
         : ['pnpm install --no-frozen-lockfile && pnpm lint:fix']),
       `pnpm certs   local CA and *.${name}.len certificate (prints the hosts line)`,
       `pnpm dev     https://api.${name}.len/docs on port 443`,
-      'pnpm eb generate resource <name>   add a resource',
-    ]);
+      'pnpm eb      generate code, add or remove features',
+    ];
   }
 
   private async selection(
@@ -126,18 +150,14 @@ export class CreateCommand {
     if (options.features) return options.features;
     if (options.preset) return manifest.preset(options.preset);
     if (!ask) return manifest.preset(CliConstants.DEFAULT_PRESET);
-    const preset = await this.prompts.select('Which features?', [
-      {label: 'standard (recommended)', value: 'standard'},
-      {label: 'minimal: core only', value: 'minimal'},
-      {label: 'full: everything', value: 'full'},
-      {label: 'custom: pick each one', value: 'custom'},
-    ]);
+    const preset = await this.prompts.select(
+      'Which features?',
+      CliConstants.PRESET_CHOICES,
+    );
     if (preset !== 'custom') return manifest.preset(preset);
     return this.prompts.multiSelect(
       'Pick the features',
-      manifest.features
-        .filter((f) => f.group !== 'internal')
-        .map((f) => ({label: `${f.group.padEnd(9)} ${f.title}`, value: f.id})),
+      manifest.choices(),
       manifest.defaults(),
     );
   }
@@ -152,7 +172,7 @@ export class CreateCommand {
     return name;
   }
 
-  private static validName(raw: string): string | null {
+  static validName(raw: string): string | null {
     return /[a-z0-9]/i.test(raw) ? null : 'Use letters or digits';
   }
 

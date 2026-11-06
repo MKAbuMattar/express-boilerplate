@@ -6,6 +6,7 @@ import {Component} from '../../config/stereotypes.js';
 import {SecurityConstants} from '../../constant/security.constants.js';
 import {AuthStrategy} from '../../enumeration/auth-strategy.enum.js';
 import {AuthException} from '../../exceptions/auth.exception.js';
+import {Principal} from '../principal.js';
 import {JwtKeys} from './jwt-keys.js';
 import {TokenRevocation} from './token-revocation.js';
 
@@ -64,5 +65,11 @@ export class TokenProvider {
   /** Revokes a validated token until it would have expired anyway. */
   async revoke(payload: JWTPayload): Promise<void> {
     await this.revocation.revoke(String(payload.jti), Number(payload.exp));
+  }
+
+  /** The caller behind a valid token; throws like validateToken. */
+  async authenticate(token: string): Promise<Principal> {
+    const payload = await this.validateToken(token);
+    return new Principal(AuthStrategy.Jwt, payload.sub ?? '', payload);
   }
 }

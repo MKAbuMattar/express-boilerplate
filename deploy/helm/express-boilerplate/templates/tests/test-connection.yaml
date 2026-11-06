@@ -14,7 +14,7 @@ spec:
   restartPolicy: Never
   automountServiceAccountToken: false
   securityContext:
-    {{- include "eb.podSecurityContext" . | nindent 4 }}
+    {{- toYaml .Values.podSecurityContext | nindent 4 }}
   containers:
     - name: livez
       image: {{ include "eb.image" . }}
@@ -32,7 +32,7 @@ spec:
         requests: {cpu: 10m, memory: 32Mi}
         limits: {memory: 128Mi}
       securityContext:
-        {{- include "eb.containerSecurityContext" . | nindent 8 }}
+        {{- toYaml .Values.securityContext | nindent 8 }}
       volumeMounts:
         - name: tls
           mountPath: /etc/tls

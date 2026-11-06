@@ -31,8 +31,4 @@ export class EventBus {
     this.emitter.on('event', safe);
     return () => this.emitter.off('event', safe);
   }
-
-  get subscriberCount(): number {
-    return this.emitter.listenerCount('event');
-  }
 }

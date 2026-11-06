@@ -2,6 +2,7 @@ import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import {Service} from '@express-boilerplate/common/config/stereotypes.js';
 import {ActuatorConstants} from '@express-boilerplate/common/constant/actuator.constants.js';
 import {HealthStatus} from '@express-boilerplate/common/enumeration/health-status.enum.js';
+import {Timeouts} from '@express-boilerplate/common/util/timeouts.js';
 import {DataSource} from '@express-boilerplate/persistence/config/database.config.js';
 import {inject} from 'inversify';
 import {Health, HealthReport} from '../../model/health.js';
@@ -76,22 +77,16 @@ export class HealthServiceImpl extends HealthService {
 
   /** Never throws and never waits past the timeout: a hung check is DOWN. */
   private static async run(indicator: HealthIndicator): Promise<Health> {
-    const ms = ActuatorConstants.INDICATOR_TIMEOUT_MS;
-    let timer: NodeJS.Timeout | undefined;
-    const timeout = new Promise<Health>((resolve) => {
-      timer = setTimeout(
-        () => resolve(Health.down({error: `timed out after ${ms} ms`})),
-        ms,
-      );
-    });
     try {
-      return await Promise.race([indicator.check(), timeout]);
+      return await Timeouts.within(
+        indicator.check(),
+        ActuatorConstants.INDICATOR_TIMEOUT_MS,
+        'check',
+      );
     } catch (error) {
       return Health.down({
         error: error instanceof Error ? error.message : String(error),
       });
-    } finally {
-      clearTimeout(timer);
     }
   }
 }

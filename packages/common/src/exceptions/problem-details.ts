@@ -69,15 +69,15 @@ export class ProblemDetails {
     return ProblemDetails.STATUS_HEADERS[status] ?? {};
   }
 
+  /** The instance is the request's own URL. */
   static send(
     response: Response,
     status: number,
     body: unknown,
-    instance: string,
     headers: Record<string, string> = {},
   ): void {
     if (response.headersSent) return;
-    const problem = ProblemDetails.from(status, body, instance);
+    const problem = ProblemDetails.from(status, body, response.req.originalUrl);
     const requestId = response.getHeader('X-Request-Id');
     if (typeof requestId === 'string') problem.requestId = requestId;
     response

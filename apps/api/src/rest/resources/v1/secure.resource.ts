@@ -38,23 +38,10 @@ export class SecureV1Resource {
 
   // @feature:auth-mtls
   @OasTag('Auth examples')
-
   @OasSummary('Mutual TLS client certificate')
-  @OasResponse(
-    HttpStatusCode.OK,
-    OpenApiConstants.json(
-      'Authenticated principal',
-      OpenApiConstants.ref('Principal'),
-    ),
-  )
-  @OasResponse(
-    HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.problem('Missing or invalid credentials'),
-  )
-  @OasResponse(
-    HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.problem('Strategy not configured'),
-  )
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.PRINCIPAL)
+  @OasResponse(HttpStatusCode.UNAUTHORIZED, OpenApiConstants.BAD_CREDENTIALS)
+  @OasResponse(HttpStatusCode.NOT_IMPLEMENTED, OpenApiConstants.NOT_CONFIGURED)
   @UseGuard(MtlsGuard)
   @Get('/mtls')
   mtls(@Request() request: ExpressRequest): ApiResponse<Principal> {
@@ -64,7 +51,6 @@ export class SecureV1Resource {
 
   // @feature:auth-hmac
   @OasTag('Auth examples')
-
   @OasSummary('HMAC-SHA256 signed request')
   @OasParameter(
     OpenApiConstants.header('X-Client-Id', 'Client id from HMAC_CLIENTS'),
@@ -74,21 +60,9 @@ export class SecureV1Resource {
     OpenApiConstants.header('X-Signature', 'hex HMAC-SHA256, see README'),
   )
   @OasRequestBody(OpenApiConstants.ANY_JSON_BODY)
-  @OasResponse(
-    HttpStatusCode.OK,
-    OpenApiConstants.json(
-      'Authenticated principal',
-      OpenApiConstants.ref('Principal'),
-    ),
-  )
-  @OasResponse(
-    HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.problem('Missing or invalid credentials'),
-  )
-  @OasResponse(
-    HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.problem('Strategy not configured'),
-  )
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.PRINCIPAL)
+  @OasResponse(HttpStatusCode.UNAUTHORIZED, OpenApiConstants.BAD_CREDENTIALS)
+  @OasResponse(HttpStatusCode.NOT_IMPLEMENTED, OpenApiConstants.NOT_CONFIGURED)
   @OasSecurity({hmac: []})
   @UseGuard(HmacGuard)
   @Post('/hmac')
@@ -98,23 +72,10 @@ export class SecureV1Resource {
   // @end:auth-hmac
 
   @OasTag('Auth examples')
-
   @OasSummary('JWT issued by this service')
-  @OasResponse(
-    HttpStatusCode.OK,
-    OpenApiConstants.json(
-      'Authenticated principal',
-      OpenApiConstants.ref('Principal'),
-    ),
-  )
-  @OasResponse(
-    HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.problem('Missing or invalid credentials'),
-  )
-  @OasResponse(
-    HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.problem('Strategy not configured'),
-  )
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.PRINCIPAL)
+  @OasResponse(HttpStatusCode.UNAUTHORIZED, OpenApiConstants.BAD_CREDENTIALS)
+  @OasResponse(HttpStatusCode.NOT_IMPLEMENTED, OpenApiConstants.NOT_CONFIGURED)
   @OasSecurity({bearerAuth: []})
   @UseGuard(JwtGuard)
   @Get('/jwt')
@@ -124,23 +85,10 @@ export class SecureV1Resource {
 
   // @feature:auth-oauth2
   @OasTag('Auth examples')
-
   @OasSummary('OAuth 2.0 access token from an external authorization server')
-  @OasResponse(
-    HttpStatusCode.OK,
-    OpenApiConstants.json(
-      'Authenticated principal',
-      OpenApiConstants.ref('Principal'),
-    ),
-  )
-  @OasResponse(
-    HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.problem('Missing or invalid credentials'),
-  )
-  @OasResponse(
-    HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.problem('Strategy not configured'),
-  )
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.PRINCIPAL)
+  @OasResponse(HttpStatusCode.UNAUTHORIZED, OpenApiConstants.BAD_CREDENTIALS)
+  @OasResponse(HttpStatusCode.NOT_IMPLEMENTED, OpenApiConstants.NOT_CONFIGURED)
   @OasSecurity({oauth2: []})
   @UseGuard(OAuth2Guard)
   @Get('/oauth2')
@@ -151,23 +99,10 @@ export class SecureV1Resource {
 
   // @feature:sso
   @OasTag('Auth examples')
-
   @OasSummary('SSO session from OIDC or SAML')
-  @OasResponse(
-    HttpStatusCode.OK,
-    OpenApiConstants.json(
-      'Authenticated principal',
-      OpenApiConstants.ref('Principal'),
-    ),
-  )
-  @OasResponse(
-    HttpStatusCode.UNAUTHORIZED,
-    OpenApiConstants.problem('Missing or invalid credentials'),
-  )
-  @OasResponse(
-    HttpStatusCode.NOT_IMPLEMENTED,
-    OpenApiConstants.problem('Strategy not configured'),
-  )
+  @OasResponse(HttpStatusCode.OK, OpenApiConstants.PRINCIPAL)
+  @OasResponse(HttpStatusCode.UNAUTHORIZED, OpenApiConstants.BAD_CREDENTIALS)
+  @OasResponse(HttpStatusCode.NOT_IMPLEMENTED, OpenApiConstants.NOT_CONFIGURED)
   @UseGuard(SsoGuard)
   @Get('/sso')
   sso(@Request() request: ExpressRequest): ApiResponse<Principal> {

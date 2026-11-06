@@ -3,9 +3,8 @@ import type {Duplex} from 'node:stream';
 import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import {Component} from '@express-boilerplate/common/config/stereotypes.js';
 import {SecurityConstants} from '@express-boilerplate/common/constant/security.constants.js';
-import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
 import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
-import {Principal} from '@express-boilerplate/common/security/principal.js';
+import type {Principal} from '@express-boilerplate/common/security/principal.js';
 import {SessionService} from '@express-boilerplate/common/security/sso/session.service.js';
 import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
 import {EventBus} from '@express-boilerplate/service/service/event-bus.service.js';
@@ -72,10 +71,6 @@ export class WebSocketGateway {
     }, WebSocketGateway.HEARTBEAT_MS);
   }
 
-  get clientCount(): number {
-    return this.alive.size;
-  }
-
   async close(): Promise<void> {
     clearInterval(this.heartbeat);
     this.unsubscribe?.();
@@ -120,8 +115,7 @@ export class WebSocketGateway {
       url.searchParams.get('access_token');
     if (token) {
       try {
-        const payload = await this.tokenProvider.validateToken(token);
-        return new Principal(AuthStrategy.Jwt, payload.sub ?? '', payload);
+        return await this.tokenProvider.authenticate(token);
       } catch {
         return null;
       }
@@ -137,11 +131,7 @@ export class WebSocketGateway {
 
   // @feature:sso
   private isAllowedOrigin(origin: string | undefined): boolean {
-    if (!origin) return false;
-    return (
-      origin === new URL(this.config.env.PUBLIC_URL).origin ||
-      this.config.corsOrigins.includes(origin)
-    );
+    return origin !== undefined && this.config.allowedOrigins.has(origin);
   }
   // @end:sso
 
@@ -175,31 +165,16 @@ export class WebSocketGateway {
     message: TransportMessage | null,
     principal: Principal,
   ): string {
-    switch (message?.type) {
-      case 'ping':
-        return TransportMessage.encode('pong', {at: Date.now()});
-      case 'echo':
-        return TransportMessage.encode('echo', message.payload);
-      case 'whoami':
-        return TransportMessage.encode('whoami', {
-          strategy: principal.strategy,
-          subject: principal.subject,
-        });
-      case 'broadcast':
-        this.broadcast(
-          TransportMessage.encode('broadcast', {
-            from: principal.subject,
-            data: message.payload.data ?? null,
-          }),
-        );
-        return TransportMessage.encode('ack', {type: 'broadcast'});
-      default:
-        return TransportMessage.encode('error', {
-          error: message
-            ? `unknown type "${message.type}"`
-            : 'invalid JSON message',
-        });
+    if (message?.type !== 'broadcast') {
+      return TransportMessage.answer(message, principal);
     }
+    this.broadcast(
+      TransportMessage.encode('broadcast', {
+        from: principal.subject,
+        data: message.payload.data ?? null,
+      }),
+    );
+    return TransportMessage.encode('ack', {type: 'broadcast'});
   }
 
   private broadcast(data: string): void {

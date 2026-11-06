@@ -54,9 +54,11 @@ export class HttpsClient {
       body?: string | object;
       clientCert?: boolean;
       url?: URL;
+      /** For a server bound to one address (RawHttp: 127.0.0.1). */
+      host?: string;
     } = {},
   ): Promise<HttpsResult> {
-    const {headers = {}, body, clientCert = false, url} = options;
+    const {headers = {}, body, clientCert = false, url, host} = options;
     const data =
       body === undefined
         ? undefined
@@ -66,7 +68,7 @@ export class HttpsClient {
     return new Promise((resolve, reject) => {
       const request = https.request(
         {
-          host: url?.hostname ?? 'localhost',
+          host: url?.hostname ?? host ?? 'localhost',
           port: url ? Number(url.port) : this.port,
           path: url ? url.pathname + url.search : path,
           method,

@@ -8,7 +8,7 @@ import type {Request} from 'express';
 
 /** Small builders for unit tests that run classes without the app. */
 export class UnitFixtures {
-  static config(env: Record<string, string> = {}): AppConfig {
+  static config(env: NodeJS.ProcessEnv = {}): AppConfig {
     return new AppConfig({NODE_ENV: 'test', ...env});
   }
 

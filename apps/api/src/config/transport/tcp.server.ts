@@ -100,22 +100,10 @@ export class TcpServer {
     message: TransportMessage | null,
     principal: Principal | null,
   ): Promise<{reply: string; principal: Principal | null}> {
-    const answer = (reply: string) => ({reply, principal});
-    if (!message)
-      return answer(
-        TransportMessage.encode('error', {error: 'invalid JSON message'}),
-      );
-    if (message.type === 'ping')
-      return answer(TransportMessage.encode('pong', {at: Date.now()}));
-    if (message.type === 'auth') {
+    if (message?.type === 'auth') {
       try {
-        const payload = await this.tokenProvider.validateToken(
+        const authed = await this.tokenProvider.authenticate(
           String(message.payload.token),
-        );
-        const authed = new Principal(
-          AuthStrategy.Jwt,
-          payload.sub ?? '',
-          payload,
         );
         return {
           reply: TransportMessage.encode('authenticated', {
@@ -124,29 +112,12 @@ export class TcpServer {
           principal: authed,
         };
       } catch {
-        return answer(
-          TransportMessage.encode('error', {error: 'invalid token'}),
-        );
+        return {
+          reply: TransportMessage.encode('error', {error: 'invalid token'}),
+          principal,
+        };
       }
     }
-    if (!principal)
-      return answer(TransportMessage.encode('error', {error: 'unauthorized'}));
-    switch (message.type) {
-      case 'echo':
-        return answer(TransportMessage.encode('echo', message.payload));
-      case 'whoami':
-        return answer(
-          TransportMessage.encode('whoami', {
-            strategy: principal.strategy,
-            subject: principal.subject,
-          }),
-        );
-      default:
-        return answer(
-          TransportMessage.encode('error', {
-            error: `unknown type "${message.type}"`,
-          }),
-        );
-    }
+    return {reply: TransportMessage.answer(message, principal), principal};
   }
 }

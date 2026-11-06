@@ -2,6 +2,7 @@ import {mkdtempSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
+import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
 import type express from 'express';
 import {LocalCertificateGenerator} from '../../scripts/generate-certs.js';
 import {Application} from '../../src/application.js';
@@ -10,7 +11,7 @@ export class TestApp {
   static readonly JWT_SECRET = 'test-jwt-secret-0123456789abcdef0123';
   static readonly HMAC_SECRET = 'test-hmac-secret';
   /** Claims for a token that may call every protected route. */
-  static readonly ALL_SCOPES = {scope: 'users:write ops:queues ops:network'};
+  static readonly ALL_SCOPES = {scope: ScopeConstants.ALL.join(' ')};
 
   private static certDir?: string;
 

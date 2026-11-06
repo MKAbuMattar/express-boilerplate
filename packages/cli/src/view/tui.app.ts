@@ -1,9 +1,12 @@
+import {basename} from 'node:path';
 import {Spinner} from '@inkjs/ui';
-import {Box, Text} from 'ink';
+import {Box} from 'ink';
 import {Component, createElement as h, type ReactElement} from 'react';
 import type {CliConfiguration} from '../config/cli.configuration.ts';
 import {CliConstants} from '../constant/cli.constants.ts';
+import {CreateCommand} from '../controller/create.command.ts';
 import {DoctorCommand} from '../controller/doctor.command.ts';
+import {GenerateCommand} from '../controller/generate.command.ts';
 import {InfoCommand} from '../controller/info.command.ts';
 import {Auths} from '../model/auth.ts';
 import {FeatureManifest} from '../model/feature-manifest.ts';
@@ -11,6 +14,7 @@ import {Fields} from '../model/field.ts';
 import type {GenerateOptions} from '../model/generate-options.ts';
 import {Names} from '../model/names.ts';
 import type {AppliedFile, Plan} from '../model/plan.ts';
+import {ProjectRecord} from '../model/project-record.ts';
 import type {Task} from '../service/progress.service.ts';
 import {CliView} from './cli.view.ts';
 import {Runner} from './runner.view.ts';
@@ -62,16 +66,13 @@ export class TuiApp extends Component<Props, State> {
   }
 
   private project(): Project | null {
-    const {workspaceService: ws} = this.props.cli;
     try {
-      const root = ws.root(this.props.cwd);
-      const record = ws.exists(root, CliConstants.RECORD_FILE)
-        ? (JSON.parse(ws.read(root, CliConstants.RECORD_FILE)) as {
-            name: string;
-            features: string[];
-          })
-        : {name: 'express-boilerplate', features: []};
-      return {root, ...record};
+      const root = this.props.cli.workspaceService.root(this.props.cwd);
+      const {name, features} = ProjectRecord.read(root) ?? {
+        name: 'express-boilerplate',
+        features: [],
+      };
+      return {root, name, features};
     } catch {
       return null;
     }
@@ -197,20 +198,14 @@ export class TuiApp extends Component<Props, State> {
             label: 'Where should the project go?',
             kind: 'text',
             placeholder: './my-api',
-            validate: (v) =>
-              /[a-z0-9]/i.test(v) ? null : 'Use letters or digits',
+            validate: (v) => CreateCommand.validName(basename(v)),
           },
           {
             key: 'preset',
             badge: 'tmpl',
             label: 'Which features?',
             kind: 'select',
-            options: () => [
-              {value: 'standard', label: 'standard (recommended)'},
-              {value: 'minimal', label: 'minimal: core only'},
-              {value: 'full', label: 'full: everything'},
-              {value: 'custom', label: 'custom: pick each one'},
-            ],
+            options: () => CliConstants.PRESET_CHOICES,
           },
           {
             key: 'features',
@@ -218,13 +213,7 @@ export class TuiApp extends Component<Props, State> {
             label: 'Pick the features',
             kind: 'multi',
             when: (a) => a.preset === 'custom',
-            options: () =>
-              manifest.features
-                .filter((f) => f.group !== 'internal')
-                .map((f) => ({
-                  value: f.id,
-                  label: `${f.group.padEnd(9)} ${f.title}`,
-                })),
+            options: () => manifest.choices(),
             selected: () => manifest.defaults(),
           },
           {
@@ -243,58 +232,22 @@ export class TuiApp extends Component<Props, State> {
     const {projectService} = this.props.cli;
     const folder = a.dir as string;
     const target = `${this.props.cwd}/${folder}`.replace(/\/\.\//g, '/');
-    const name = folder
-      .split('/')
-      .filter(Boolean)
-      .at(-1)!
-      .toLowerCase()
-      .replace(/[^a-z0-9-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+    const name = CreateCommand.packageName(basename(target));
     const enabled = manifest.resolve(
       a.preset === 'custom'
         ? (a.features as string[])
         : manifest.preset(a.preset as string),
     );
     const install = a.deps as boolean;
+    const project = {source: this.source, target, name, enabled, manifest};
     return {
       name: 'run',
       title: `Create ${name}`,
-      tasks: [
-        {
-          title: `Write ${folder} (${enabled.size} features)`,
-          run: () =>
-            projectService.create({
-              source: this.source,
-              target,
-              name,
-              enabled,
-              manifest,
-            }),
-        },
-        ...(install
-          ? [
-              {
-                title: 'Install dependencies',
-                run: () => projectService.install(target),
-              },
-              {title: 'Format', run: () => projectService.format(target)},
-            ]
-          : []),
-      ],
+      tasks: CreateCommand.tasks(projectService, project, folder, install),
       result: () => ({
         name: 'result',
         title: `Liftoff: ${name} is ready`,
-        lines: [
-          `Features: ${[...enabled].sort().join(', ') || 'core only'}`,
-          '',
-          `cd ${folder}`,
-          ...(install
-            ? []
-            : ['pnpm install --no-frozen-lockfile && pnpm lint:fix']),
-          `pnpm certs   *.${name}.len certificate (prints the hosts line)`,
-          `pnpm dev     https://api.${name}.len/docs on port 443`,
-          'pnpm eb      this app, inside the project',
-        ],
+        lines: CreateCommand.nextSteps(project, folder, install),
       }),
     };
   }
@@ -319,11 +272,7 @@ export class TuiApp extends Component<Props, State> {
         badge: 'kind',
         label: 'What should be generated?',
         kind: 'select',
-        options: () =>
-          Object.entries(CliConstants.GENERATORS).map(([value, g]) => ({
-            value,
-            label: `${value.padEnd(11)} ${g.description}`,
-          })),
+        options: () => GenerateCommand.kindChoices(),
       },
       {
         key: 'name',
@@ -332,14 +281,7 @@ export class TuiApp extends Component<Props, State> {
         kind: 'text',
         when: (a) => !has(a.kind as string, 'endpoint', 'migration'),
         placeholder: 'order',
-        validate: (v) => {
-          try {
-            new Names(v);
-            return null;
-          } catch (error) {
-            return (error as Error).message;
-          }
-        },
+        validate: (v) => Fields.errorOf(() => new Names(v)),
       },
       {
         key: 'name',
@@ -384,17 +326,9 @@ export class TuiApp extends Component<Props, State> {
         label: 'Fields (name:type; string, text, int, boolean)',
         kind: 'text',
         when: (a) =>
-          Boolean(CliConstants.GENERATORS[a.kind as string]?.fields) ||
-          (a.kind === 'migration' && /^(create|add)_/.test(String(a.name))),
+          GenerateCommand.wantsFields(a.kind as string, String(a.name)),
         placeholder: CliConstants.DEFAULT_FIELDS,
-        validate: (v) => {
-          try {
-            Fields.parse(v);
-            return null;
-          } catch (error) {
-            return (error as Error).message;
-          }
-        },
+        validate: (v) => Fields.errorOf(() => Fields.parse(v)),
       },
       {
         key: 'auth',
@@ -481,10 +415,7 @@ export class TuiApp extends Component<Props, State> {
     const options: GenerateOptions = {
       name: a.name as string,
       fields: Fields.parse((a.fields as string) || CliConstants.DEFAULT_FIELDS),
-      values: String(a.values ?? '')
-        .split(',')
-        .map((v) => v.trim())
-        .filter(Boolean),
+      values: Fields.list(a.values as string | undefined),
       status: Number(a.status ?? 422),
       migration: Boolean(a.migration),
       repository: Boolean(a.repository),
@@ -519,37 +450,20 @@ export class TuiApp extends Component<Props, State> {
       ],
       question: 'Write these files?',
       yes: () => {
-        let written: AppliedFile[] = [];
+        const write = GenerateCommand.write(
+          workspaceService,
+          project.root,
+          plan,
+          false,
+        );
         return {
           name: 'run',
           title: `Generate ${kind} ${options.name}`,
-          tasks: [
-            {
-              title: `Write ${plan.files.length} files`,
-              run: () => {
-                written = workspaceService.apply(project.root, plan, {
-                  dryRun: false,
-                  force: false,
-                });
-              },
-            },
-            {
-              title: 'Format',
-              run: () =>
-                workspaceService.format(
-                  project.root,
-                  written.map((f) => f.path),
-                ),
-            },
-          ],
+          tasks: write.tasks,
           result: () => ({
             name: 'result',
             title: `Generated ${kind} ${options.name}`,
-            lines: [
-              ...written.map((f) => `${f.kind.padEnd(9)} ${f.path}`),
-              ...plan.notes,
-              'Next: pnpm test',
-            ],
+            lines: write.lines(),
           }),
         };
       },
@@ -563,12 +477,9 @@ export class TuiApp extends Component<Props, State> {
     return this.loading('Find the template', async () => {
       const manifest = await this.loadManifest();
       const enabled = manifest.resolve(project.features);
-      const choices = manifest.features
-        .filter((f) => f.group !== 'internal')
-        .filter((f) =>
-          mode === 'add' ? !enabled.has(f.id) : enabled.has(f.id),
-        )
-        .map((f) => ({value: f.id, label: `${f.group.padEnd(9)} ${f.title}`}));
+      const choices = manifest.choices((f) =>
+        mode === 'add' ? !enabled.has(f.id) : enabled.has(f.id),
+      );
       if (choices.length === 0) {
         return {
           name: 'result',
@@ -593,7 +504,6 @@ export class TuiApp extends Component<Props, State> {
                 : 'Which features to turn off?',
             kind: 'multi',
             options: () => choices,
-            validate: () => null,
           },
         ],
         next: (a) => this.featurePreview(project, mode, a.ids as string[]),
@@ -751,21 +661,11 @@ export class TuiApp extends Component<Props, State> {
         return h(
           Box,
           {flexDirection: 'column'},
-          h(
-            Box,
-            {
-              flexDirection: 'column',
-              borderStyle: 'round',
-              borderColor: screen.failed ? 'red' : 'green',
-              paddingX: 1,
-              marginBottom: 1,
-            },
-            h(
-              Text,
-              {bold: true, color: screen.failed ? 'red' : 'green'},
-              screen.title,
-            ),
-            ...screen.lines.map((l, i) => h(Text, {key: i}, l)),
+          CliView.summary(
+            screen.title,
+            screen.lines,
+            screen.failed ? 'red' : 'green',
+            'marginBottom',
           ),
           this.afterwards(),
         );

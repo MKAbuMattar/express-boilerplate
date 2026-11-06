@@ -33,41 +33,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PAT_DEL_TOKEN }}
           REPO_NAME: ${{ env.REPO_NAME }}
+        # Keep the 5 newest versions. Sorted after paging, because --jq runs
+        # on each page separately.
         run: |
-          # Get all package versions sorted by creation date (newest first)
-          gh api \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "/user/packages/container/${REPO_NAME}/versions" \
-            --paginate \
-            --jq 'sort_by(.created_at) | reverse' > all_versions.json
-
-          # Get total count
-          TOTAL_COUNT=$(jq 'length' all_versions.json)
-          echo "Total package versions found: $TOTAL_COUNT"
-
-          # If we have more than 5 versions, delete the older ones beyond the 5 most recent
-          if [ "$TOTAL_COUNT" -gt 5 ]; then
-            echo "Keeping 5 most recent versions, deleting $(($TOTAL_COUNT - 5)) older versions"
-            
-            # Get versions to delete (all except the first 5 most recent)
-            jq -r '.[5:] | .[].id' all_versions.json > versions_to_delete.txt
-            
-            # Delete old versions
-            while read version_id; do
-              if [ ! -z "$version_id" ]; then
-                echo "Deleting version ID: $version_id"
-                gh api \
-                  --method DELETE \
-                  -H "Accept: application/vnd.github+json" \
-                  -H "X-GitHub-Api-Version: 2022-11-28" \
-                  "/user/packages/container/${REPO_NAME}/versions/${version_id}" || true
-              fi
-            done < versions_to_delete.txt
-            
-            rm -f versions_to_delete.txt
-          else
-            echo "Total versions ($TOTAL_COUNT) is <= 5, no cleanup needed"
-          fi
-
-          rm -f all_versions.json
+          gh api --paginate "/user/packages/container/${REPO_NAME}/versions" \
+            --jq '.[] | [.created_at, .id] | @tsv' \
+            | sort -r | tail -n +6 | cut -f2 \
+            | while read -r id; do
+                echo "Deleting version $id"
+                gh api --method DELETE "/user/packages/container/${REPO_NAME}/versions/$id" || true
+              done

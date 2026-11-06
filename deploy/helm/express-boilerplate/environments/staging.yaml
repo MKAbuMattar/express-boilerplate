@@ -1,11 +1,6 @@
 # Staging: one region, small, synced automatically by Argo CD.
-image:
-  # Set image.digest from your release pipeline or Argo CD Image Updater.
-  # Empty falls back to the chart appVersion tag.
-  tag: ""
-  digest: ""
-
-replicaCount: 2
+# Set image.digest from your release pipeline or Argo CD Image Updater; the
+# default is the chart appVersion tag. Unset values are the chart defaults.
 
 config:
   PUBLIC_URL: https://api.staging.example.com
@@ -23,8 +18,6 @@ ingress:
   className: nginx
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt
-    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
   hosts: [api.staging.example.com]
   tls:
     - secretName: express-boilerplate-staging-tls

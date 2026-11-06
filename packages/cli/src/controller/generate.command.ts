@@ -2,9 +2,9 @@ import {CliConstants} from '../constant/cli.constants.ts';
 import {Auths} from '../model/auth.ts';
 import {type Field, Fields} from '../model/field.ts';
 import type {GenerateOptions} from '../model/generate-options.ts';
-import type {AppliedFile} from '../model/plan.ts';
+import type {AppliedFile, Plan} from '../model/plan.ts';
 import type {GeneratorService} from '../service/generator.service.ts';
-import type {ProgressService} from '../service/progress.service.ts';
+import type {ProgressService, Task} from '../service/progress.service.ts';
 import type {PromptService} from '../service/prompt.service.ts';
 import type {WorkspaceService} from '../service/workspace.service.ts';
 
@@ -67,9 +67,11 @@ export class GenerateCommand {
     const options = await this.options(kind, name, flags);
     const plan = this.generators.plan(kind, root, options);
 
-    let applied: AppliedFile[] = [];
     if (flags.dryRun) {
-      applied = this.workspace.apply(root, plan, {dryRun: true, force: true});
+      const applied = this.workspace.apply(root, plan, {
+        dryRun: true,
+        force: true,
+      });
       this.progress.summary(`Dry run: ${kind} ${name} (nothing written)`, [
         ...applied.flatMap((f) => [
           `${f.kind.padEnd(9)} ${f.path}`,
@@ -82,41 +84,72 @@ export class GenerateCommand {
       ]);
       return;
     }
-    const overwritten =
-      applied.length === 0 && flags.force
-        ? plan.files.filter(
-            (f) => f.kind === 'create' && this.workspace.exists(root, f.path),
-          )
-        : [];
+    const overwritten = flags.force
+      ? plan.files.filter(
+          (f) => f.kind === 'create' && this.workspace.exists(root, f.path),
+        )
+      : [];
     if (overwritten.length > 0) {
       plan.note(
         `--force replaced ${overwritten.length} existing file(s); your edits in them are gone (check git diff).`,
       );
     }
-    await this.progress.run([
-      {
-        title: `Write ${plan.files.length} files`,
-        run: () => {
-          applied = this.workspace.apply(root, plan, {
-            dryRun: false,
-            force: Boolean(flags.force),
-          });
+    const write = GenerateCommand.write(
+      this.workspace,
+      root,
+      plan,
+      Boolean(flags.force),
+    );
+    await this.progress.run(write.tasks);
+    this.progress.summary(`Generated ${kind} ${name}`, write.lines());
+  }
+
+  /** Write and format the plan; lines() reports what was written. */
+  static write(
+    workspace: WorkspaceService,
+    root: string,
+    plan: Plan,
+    force: boolean,
+  ): {tasks: Task[]; lines: () => string[]} {
+    let applied: AppliedFile[] = [];
+    return {
+      tasks: [
+        {
+          title: `Write ${plan.files.length} files`,
+          run: () => {
+            applied = workspace.apply(root, plan, {dryRun: false, force});
+          },
         },
-      },
-      {
-        title: 'Format',
-        run: () =>
-          this.workspace.format(
-            root,
-            applied.map((f) => f.path),
-          ),
-      },
-    ]);
-    this.progress.summary(`Generated ${kind} ${name}`, [
-      ...applied.map((f) => `${f.kind.padEnd(9)} ${f.path}`),
-      ...plan.notes,
-      'Next: pnpm test',
-    ]);
+        {
+          title: 'Format',
+          run: () =>
+            workspace.format(
+              root,
+              applied.map((f) => f.path),
+            ),
+        },
+      ],
+      lines: () => [
+        ...applied.map((f) => `${f.kind.padEnd(9)} ${f.path}`),
+        ...plan.notes,
+        'Next: pnpm test',
+      ],
+    };
+  }
+
+  /** Kinds that take --fields; a migration only when it creates or adds. */
+  static wantsFields(kind: string, name: string): boolean {
+    return (
+      Boolean(CliConstants.GENERATORS[kind]?.fields) ||
+      (kind === 'migration' && /^(create|add)_/.test(name))
+    );
+  }
+
+  static kindChoices(): {label: string; value: string}[] {
+    return Object.entries(CliConstants.GENERATORS).map(([value, g]) => ({
+      label: `${value.padEnd(11)} ${g.description}`,
+      value,
+    }));
   }
 
   private async options(
@@ -124,28 +157,23 @@ export class GenerateCommand {
     name: string,
     flags: GenerateFlags,
   ): Promise<GenerateOptions> {
-    const wantsFields =
-      CliConstants.GENERATORS[kind]?.fields ||
-      (kind === 'migration' && /^(create|add)_/.test(name));
     let fieldSpec = flags.fields;
-    if (!fieldSpec && wantsFields && this.interactive) {
+    if (
+      !fieldSpec &&
+      GenerateCommand.wantsFields(kind, name) &&
+      this.interactive
+    ) {
       fieldSpec = await this.prompts.text(
         'Fields (name:type, types: string, text, int, boolean)',
         CliConstants.DEFAULT_FIELDS,
-        (v) => GenerateCommand.fieldError(v),
+        (v) => Fields.errorOf(() => Fields.parse(v)),
       );
     }
-    let values = flags.values
-      ?.split(',')
-      .map((v) => v.trim())
-      .filter(Boolean);
-    if (kind === 'enum' && !values?.length && this.interactive) {
-      values = (
-        await this.prompts.text('Members, comma-separated', 'active,inactive')
-      )
-        .split(',')
-        .map((v) => v.trim())
-        .filter(Boolean);
+    let values = Fields.list(flags.values);
+    if (kind === 'enum' && !values.length && this.interactive) {
+      values = Fields.list(
+        await this.prompts.text('Members, comma-separated', 'active,inactive'),
+      );
     }
     const fields: Field[] = Fields.parse(
       fieldSpec ?? CliConstants.DEFAULT_FIELDS,
@@ -153,7 +181,7 @@ export class GenerateCommand {
     return {
       name,
       fields,
-      values: values ?? [],
+      values,
       status: Number(flags.status ?? 422),
       migration: Boolean(flags.migration),
       repository: Boolean(flags.repository),
@@ -171,10 +199,7 @@ export class GenerateCommand {
   private chooseKind(): Promise<string> {
     return this.prompts.select(
       'What should be generated?',
-      Object.entries(CliConstants.GENERATORS).map(([value, g]) => ({
-        label: `${value.padEnd(11)} ${g.description}`,
-        value,
-      })),
+      GenerateCommand.kindChoices(),
     );
   }
 
@@ -183,14 +208,5 @@ export class GenerateCommand {
       throw new Error(`Missing ${what}. Usage: eb generate <kind> <name>`);
     }
     return prompt();
-  }
-
-  private static fieldError(spec: string): string | null {
-    try {
-      Fields.parse(spec);
-      return null;
-    } catch (error) {
-      return (error as Error).message;
-    }
   }
 }

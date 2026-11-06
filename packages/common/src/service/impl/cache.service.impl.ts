@@ -3,6 +3,7 @@ import {AppConfig} from '../../config/app.config.js';
 import {CacheStore} from '../../config/cache/cache-store.js';
 import {Service} from '../../config/stereotypes.js';
 import {AppLogger} from '../../util/app-logger.js';
+import {Timeouts} from '../../util/timeouts.js';
 import {CacheService} from '../cache.service.js';
 
 /**
@@ -89,15 +90,7 @@ export class CacheServiceImpl extends CacheService {
   }
 
   private withTimeout<R>(promise: Promise<R>): Promise<R> {
-    const ms = this.config.env.CACHE_TIMEOUT_MS;
-    let timer: NodeJS.Timeout | undefined;
-    const timeout = new Promise<never>((_resolve, reject) => {
-      timer = setTimeout(
-        () => reject(new Error(`cache timed out after ${ms}ms`)),
-        ms,
-      );
-    });
-    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+    return Timeouts.within(promise, this.config.env.CACHE_TIMEOUT_MS, 'cache');
   }
 
   private get defaultTtl(): number {

@@ -38,7 +38,6 @@ export class ExperimentV1Resource {
   ) {}
 
   @OasTag('Experiments')
-
   @OasSummary('List A/B experiments')
   @OasResponse(
     HttpStatusCode.OK,
@@ -53,7 +52,6 @@ export class ExperimentV1Resource {
   }
 
   @OasTag('Experiments')
-
   @OasSummary('Variant for the caller (SSO subject, else an ab_id cookie)')
   @OasParameter({
     name: 'name',

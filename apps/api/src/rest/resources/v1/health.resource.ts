@@ -20,7 +20,6 @@ export class HealthV1Resource {
   ) {}
 
   @OasTag('Health')
-
   @OasSummary('Liveness and database readiness')
   @OasResponse(
     HttpStatusCode.OK,

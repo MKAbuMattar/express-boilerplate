@@ -1,6 +1,7 @@
 import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import {DatabaseConfig} from '@express-boilerplate/persistence/config/database.config.js';
 import {afterEach, describe, expect, it, vi} from 'vitest';
+import {UnitFixtures} from '../support/unit-fixtures.js';
 
 describe('AppConfig', () => {
   afterEach(() => {
@@ -61,10 +62,10 @@ describe('AppConfig', () => {
 
   // @feature:experiments
   it('rejects malformed experiments', () => {
-    expect(
-      () => new AppConfig({NODE_ENV: 'test', EXPERIMENTS: 'x:101'}),
-    ).toThrow('EXPERIMENTS');
-    expect(() => new AppConfig({NODE_ENV: 'test', EXPERIMENTS: 'x'})).toThrow(
+    expect(() => UnitFixtures.config({EXPERIMENTS: 'x:101'})).toThrow(
+      'EXPERIMENTS',
+    );
+    expect(() => UnitFixtures.config({EXPERIMENTS: 'x'})).toThrow(
       'EXPERIMENTS',
     );
   });
@@ -132,8 +133,8 @@ describe('AppConfig', () => {
     });
 
     it('does not apply to development, test or in-process sql.js', () => {
-      expect(
-        () => new AppConfig({NODE_ENV: 'test', CACHE_URL: 'redis://c:6379'}),
+      expect(() =>
+        UnitFixtures.config({CACHE_URL: 'redis://c:6379'}),
       ).not.toThrow();
       expect(() => prod({DB_TYPE: 'sqljs'})).not.toThrow();
     });
@@ -141,7 +142,7 @@ describe('AppConfig', () => {
 
   describe('DatabaseConfig TLS', () => {
     const options = (env: NodeJS.ProcessEnv) =>
-      DatabaseConfig.options(new AppConfig({NODE_ENV: 'test', ...env})) as {
+      DatabaseConfig.options(UnitFixtures.config(env)) as {
         ssl?: unknown;
         tls?: boolean;
         options?: {encrypt?: boolean};

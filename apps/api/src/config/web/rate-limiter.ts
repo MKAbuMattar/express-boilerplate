@@ -53,13 +53,9 @@ export class RateLimiter {
       );
       response.setHeader('RateLimit-Reset', String(resetSeconds));
       if (count > limit) {
-        ProblemDetails.send(
-          response,
-          429,
-          'Rate limit exceeded, retry later',
-          request.originalUrl,
-          {'Retry-After': String(resetSeconds)},
-        );
+        ProblemDetails.send(response, 429, 'Rate limit exceeded, retry later', {
+          'Retry-After': String(resetSeconds),
+        });
         return;
       }
       next();

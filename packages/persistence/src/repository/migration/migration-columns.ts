@@ -12,33 +12,34 @@ export class MigrationColumns {
   }
 
   static createdAt(queryRunner: QueryRunner): TableColumnOptions {
-    const types = queryRunner.connection.driver.mappedDataTypes;
-    return {
-      name: 'createdAt',
-      type: queryRunner.connection.driver.normalizeType({
-        type: types.createDate,
-      }),
-      precision: types.createDatePrecision,
-      default: types.createDateDefault,
-    };
+    return MigrationColumns.timestamp(queryRunner, 'createdAt', 'create');
   }
 
   static updatedAt(queryRunner: QueryRunner): TableColumnOptions {
-    const types = queryRunner.connection.driver.mappedDataTypes;
     return {
-      name: 'updatedAt',
-      type: queryRunner.connection.driver.normalizeType({
-        type: types.updateDate,
-      }),
-      precision: types.updateDatePrecision,
-      default: types.updateDateDefault,
+      ...MigrationColumns.timestamp(queryRunner, 'updatedAt', 'update'),
       // @feature:db-mysql
       // MySQL and MariaDB keep updatedAt current in the column itself, as
       // @UpdateDateColumn declares it there.
       ...(MigrationColumns.isMysql(queryRunner) && {
-        onUpdate: types.updateDateDefault,
+        onUpdate:
+          queryRunner.connection.driver.mappedDataTypes.updateDateDefault,
       }),
       // @end:db-mysql
+    };
+  }
+
+  private static timestamp(
+    queryRunner: QueryRunner,
+    name: string,
+    kind: 'create' | 'update',
+  ): TableColumnOptions {
+    const types = queryRunner.connection.driver.mappedDataTypes;
+    return {
+      name,
+      type: MigrationColumns.type(queryRunner, types[`${kind}Date`] as string),
+      precision: types[`${kind}DatePrecision`],
+      default: types[`${kind}DateDefault`],
     };
   }
 

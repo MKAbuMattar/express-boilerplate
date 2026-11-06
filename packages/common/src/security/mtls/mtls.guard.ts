@@ -35,32 +35,22 @@ export class MtlsGuard implements ExpressGuard {
     }
     const peer = socket.getPeerCertificate();
     const {MTLS_FORWARDED_HEADER, MTLS_TRUSTED_PROXY_CN} = this.config.env;
-
-    if (MTLS_FORWARDED_HEADER && peer.subject.CN === MTLS_TRUSTED_PROXY_CN) {
-      const forwarded = request.header(MTLS_FORWARDED_HEADER);
-      const certificate = this.verifyForwarded(forwarded);
-      request.principal = new Principal(
-        AuthStrategy.Mtls,
-        MtlsGuard.commonName(certificate.subject),
-        {
-          fingerprint256: certificate.fingerprint256,
-          serialNumber: certificate.serialNumber,
-          via: MTLS_TRUSTED_PROXY_CN,
-          scope: this.scopesFor(MtlsGuard.commonName(certificate.subject)),
-        },
-      );
-      return true;
-    }
-
-    request.principal = new Principal(
-      AuthStrategy.Mtls,
-      String(peer.subject.CN),
-      {
-        fingerprint256: peer.fingerprint256,
-        serialNumber: peer.serialNumber,
-        scope: this.scopesFor(String(peer.subject.CN)),
-      },
-    );
+    // A trusted proxy speaks for the client in a header; anyone else is the
+    // client.
+    const proxied =
+      MTLS_FORWARDED_HEADER && peer.subject.CN === MTLS_TRUSTED_PROXY_CN;
+    const certificate = proxied
+      ? this.verifyForwarded(request.header(MTLS_FORWARDED_HEADER))
+      : null;
+    const cn = certificate
+      ? MtlsGuard.commonName(certificate.subject)
+      : String(peer.subject.CN);
+    request.principal = new Principal(AuthStrategy.Mtls, cn, {
+      fingerprint256: (certificate ?? peer).fingerprint256,
+      serialNumber: (certificate ?? peer).serialNumber,
+      ...(proxied && {via: MTLS_TRUSTED_PROXY_CN}),
+      scope: this.scopesFor(cn),
+    });
     return true;
   }
 
@@ -73,12 +63,12 @@ export class MtlsGuard implements ExpressGuard {
       throw MtlsGuard.denied('unreadable forwarded certificate');
     }
     const ca = this.caCertificate();
-    const now = Date.now();
+    const now = new Date();
     const valid =
       certificate.checkIssued(ca) &&
       certificate.verify(ca.publicKey) &&
-      new Date(certificate.validFrom).getTime() <= now &&
-      now <= new Date(certificate.validTo).getTime() &&
+      certificate.validFromDate <= now &&
+      now <= certificate.validToDate &&
       (certificate.keyUsage ?? []).includes(MtlsGuard.CLIENT_AUTH_OID);
     if (!valid) throw MtlsGuard.denied('forwarded certificate not trusted');
     return certificate;

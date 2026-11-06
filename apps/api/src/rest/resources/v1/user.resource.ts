@@ -35,7 +35,6 @@ export class UserV1Resource {
   constructor(@inject(UserService) private readonly userService: UserService) {}
 
   @OasTag('Users v1')
-
   @OasSummary('List users (public)')
   @OasResponse(
     HttpStatusCode.OK,
@@ -44,11 +43,13 @@ export class UserV1Resource {
   @Get()
   async getUsers(): Promise<ApiResponse<UserV1Dto[]>> {
     const users = await this.userService.findAll();
-    return ApiResponse.ok('Users found', UserConverter.toDtoList(users));
+    return ApiResponse.ok(
+      'Users found',
+      users.map((u) => UserConverter.toDto(u)),
+    );
   }
 
   @OasTag('Users v1')
-
   @OasSummary('Get a user by id (public)')
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasResponse(
@@ -68,7 +69,6 @@ export class UserV1Resource {
   }
 
   @OasTag('Users v1')
-
   @OasSummary('Create a user (JWT)')
   @OasRequestBody(OpenApiConstants.CREATE_USER_BODY)
   @OasResponse(
@@ -98,7 +98,6 @@ export class UserV1Resource {
   }
 
   @OasTag('Users v1')
-
   @OasSummary('Delete a user (JWT)')
   @OasParameter(OpenApiConstants.ID_PATH_PARAM)
   @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)

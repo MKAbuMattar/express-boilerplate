@@ -34,8 +34,4 @@ export class UserConverter {
     const json = JSON.stringify(UserConverter.toV2Dto(user));
     return `"${createHash('sha256').update(json).digest('base64url').slice(0, 27)}"`;
   }
-
-  static toDtoList(users: UserEntity[]): UserV1Dto[] {
-    return users.map((user) => UserConverter.toDto(user));
-  }
 }
