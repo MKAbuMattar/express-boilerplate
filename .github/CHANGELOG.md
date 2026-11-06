@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.1 (2026-11-06)</small>
+
+* fix(cli): publish as create-expresso ([b6e56e1](https://github.com/MKAbuMattar/express-boilerplate/commit/b6e56e1))
+* fix(cli): publish as create-expresso (#845) ([93b85d6](https://github.com/MKAbuMattar/express-boilerplate/commit/93b85d6)), closes [#845](https://github.com/MKAbuMattar/express-boilerplate/issues/845)
+
 ## 3.0.0 (2026-11-06)
 
 * feat: API versions, migrations, realtime transports, queues, HTTP semantics ([ececf47](https://github.com/MKAbuMattar/express-boilerplate/commit/ececf47))
