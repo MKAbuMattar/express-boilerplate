@@ -2,6 +2,60 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.0.0 (2026-11-06)
+
+* feat: API versions, migrations, realtime transports, queues, HTTP semantics ([ececf47](https://github.com/MKAbuMattar/express-boilerplate/commit/ececf47))
+* feat: layered monorepo, project generator, TLS only on 443 (#837) ([4001019](https://github.com/MKAbuMattar/express-boilerplate/commit/4001019)), closes [#837](https://github.com/MKAbuMattar/express-boilerplate/issues/837)
+* feat(auth): revocation, ES256 with JWKS rotation, client scopes, route audit ([dcefe83](https://github.com/MKAbuMattar/express-boilerplate/commit/dcefe83))
+* feat(cli): generate projects with only the features you pick ([c7d061d](https://github.com/MKAbuMattar/express-boilerplate/commit/c7d061d))
+* feat(deploy): Helm chart, Argo CD app of apps, Actuator health ([20e8a6a](https://github.com/MKAbuMattar/express-boilerplate/commit/20e8a6a))
+* feat(deploy): public and private APISIX gateways in place of Caddy ([03f1dc3](https://github.com/MKAbuMattar/express-boilerplate/commit/03f1dc3))
+* feat(docker): full local stack with Keycloak, APISIX, Vault, observability ([77f23c0](https://github.com/MKAbuMattar/express-boilerplate/commit/77f23c0))
+* feat(helm): TLS only on 443, cert-manager pod certificate, verified re-encryption ([42029a5](https://github.com/MKAbuMattar/express-boilerplate/commit/42029a5))
+* feat(observability): metrics, tracing, Vault secrets, SMTP mail ([e6f54e8](https://github.com/MKAbuMattar/express-boilerplate/commit/e6f54e8))
+* feat(security): CVE gates, runtime hardening, HTTP/3 via Caddy ([85a8f06](https://github.com/MKAbuMattar/express-boilerplate/commit/85a8f06))
+* feat(security): request-level protection middlewares ([2a88e7b](https://github.com/MKAbuMattar/express-boilerplate/commit/2a88e7b))
+* feat(security): scope-based authorization guard ([80c0a02](https://github.com/MKAbuMattar/express-boilerplate/commit/80c0a02))
+* fix: advertise ALPN ndjson/1 only when TCP is on; dev uses node --watch ([5771ec7](https://github.com/MKAbuMattar/express-boilerplate/commit/5771ec7))
+* fix: resolve CodeQL findings in route matching and import pruning ([5075db6](https://github.com/MKAbuMattar/express-boilerplate/commit/5075db6))
+* fix(cli): drop deepmerge, which has an unfixed advisory ([2dd43fb](https://github.com/MKAbuMattar/express-boilerplate/commit/2dd43fb))
+* fix(docs): show Swagger responses, path params and request bodies ([5865a1f](https://github.com/MKAbuMattar/express-boilerplate/commit/5865a1f))
+* fix(queue): non-numeric dead-letter job ids; simpler Mongo test container ([6b011dd](https://github.com/MKAbuMattar/express-boilerplate/commit/6b011dd))
+* fix(security): client certificates required or off, never optional ([8d102dc](https://github.com/MKAbuMattar/express-boilerplate/commit/8d102dc))
+* fix(security): keep the CSP in development; run CodeQL workflow on PRs ([6045cda](https://github.com/MKAbuMattar/express-boilerplate/commit/6045cda))
+* fix(sso): return 401 for failed OIDC and SAML logins ([c204ba1](https://github.com/MKAbuMattar/express-boilerplate/commit/c204ba1))
+* fix(test): pass the container tests in CI ([903063c](https://github.com/MKAbuMattar/express-boilerplate/commit/903063c))
+* fix(test): run MongoDB 7 in the container test and compose ([69c2c10](https://github.com/MKAbuMattar/express-boilerplate/commit/69c2c10))
+* chore: format pnpm-workspace.yaml ([f07937a](https://github.com/MKAbuMattar/express-boilerplate/commit/f07937a))
+* chore: merge main (pnpm 12.18.0) ([643b66a](https://github.com/MKAbuMattar/express-boilerplate/commit/643b66a))
+* chore: merge main (typescript type bumps) ([1be58ff](https://github.com/MKAbuMattar/express-boilerplate/commit/1be58ff))
+* chore(deps): lock file maintenance (#804) ([8155560](https://github.com/MKAbuMattar/express-boilerplate/commit/8155560)), closes [#804](https://github.com/MKAbuMattar/express-boilerplate/issues/804)
+* chore(deps): update all non-major dependencies (#842) ([782b775](https://github.com/MKAbuMattar/express-boilerplate/commit/782b775)), closes [#842](https://github.com/MKAbuMattar/express-boilerplate/issues/842)
+* chore(deps): update typescript (#835) ([aba1ea2](https://github.com/MKAbuMattar/express-boilerplate/commit/aba1ea2)), closes [#835](https://github.com/MKAbuMattar/express-boilerplate/issues/835)
+* ci: check generated projects and publish the CLI on release ([a16d9b4](https://github.com/MKAbuMattar/express-boilerplate/commit/a16d9b4))
+* ci: fix CodeQL source paths and Biome checks for the monorepo ([bf1107f](https://github.com/MKAbuMattar/express-boilerplate/commit/bf1107f))
+* ci: install the CLI before generating projects ([2aa7ffd](https://github.com/MKAbuMattar/express-boilerplate/commit/2aa7ffd))
+* refactor: one Redis client, one migration template, fewer dependencies ([71930a4](https://github.com/MKAbuMattar/express-boilerplate/commit/71930a4))
+* refactor: plain application/json for health, no vendor names ([90680c5](https://github.com/MKAbuMattar/express-boilerplate/commit/90680c5))
+* refactor: pnpm and Turborepo monorepo, TLS only on 443 ([09dbb22](https://github.com/MKAbuMattar/express-boilerplate/commit/09dbb22))
+* refactor: remove duplicated code across the CLI, API, packages and deploy ([1c7b62e](https://github.com/MKAbuMattar/express-boilerplate/commit/1c7b62e))
+* refactor: split the api into layer packages ([1f30865](https://github.com/MKAbuMattar/express-boilerplate/commit/1f30865))
+* docs: agent instructions in AGENTS.md, imported by CLAUDE.md, GEMINI.md and Cursor ([6e2b63c](https://github.com/MKAbuMattar/express-boilerplate/commit/6e2b63c))
+* docs: guides for setup, the generator, compose, Kubernetes and design ([c20849b](https://github.com/MKAbuMattar/express-boilerplate/commit/c20849b))
+* docs: package descriptions and a README for each package ([38122b7](https://github.com/MKAbuMattar/express-boilerplate/commit/38122b7))
+* docs(agents): note the PR title types allowed by pr-title.yml ([be59a02](https://github.com/MKAbuMattar/express-boilerplate/commit/be59a02))
+* docs(api): describe QUERY search in the tag, not as seven 405 operations ([845a3bf](https://github.com/MKAbuMattar/express-boilerplate/commit/845a3bf))
+* docs(api): grouped, typed and documented OpenAPI ([22e8cdd](https://github.com/MKAbuMattar/express-boilerplate/commit/22e8cdd))
+* style: sort imports after the middleware move ([011a35e](https://github.com/MKAbuMattar/express-boilerplate/commit/011a35e))
+* test: add unit, integration, containers, e2e, monkey and chaos suites ([c53bc63](https://github.com/MKAbuMattar/express-boilerplate/commit/c53bc63))
+* feat!: rebuild project layout, auth, database and cache layers ([88939d9](https://github.com/MKAbuMattar/express-boilerplate/commit/88939d9))
+
+
+### BREAKING CHANGE
+
+* routes, env vars and project layout changed. API_KEY and
+CORS_WHITELIST are removed; see .env.example. Requires Node 26.
+
 ## <small>2.4.7 (2026-11-05)</small>
 
 * fix(deps): update all non-major dependencies (#833) ([dbe9edd](https://github.com/MKAbuMattar/express-boilerplate/commit/dbe9edd)), closes [#833](https://github.com/MKAbuMattar/express-boilerplate/issues/833)
