@@ -688,5 +688,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - [InversifyJS HTTP](https://inversify.io/framework/)
 - [TypeORM](https://typeorm.io/)
 - [jose](https://github.com/panva/jose), [openid-client](https://github.com/panva/openid-client), [node-saml](https://github.com/node-saml/node-saml)
-- [node-redis](https://github.com/redis/node-redis)
+- [ioredis](https://github.com/redis/ioredis)
 - [Pino](https://getpino.io/), [Vitest](https://vitest.dev/), [Biome](https://biomejs.dev/)

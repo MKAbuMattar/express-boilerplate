@@ -4,7 +4,7 @@ import {SecurityConstants} from '../constant/security.constants.js';
 import {CacheType} from '../enumeration/cache-type.enum.js';
 import {DatabaseType} from '../enumeration/database-type.enum.js';
 
-export type Env = ReturnType<(typeof AppConfig)['read']>;
+type Env = ReturnType<(typeof AppConfig)['read']>;
 
 export class AppConfig {
   readonly env: Env;

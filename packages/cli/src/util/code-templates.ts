@@ -36,25 +36,26 @@ export class CodeTemplates {
     return {kind: 'blank'};
   }
 
-  static migrationColumn(field: Field): string {
-    switch (field.type) {
-      case 'string':
-        return `{name: '${field.name}', type: 'varchar', length: '255', isNullable: true}`;
-      case 'text':
-        return `{name: '${field.name}', type: MigrationColumns.type(queryRunner, 'text'), isNullable: true}`;
-      case 'int':
-        return `{name: '${field.name}', type: MigrationColumns.type(queryRunner, 'int'), isNullable: true}`;
-      case 'boolean':
-        return `{name: '${field.name}', type: MigrationColumns.type(queryRunner, 'boolean'), isNullable: true}`;
-    }
+  /** Nullable unless the table is new: rows that exist must stay valid. */
+  static migrationColumn(field: Field, nullable = true): string {
+    const type =
+      field.type === 'string'
+        ? "'varchar', length: '255'"
+        : `MigrationColumns.type(queryRunner, '${field.type}')`;
+    return `{name: '${field.name}', type: ${type}${nullable ? ', isNullable: true' : ''}}`;
   }
 
-  migration(
+  static migration(
     className: string,
     intent: MigrationIntent,
     fields: Field[],
+    nullable = true,
   ): string {
-    const {up, down, imports} = CodeTemplates.migrationBody(intent, fields);
+    const {up, down, imports} = CodeTemplates.migrationBody(
+      intent,
+      fields,
+      nullable,
+    );
     return `import {${imports}} from 'typeorm';
 ${up.includes('MigrationColumns') ? "import {MigrationColumns} from './migration-columns.js';\n" : ''}
 /** Never edit once shipped; add another migration instead. */
@@ -75,6 +76,7 @@ ${down}
   private static migrationBody(
     intent: MigrationIntent,
     fields: Field[],
+    nullable: boolean,
   ): {up: string; down: string; imports: string} {
     switch (intent.kind) {
       case 'create':
@@ -85,7 +87,7 @@ ${down}
         name: '${intent.table}',
         columns: [
           {name: 'id', type: 'varchar', length: '36', isPrimary: true},
-${fields.map((f) => `          ${CodeTemplates.migrationColumn(f)},`).join('\n')}
+${fields.map((f) => `          ${CodeTemplates.migrationColumn(f, nullable)},`).join('\n')}
           MigrationColumns.createdAt(queryRunner),
           MigrationColumns.updatedAt(queryRunner),
         ],

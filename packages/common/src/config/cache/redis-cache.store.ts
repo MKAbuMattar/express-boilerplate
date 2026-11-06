@@ -1,24 +1,34 @@
-import {createClient, createCluster} from 'redis';
+import {Cluster, Redis} from 'ioredis';
 import {CacheStore} from './cache-store.js';
-
-type RedisConnection =
-  | ReturnType<typeof createClient>
-  | ReturnType<typeof createCluster>;
 
 /**
  * Redis protocol store: Redis, Valkey, AWS ElastiCache and MemoryDB.
  * Use rediss:// for TLS (ElastiCache in-transit encryption) and
- * cluster=true for cluster-mode-enabled endpoints.
+ * cluster=true for cluster-mode-enabled endpoints. ioredis, the client
+ * BullMQ already uses, so the app has one Redis client, not two.
  */
 export class RedisCacheStore extends CacheStore {
   readonly type = 'redis';
-  private readonly connection: RedisConnection;
+  private readonly connection: Redis | Cluster;
 
   constructor(url: string, cluster: boolean) {
     super();
     this.connection = cluster
-      ? createCluster({rootNodes: [{url}], useReplicas: true})
-      : createClient({url});
+      ? RedisCacheStore.cluster(new URL(url))
+      : new Redis(url, {lazyConnect: true});
+  }
+
+  /** A cluster takes its seed node and credentials apart, not as a URL. */
+  private static cluster(url: URL): Cluster {
+    return new Cluster([{host: url.hostname, port: Number(url.port || 6379)}], {
+      lazyConnect: true,
+      scaleReads: 'slave',
+      redisOptions: {
+        username: decodeURIComponent(url.username) || undefined,
+        password: decodeURIComponent(url.password) || undefined,
+        tls: url.protocol === 'rediss:' ? {} : undefined,
+      },
+    });
   }
 
   async connect(): Promise<void> {
@@ -26,18 +36,15 @@ export class RedisCacheStore extends CacheStore {
   }
 
   async close(): Promise<void> {
-    await this.connection.close();
+    await this.connection.quit();
   }
 
   async get(key: string): Promise<string | null> {
-    const value = await this.connection.get(key);
-    return value === null ? null : String(value);
+    return this.connection.get(key);
   }
 
   async set(key: string, value: string, ttlSeconds: number): Promise<void> {
-    await this.connection.set(key, value, {
-      expiration: {type: 'EX', value: ttlSeconds},
-    });
+    await this.connection.set(key, value, 'EX', ttlSeconds);
   }
 
   async setIfAbsent(
@@ -45,11 +52,9 @@ export class RedisCacheStore extends CacheStore {
     value: string,
     ttlSeconds: number,
   ): Promise<boolean> {
-    const reply = await this.connection.set(key, value, {
-      expiration: {type: 'EX', value: ttlSeconds},
-      condition: 'NX',
-    });
-    return reply !== null;
+    return (
+      (await this.connection.set(key, value, 'EX', ttlSeconds, 'NX')) !== null
+    );
   }
 
   async increment(
@@ -59,15 +64,19 @@ export class RedisCacheStore extends CacheStore {
     // One atomic round trip. EXPIRE NX sets the TTL only when the key has
     // none, so the window does not slide and a crash between commands can
     // never leave a counter that never expires.
-    const [count, , ttl] = (await this.connection
+    const replies = await this.connection
       .multi()
       .incr(key)
       .expire(key, ttlSeconds, 'NX')
       .ttl(key)
-      .exec()) as unknown as [number, number, number];
+      .exec();
+    const [count, , ttl] = (replies ?? []).map(([error, value]) => {
+      if (error) throw error;
+      return Number(value);
+    });
     return {
-      count: Number(count),
-      resetSeconds: Number(ttl) > 0 ? Number(ttl) : ttlSeconds,
+      count: count ?? 0,
+      resetSeconds: (ttl ?? 0) > 0 ? (ttl as number) : ttlSeconds,
     };
   }
 

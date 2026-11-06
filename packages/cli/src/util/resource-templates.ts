@@ -2,6 +2,7 @@ import type {AuthSpec} from '../model/auth.ts';
 import type {Field} from '../model/field.ts';
 import type {Names} from '../model/names.ts';
 import {AuthTemplates} from './auth-templates.ts';
+import {CodeTemplates} from './code-templates.ts';
 
 /**
  * Source text for each file `eb generate resource` writes. Every template
@@ -127,45 +128,12 @@ export class ${n.pascal}Repository {
   }
 
   migration(): string {
-    const {n} = this;
-    const col = (f: Field) => {
-      switch (f.type) {
-        case 'string':
-          return `{name: '${f.name}', type: 'varchar', length: '255'}`;
-        case 'text':
-          return `{name: '${f.name}', type: MigrationColumns.type(queryRunner, 'text')}`;
-        case 'int':
-          return `{name: '${f.name}', type: MigrationColumns.type(queryRunner, 'int')}`;
-        case 'boolean':
-          return `{name: '${f.name}', type: MigrationColumns.type(queryRunner, 'boolean')}`;
-      }
-    };
-    return `import {type MigrationInterface, type QueryRunner, Table} from 'typeorm';
-import {MigrationColumns} from './migration-columns.js';
-
-/** The ${n.table} table (generated). Never edit once shipped; add a migration. */
-export class Create${n.pluralPascal}Table${this.stamp} implements MigrationInterface {
-  name = 'Create${n.pluralPascal}Table${this.stamp}';
-
-  async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.createTable(
-      new Table({
-        name: '${n.table}',
-        columns: [
-          {name: 'id', type: 'varchar', length: '36', isPrimary: true},
-${this.fields.map((f) => `          ${col(f)},`).join('\n')}
-          MigrationColumns.createdAt(queryRunner),
-          MigrationColumns.updatedAt(queryRunner),
-        ],
-      }),
+    return CodeTemplates.migration(
+      this.migrationClass,
+      {kind: 'create', table: this.n.table},
+      this.fields,
+      false,
     );
-  }
-
-  async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('${n.table}');
-  }
-}
-`;
   }
 
   createDto(): string {

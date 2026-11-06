@@ -95,7 +95,7 @@
         "packages/common/src/config/queue/bullmq-queue.broker.ts"
       ],
       "dependencies": {
-        "packages/common": ["redis", "bullmq", "ioredis"]
+        "packages/common": ["bullmq", "ioredis"]
       }
     },
     {

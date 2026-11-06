@@ -47,13 +47,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.5",
-    "lint-staged": "17.6.0",
     "turbo": "2.11.10"
-  },
-  "lint-staged": {
-    "*.{js,ts,json,jsonc}": [
-      "biome check --write --no-errors-on-unmatched"
-    ]
   },
   "engines": {
     "node": ">=26"

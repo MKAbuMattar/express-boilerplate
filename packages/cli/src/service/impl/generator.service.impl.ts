@@ -99,7 +99,7 @@ export class GeneratorServiceImpl extends GeneratorService {
         }
         break;
       case 'migration':
-        this.migration(plan, c, options, stamp);
+        this.migration(plan, options, stamp);
         break;
       case 'repository':
         if (!this.workspace.exists(root, `${P}/model/${n.kebab}.entity.ts`)) {
@@ -449,12 +449,7 @@ export class GeneratorServiceImpl extends GeneratorService {
     }
   }
 
-  private migration(
-    plan: Plan,
-    c: CodeTemplates,
-    options: GenerateOptions,
-    stamp: number,
-  ): void {
+  private migration(plan: Plan, options: GenerateOptions, stamp: number): void {
     const snake = options.name.replace(/-/g, '_').toLowerCase();
     if (!/^[a-z][a-z0-9_]*$/.test(snake)) {
       throw new Error(
@@ -467,7 +462,7 @@ export class GeneratorServiceImpl extends GeneratorService {
     const intent = CodeTemplates.migrationIntent(snake);
     plan.create(
       `${GeneratorServiceImpl.P}/repository/migration/${file}.ts`,
-      c.migration(className, intent, options.fields),
+      CodeTemplates.migration(className, intent, options.fields),
     );
     this.registerMigration(plan, className, file);
     if (intent.kind === 'blank') {

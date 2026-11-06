@@ -22,7 +22,7 @@ import {inject} from 'inversify';
  *   /actuator/info                          app and runtime (ops networks only)
  *   /actuator/prometheus                    = /metrics (ops networks only)
  */
-export class ActuatorResponses {
+class ActuatorResponses {
   static send(response: ExpressResponse, body: object, status = 200): void {
     response
       .status(status)
