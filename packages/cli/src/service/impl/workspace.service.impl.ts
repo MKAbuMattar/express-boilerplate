@@ -22,9 +22,7 @@ export class WorkspaceServiceImpl extends WorkspaceService {
       }
       const parent = dirname(dir);
       if (parent === dir) {
-        throw new Error(
-          'Run this inside a project made by create-express-boilerplate',
-        );
+        throw new Error('Run this inside a project made by create-expresso');
       }
       dir = parent;
     }

@@ -1,4 +1,4 @@
-# create-express-boilerplate
+# create-expresso
 
 The project CLI. Two jobs:
 
@@ -9,7 +9,7 @@ Depends on nothing in the workspace. The terminal UI uses `ink`, `@inkjs/ui` and
 
 ## The app
 
-Run `eb` (or `npx create-express-boilerplate`) in a terminal and you get a full-screen app instead of flags: a menu, then each job as a short checklist. Every answered step stays on screen next to its badge (`dir`, `tmpl`, `feat`, `deps`, `kind`, `auth`...), then a preview of every file it will write, a confirm, live progress, and a result panel that goes back to the menu.
+Run `eb` (or `npx create-expresso`) in a terminal and you get a full-screen app instead of flags: a menu, then each job as a short checklist. Every answered step stays on screen next to its badge (`dir`, `tmpl`, `feat`, `deps`, `kind`, `auth`...), then a preview of every file it will write, a confirm, live progress, and a result panel that goes back to the menu.
 
 ```
  eb      shop
@@ -28,7 +28,7 @@ Inside a project the menu offers generate, add or remove a feature, info, doctor
 
 ## Commands
 
-Run with `npx create-express-boilerplate <command>` (or `pnpm dlx`), or with `pnpm eb <command>` inside a project. In a terminal, anything you leave out is asked for; in CI or a pipe, a missing argument is an error and progress prints as plain lines.
+Run with `npx create-expresso <command>` (or `pnpm dlx`), or with `pnpm eb <command>` inside a project. In a terminal, anything you leave out is asked for; in CI or a pipe, a missing argument is an error and progress prints as plain lines.
 
 | Command                                    | Does                                                                                       |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------ |
@@ -103,13 +103,13 @@ The template itself has every feature on, so it must lint, typecheck and pass it
 
 ## Publishing
 
-The release workflow publishes this package to npm after each release, versioned like the release (`3.1.0` for tag `v3.1.0`), with provenance. A published CLI downloads the template from its own tag, so `npx create-express-boilerplate@3.1.0` always creates the 3.1.0 template. `--ref main` takes the newest, `--template <dir>` a local checkout or fork. It needs an `NPM_TOKEN` repository secret.
+The release workflow publishes this package to npm after each release, versioned like the release (`3.1.0` for tag `v3.1.0`), with provenance. A published CLI downloads the template from its own tag, so `npx create-expresso@3.1.0` always creates the 3.1.0 template. `--ref main` takes the newest, `--template <dir>` a local checkout or fork. It needs an `NPM_TOKEN` repository secret.
 
 Check a build locally before a release:
 
 ```sh
-pnpm --filter create-express-boilerplate pack --pack-destination /tmp/eb
-cd /tmp && npx --package=/tmp/eb/create-express-boilerplate-0.0.0.tgz create-express-boilerplate my-api --template <this repo>
+pnpm --filter create-expresso pack --pack-destination /tmp/eb
+cd /tmp && npx --package=/tmp/eb/create-expresso-0.0.0.tgz create-expresso my-api --template <this repo>
 ```
 
 ## Scripts

@@ -1,5 +1,5 @@
 {
-  "name": "create-express-boilerplate",
+  "name": "create-expresso",
   "description": "Create an express-boilerplate project with only the features you pick, and generate resources inside it.",
   "type": "module",
   "version": "0.0.0",
@@ -22,7 +22,7 @@
     "typescript"
   ],
   "bin": {
-    "create-express-boilerplate": "./dist/main.js",
+    "create-expresso": "./dist/main.js",
     "eb": "./dist/main.js"
   },
   "files": [

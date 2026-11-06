@@ -38,7 +38,7 @@ Needs Node 26+, pnpm 12, and openssl.
 **New project with only the features you want** (interactive):
 
 ```sh
-pnpm create express-boilerplate my-api      # or, from a checkout: pnpm eb create ../my-api
+pnpm create expresso my-api      # or, from a checkout: pnpm eb create ../my-api
 cd my-api
 ```
 
@@ -75,13 +75,13 @@ Trust `apps/api/certs/ca.crt` in your OS to remove the browser warning. Swagger 
 
 ## Create a project
 
-`create-express-boilerplate` (also `pnpm eb create` from a checkout) copies this repository with only the features you choose. Code for the others is removed, not switched off: their files, their dependencies, their env settings, their compose services and their tests are gone, and what is left lints, typechecks and passes its tests. CI generates the `minimal`, `standard` and `full` presets on every push to keep that true.
+`create-expresso` (also `pnpm eb create` from a checkout) copies this repository with only the features you choose. Code for the others is removed, not switched off: their files, their dependencies, their env settings, their compose services and their tests are gone, and what is left lints, typechecks and passes its tests. CI generates the `minimal`, `standard` and `full` presets on every push to keep that true.
 
 ```sh
-pnpm create express-boilerplate my-api                          # the app: menu, checklist, preview
-pnpm create express-boilerplate my-api --preset minimal --yes   # core only
-pnpm create express-boilerplate my-api --features auth-oidc,redis,metrics
-pnpm create express-boilerplate my-api --config eb.config.json  # {"name", "preset" | "features", "install"}
+pnpm create expresso my-api                          # the app: menu, checklist, preview
+pnpm create expresso my-api --preset minimal --yes   # core only
+pnpm create expresso my-api --features auth-oidc,redis,metrics
+pnpm create expresso my-api --config eb.config.json  # {"name", "preset" | "features", "install"}
 pnpm eb features                                                # list features and presets
 ```
 
@@ -141,7 +141,7 @@ A pnpm workspace run by Turborepo. Each package has its own README:
 | [`packages/service`](packages/service/README.md)         | Business logic: service contracts and their implementations                                         | persistence, common |
 | [`packages/persistence`](packages/persistence/README.md) | Data access: entities, repositories, migrations, the database connection                            | common              |
 | [`packages/common`](packages/common/README.md)           | Shared infrastructure: config, dependency injection, security, errors, cache, queues, observability | nothing             |
-| [`packages/cli`](packages/cli/README.md)                 | `create-express-boilerplate` and `eb`: create a project, generate resources                         | nothing             |
+| [`packages/cli`](packages/cli/README.md)                 | `create-expresso` and `eb`: create a project, generate resources                                    | nothing             |
 
 The package dependencies enforce the direction: pnpm only resolves what a package declares, so `persistence` cannot import `service`, and nothing can import `api`. A Biome rule keeps the API layer off `persistence` too; only `application.ts`, the composition root, wires it in. `turbo run build` builds the layers in that order and caches the result.
 
