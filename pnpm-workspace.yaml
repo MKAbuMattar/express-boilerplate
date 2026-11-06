@@ -56,4 +56,4 @@ minimumReleaseAgeExclude:
 # Pin exact versions on `pnpm add` (pnpm 12 reads this here, not from .npmrc).
 saveExact: true
 patchedDependencies:
-  '@inkjs/ui@2.0.0': patches/@inkjs__ui@2.0.0.patch
+  "@inkjs/ui@2.0.0": patches/@inkjs__ui@2.0.0.patch
