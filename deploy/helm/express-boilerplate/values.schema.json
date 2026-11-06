@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "express-boilerplate values",
+  "type": "object",
+  "required": ["image", "config", "resources"],
+  "properties": {
+    "image": {
+      "type": "object",
+      "required": ["repository"],
+      "properties": {
+        "repository": { "type": "string", "minLength": 1 },
+        "tag": { "type": "string" },
+        "digest": { "type": "string", "pattern": "^(sha256:[a-f0-9]{64})?$" },
+        "pullPolicy": { "enum": ["Always", "IfNotPresent", "Never"] }
+      }
+    },
+    "replicaCount": { "type": "integer", "minimum": 1 },
+    "config": {
+      "type": "object",
+      "description": "Environment variables; values must be strings so YAML never turns them into numbers or booleans",
+      "propertyNames": { "pattern": "^[A-Z][A-Z0-9_]*$" },
+      "additionalProperties": { "type": "string" },
+      "not": {
+        "anyOf": [
+          { "required": ["SESSION_SECRET"] },
+          { "required": ["JWT_SECRET"] },
+          { "required": ["DB_URL"] },
+          { "required": ["CACHE_URL"] },
+          { "required": ["HMAC_CLIENTS"] },
+          { "required": ["OIDC_CLIENT_SECRET"] },
+          { "required": ["VAULT_TOKEN"] },
+          { "required": ["VAULT_SECRET_ID"] }
+        ]
+      }
+    },
+    "trustProxyHops": { "type": "integer", "minimum": 0 },
+    "secrets": {
+      "type": "object",
+      "properties": { "existingSecret": { "type": "string" } }
+    },
+    "externalSecret": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "refreshInterval": { "type": "string" },
+        "secretStoreRef": {
+          "type": "object",
+          "properties": {
+            "kind": { "enum": ["SecretStore", "ClusterSecretStore"] },
+            "name": { "type": "string" }
+          }
+        },
+        "remoteKey": { "type": "string" }
+      }
+    },
+    "migrations": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "backoffLimit": { "type": "integer", "minimum": 0 },
+        "activeDeadlineSeconds": { "type": "integer", "minimum": 30 }
+      }
+    },
+    "tls": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "secretName": { "type": "string" },
+        "certManager": { "type": "object" }
+      }
+    },
+    "securityContext": {
+      "type": "object",
+      "properties": {
+        "allowPrivilegeEscalation": { "const": false },
+        "runAsNonRoot": { "const": true }
+      }
+    },
+    "podSecurityContext": {
+      "type": "object",
+      "properties": { "runAsNonRoot": { "const": true } }
+    },
+    "service": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": ["ClusterIP", "NodePort", "LoadBalancer"] }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "hosts": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "required": ["requests"],
+      "properties": {
+        "requests": { "type": "object", "required": ["cpu", "memory"] }
+      }
+    },
+    "autoscaling": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "minReplicas": { "type": "integer", "minimum": 1 },
+        "maxReplicas": { "type": "integer", "minimum": 1 },
+        "targetCPUUtilizationPercentage": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        }
+      }
+    },
+    "podDisruptionBudget": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "maxUnavailable": { "type": ["integer", "string"] }
+      }
+    },
+    "terminationGracePeriodSeconds": { "type": "integer", "minimum": 15 }
+  }
+}

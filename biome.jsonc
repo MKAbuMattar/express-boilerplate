@@ -6,8 +6,14 @@
       "!**/dist/**/*",
       "!**/node_modules/**/*",
       "!**/coverage/**/*",
-      "!**/src/generated/**/*",
-      "!**/CHANGELOG.md"
+      "!**/CHANGELOG.md",
+      "!**/.turbo/**/*",
+      // Agent skill front matter must stay byte-exact; the formatter breaks it.
+      "!**/SKILL.md",
+      // Helm templates are Go templates, not YAML; helm lint checks them.
+      "!deploy/helm/**/templates/**/*",
+      // Exported by drawio from the .drawio sources next to them.
+      "!docs/diagrams/**/*"
     ],
     "ignoreUnknown": true
   },
@@ -29,10 +35,14 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "suspicious": {
         "noExplicitAny": "off",
         "noConfusingVoidType": "off"
+      },
+      "performance": {
+        // House rule: named imports only, never `import * as x`.
+        "noNamespaceImport": "error"
       },
       "style": {
         "noUselessElse": "off",
@@ -48,8 +58,37 @@
         "noInferrableTypes": "error"
       },
       "complexity": {
-        "noForEach": "off"
+        "noForEach": "off",
+        // House rule: all code lives in classes, including static-only helpers.
+        "noStaticOnlyClass": "off"
       }
     }
-  }
+  },
+  // Layers: api -> service -> persistence, and every layer -> common. The
+  // package dependencies enforce the direction between packages; this keeps
+  // the API layer off the data layer. application.ts is the composition root.
+  "overrides": [
+    {
+      "includes": ["apps/api/src/**", "!apps/api/src/application.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@express-boilerplate/persistence/**"],
+                    "importNamePattern": ".*Entity",
+                    "invertImportNamePattern": true,
+                    "message": "The API layer calls the service layer. Only entity types may be imported from persistence (for converters)."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

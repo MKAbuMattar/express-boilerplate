@@ -1,0 +1,45 @@
+# helm test: the Service answers /livez. Uses the app image (it has Node and
+# fetch), so no extra image to trust or pin.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "eb.fullname" . }}-test
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+    app.kubernetes.io/component: test
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  automountServiceAccountToken: false
+  securityContext:
+    {{- toYaml .Values.podSecurityContext | nindent 4 }}
+  containers:
+    - name: livez
+      image: {{ include "eb.image" . }}
+      env:
+        # Trust the pod CA; the cert names the Service, so it verifies.
+        - name: NODE_EXTRA_CA_CERTS
+          value: /etc/tls/ca.crt
+      command:
+        - node
+        - -e
+        - >-
+          fetch('https://{{ include "eb.fullname" . }}/livez')
+          .then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))
+      resources:
+        requests: {cpu: 10m, memory: 32Mi}
+        limits: {memory: 128Mi}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+      volumeMounts:
+        - name: tls
+          mountPath: /etc/tls
+          readOnly: true
+  volumes:
+    - name: tls
+      secret:
+        secretName: {{ include "eb.tlsSecretName" . }}
+        items:
+          - {key: ca.crt, path: ca.crt}

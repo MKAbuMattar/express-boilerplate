@@ -1,0 +1,80 @@
+name: Helm
+
+# Lints and renders the chart for every environment and validates the output
+# against Kubernetes and CRD schemas, so template mistakes fail here, not in a
+# cluster.
+on:
+  push:
+    branches: [main]
+    paths: ["deploy/helm/**", "deploy/argocd/**", ".github/workflows/helm.yml"]
+  pull_request:
+    paths: ["deploy/helm/**", "deploy/argocd/**", ".github/workflows/helm.yml"]
+
+permissions:
+  contents: read
+
+env:
+  CHART: deploy/helm/express-boilerplate
+  KUBECONFORM_VERSION: v0.8.0
+
+jobs:
+  chart:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
+        with:
+          egress-policy: audit
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Helm
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5.0.1
+
+      - name: Install kubeconform (checksum verified)
+        run: |
+          base="https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}"
+          curl -sSLO "$base/kubeconform-linux-amd64.tar.gz"
+          curl -sSLO "$base/CHECKSUMS"
+          grep ' kubeconform-linux-amd64.tar.gz$' CHECKSUMS | sha256sum -c -
+          tar -xzf kubeconform-linux-amd64.tar.gz kubeconform
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Lint (defaults and every environment)
+        run: |
+          helm lint "$CHART" --strict
+          for env in "$CHART"/environments/*.yaml; do
+            helm lint "$CHART" --strict -f "$env"
+          done
+
+      - name: Render and validate
+        run: |
+          crds='https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+          for env in "$CHART"/environments/*.yaml; do
+            echo "::group::$(basename "$env")"
+            helm template express-boilerplate "$CHART" -f "$env" \
+              | kubeconform -strict -summary \
+                  -schema-location default -schema-location "$crds"
+            echo "::endgroup::"
+          done
+
+      - name: Render with every optional feature on
+        run: |
+          helm template express-boilerplate "$CHART" \
+            --set secrets.existingSecret=app-secrets \
+            --set tls.secretName=app-tls \
+            --set autoscaling.enabled=true \
+            --set networkPolicy.enabled=true \
+            --set serviceMonitor.enabled=true \
+            --set httpRoute.enabled=true \
+            --set 'httpRoute.parentRefs[0].name=gateway' \
+            --set 'httpRoute.hostnames[0]=api.example.com' \
+            | kubeconform -strict -summary -schema-location default \
+                -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+
+      - name: Validate Argo CD manifests
+        run: |
+          kubeconform -strict -summary -schema-location \
+            'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+            deploy/argocd/root.yaml deploy/argocd/apps/

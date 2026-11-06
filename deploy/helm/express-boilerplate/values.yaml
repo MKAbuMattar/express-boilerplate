@@ -1,0 +1,178 @@
+# Default values for express-boilerplate. Environment files in environments/
+# override these. Never put secrets here: use secrets.existingSecret or
+# externalSecret.
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: ghcr.io/mkabumattar/express-boilerplate
+  # Pin per environment. An empty tag falls back to the chart appVersion.
+  tag: ""
+  # sha256:... takes precedence over tag: immutable, the recommended choice.
+  digest: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+# Ignored when autoscaling.enabled is true.
+replicaCount: 2
+
+# Non-secret settings, passed as environment variables (see .env.example).
+# The chart sets NODE_ENV, HOST, PORT, TLS_*, DB_TLS, TRUST_PROXY and
+# DB_MIGRATIONS_RUN itself; any key here overrides them.
+config:
+  PUBLIC_URL: https://api.example.com
+  DB_TYPE: postgres
+  CACHE_TYPE: redis
+  QUEUE_TYPE: bullmq
+  METRICS_ENABLED: "true"
+  RATE_LIMIT_ENABLED: "true"
+  # Pod networks that may call /metrics and ops routes. 100.64.0.0/10 covers
+  # clusters that give pods CGNAT addresses (EKS custom networking and others).
+  OPS_ALLOWED_CIDRS: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,100.64.0.0/10,127.0.0.0/8,::1/128,fc00::/7"
+
+# Proxy hops in front of the pods (the ingress controller is one).
+trustProxyHops: 1
+
+secrets:
+  # Name of a Secret with DB_URL, CACHE_URL, SESSION_SECRET, JWT_SECRET...
+  # Required for plain `helm install` (the migration hook runs first).
+  existingSecret: ""
+
+# External Secrets Operator: copy the secrets from Vault (or a cloud secret
+# manager) into <fullname>-secrets. Needs the operator and a SecretStore.
+externalSecret:
+  enabled: false
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ""
+  # Vault KV path, e.g. express-boilerplate/production
+  remoteKey: ""
+
+# The database server's certificate authority, when it is not a public one
+# (in-cluster Postgres with cert-manager, the AWS RDS bundle): a Secret with
+# ca.crt. Mounted in the pods and the migration Job; sets DB_TLS_CA_FILE.
+database:
+  caSecret: ""
+
+# Database migrations as a Job before the new version rolls out.
+migrations:
+  enabled: true
+  backoffLimit: 1
+  activeDeadlineSeconds: 600
+  resources:
+    requests: { cpu: 50m, memory: 128Mi }
+    limits: { memory: 256Mi }
+
+# TLS is not optional: the pod serves HTTPS on 443 only, and the ingress or
+# gateway re-encrypts to it. Encrypted in transit on every hop.
+tls:
+  # Existing Secret with tls.crt, tls.key and ca.crt. Empty: the chart creates
+  # a cert-manager Certificate (<fullname>-tls) for the Service DNS names.
+  secretName: ""
+  certManager:
+    issuerRef:
+      kind: ClusterIssuer
+      name: internal-ca
+    duration: 2160h
+    renewBefore: 360h
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext:
+  # Lets the non-root app bind 443. Namespaced and in the Kubernetes "safe"
+  # sysctl set since 1.22, so no node or PSA change is needed.
+  sysctls:
+    - name: net.ipv4.ip_unprivileged_port_start
+      value: "443"
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  capabilities:
+    drop: [ALL]
+
+service:
+  type: ClusterIP
+  annotations: {}
+
+ingress:
+  enabled: false
+  # "apisix" adds a BackendTrafficPolicy (HTTPS to the pods, Host passed
+  # through); ingress-nginx uses the annotations below instead.
+  className: ""
+  apisix:
+    # Upstream timeouts, e.g. {connect: 5s, send: 30s, read: 30s}.
+    timeout: {}
+  # Re-encrypt to the pod. These are ingress-nginx keys; other controllers
+  # have their own.
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts: []
+  tls: []
+
+# Gateway API alternative to Ingress. A BackendTLSPolicy makes the gateway
+# speak verified TLS to the pods. Its listener must be HTTPS.
+httpRoute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  hostnames: []
+
+# Requests reserve capacity; a memory limit stops leaks from taking the node.
+# No CPU limit: throttling hurts latency more than it protects.
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: null
+
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+topologySpread:
+  enabled: true
+
+networkPolicy:
+  enabled: false
+  # Namespaces allowed to reach the pods.
+  ingressNamespaces: [ingress-nginx, monitoring]
+  # Egress rules; empty leaves egress open.
+  egress: []
+
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  labels: {}
+
+terminationGracePeriodSeconds: 30
+priorityClassName: ""
+extraEnv: []
+nodeSelector: {}
+tolerations: []
+affinity: {}

@@ -1,0 +1,42 @@
+# Production: autoscaled, spread across zones, synced by hand in Argo CD.
+# Set image.digest from your release pipeline: an immutable digest, never a
+# moving tag. Every other value not set here is the chart default.
+config:
+  PUBLIC_URL: https://api.example.com
+  CORS_ORIGINS: https://app.example.com
+
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault
+  remoteKey: express-boilerplate/production
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts: [api.example.com]
+  tls:
+    - secretName: express-boilerplate-production-tls
+      hosts: [api.example.com]
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 384Mi
+  limits:
+    memory: 768Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 65
+
+networkPolicy:
+  enabled: true
+
+serviceMonitor:
+  enabled: true

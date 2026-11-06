@@ -1,0 +1,79 @@
+# apisix: no product name in any response. APISIX sets Server after
+# nginx's header filter, so it is removed by a plugin, not the config.
+apiVersion: apisix.apache.org/v2
+kind: ApisixGlobalRule
+metadata:
+  name: no-server-header
+  namespace: apisix
+spec:
+  ingressClassName: apisix
+  plugins:
+    - name: response-rewrite
+      enable: true
+      config:
+        headers:
+          remove: [Server]
+---
+# apisix: whatever no other route matches gets problem details, not the
+# gateway's own 404 body. Lowest priority, no backend.
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: not-found
+  namespace: apisix
+spec:
+  ingressClassName: apisix
+  http:
+    - name: not-found
+      priority: -100
+      match:
+        paths: ["/*"]
+      plugins:
+        - name: fault-injection
+          enable: true
+          config:
+            abort:
+              http_status: 404
+              headers:
+                content-type: application/problem+json
+              body: '{"type": "about:blank", "title": "Not Found", "status": 404, "detail": "Nothing is served at this host and path."}'
+---
+# apisix-private: no product name in any response. APISIX sets Server after
+# nginx's header filter, so it is removed by a plugin, not the config.
+apiVersion: apisix.apache.org/v2
+kind: ApisixGlobalRule
+metadata:
+  name: no-server-header
+  namespace: apisix-private
+spec:
+  ingressClassName: apisix-private
+  plugins:
+    - name: response-rewrite
+      enable: true
+      config:
+        headers:
+          remove: [Server]
+---
+# apisix-private: whatever no other route matches gets problem details, not the
+# gateway's own 404 body. Lowest priority, no backend.
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: not-found
+  namespace: apisix-private
+spec:
+  ingressClassName: apisix-private
+  http:
+    - name: not-found
+      priority: -100
+      match:
+        paths: ["/*"]
+      plugins:
+        - name: fault-injection
+          enable: true
+          config:
+            abort:
+              http_status: 404
+              headers:
+                content-type: application/problem+json
+              body: '{"type": "about:blank", "title": "Not Found", "status": 404, "detail": "Nothing is served at this host and path."}'

@@ -1,0 +1,29 @@
+{{- if .Values.httpRoute.enabled }}
+# Gateway API, the successor to Ingress. Needs a Gateway (Envoy Gateway,
+# Istio, Cilium, NGINX Gateway Fabric...) listed in parentRefs.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "eb.fullname" . }}
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+  {{- with .Values.httpRoute.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+    {{- required "httpRoute.parentRefs is required" .Values.httpRoute.parentRefs | toYaml | nindent 4 }}
+  {{- with .Values.httpRoute.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: {{ include "eb.fullname" . }}
+          port: 443
+{{- end }}

@@ -1,0 +1,30 @@
+# Staging: one region, small, synced automatically by Argo CD.
+# Set image.digest from your release pipeline or Argo CD Image Updater; the
+# default is the chart appVersion tag. Unset values are the chart defaults.
+
+config:
+  PUBLIC_URL: https://api.staging.example.com
+  CORS_ORIGINS: https://app.staging.example.com
+
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: vault
+  remoteKey: express-boilerplate/staging
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts: [api.staging.example.com]
+  tls:
+    - secretName: express-boilerplate-staging-tls
+      hosts: [api.staging.example.com]
+
+networkPolicy:
+  enabled: true
+
+serviceMonitor:
+  enabled: true

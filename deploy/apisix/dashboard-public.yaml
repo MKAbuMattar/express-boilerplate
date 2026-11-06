@@ -1,0 +1,29 @@
+# APISIX Dashboard: reads and writes routes in etcd over mutual TLS.
+# The public gateway's routes, at https://dashboard-public.<DEV_DOMAIN>
+# (served by the private gateway: no tool is on the public one).
+# Development login (admin/admin). Production puts an OAuth2 proxy in front.
+conf:
+  listen:
+    host: 0.0.0.0
+    port: 9000
+  # Only the gateway reaches it: the port is not published.
+  allow_list: ["0.0.0.0/0"]
+  etcd:
+    endpoints: ["etcd:2379"]
+    prefix: /apisix-public
+    mtls:
+      key_file: /certs/etcd-client.key
+      cert_file: /certs/etcd-client.crt
+      ca_file: /certs/ca.crt
+  log:
+    error_log:
+      level: warn
+      file_path: /dev/stderr
+    access_log:
+      file_path: /dev/stdout
+authentication:
+  secret: dev-dashboard-secret-change-me
+  expire_time: 3600
+  users:
+    - username: admin
+      password: admin

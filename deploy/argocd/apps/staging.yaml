@@ -1,0 +1,41 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: express-boilerplate-staging
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: express-boilerplate
+  source:
+    repoURL: https://github.com/MKAbuMattar/express-boilerplate.git
+    targetRevision: main
+    path: deploy/helm/express-boilerplate
+    helm:
+      releaseName: express-boilerplate
+      valueFiles:
+        - environments/staging.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: express-boilerplate-staging
+  syncPolicy:
+    # Staging follows main automatically and repairs drift.
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true
+    managedNamespaceMetadata:
+      labels:
+        # Pod Security Admission: the chart meets the restricted profile.
+        pod-security.kubernetes.io/enforce: restricted
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m

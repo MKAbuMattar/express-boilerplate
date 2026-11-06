@@ -1,0 +1,21 @@
+# Private gateway: operator tools (dashboards, metrics, secrets). Keep its
+# LoadBalancer on an internal network (cloud annotations go in service).
+# Ingresses use ingressClassName: apisix-private.
+apisix:
+  admin:
+    credentials:
+      admin: change-me-private-admin-key
+      viewer: change-me-private-viewer-key
+ingress-controller:
+  config:
+    # A second controller name, so neither controller takes the other's routes.
+    controllerName: apisix.apache.org/apisix-ingress-controller-private
+    kubernetes:
+      ingressClass: apisix-private
+  gatewayProxy:
+    provider:
+      controlPlane:
+        service: { name: apisix-private-admin, port: 9180 }
+        auth:
+          type: AdminKey
+          adminKey: { value: change-me-private-admin-key }

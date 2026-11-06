@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eb.fullname" . }}
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+  annotations:
+    # Before the migration Job (wave 0) and the Deployment (wave 1).
+    argocd.argoproj.io/sync-wave: "-1"
+data:
+  {{- include "eb.env" . | nindent 2 }}

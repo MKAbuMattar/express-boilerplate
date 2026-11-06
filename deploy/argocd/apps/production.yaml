@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: express-boilerplate-production
+  namespace: argocd
+  annotations:
+    # After staging in the same root sync.
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: express-boilerplate
+  source:
+    repoURL: https://github.com/MKAbuMattar/express-boilerplate.git
+    # Pin a release tag (e.g. v3.0.0) and promote by changing it; main is
+    # only the starting point.
+    targetRevision: main
+    path: deploy/helm/express-boilerplate
+    helm:
+      releaseName: express-boilerplate
+      valueFiles:
+        - environments/production.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: express-boilerplate-production
+  syncPolicy:
+    # No automated sync: a person presses Sync, inside the project's window.
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - PruneLast=true
+    managedNamespaceMetadata:
+      labels:
+        pod-security.kubernetes.io/enforce: restricted
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas

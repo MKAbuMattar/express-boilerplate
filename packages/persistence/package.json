@@ -1,0 +1,41 @@
+{
+  "name": "@express-boilerplate/persistence",
+  "description": "Data access: TypeORM entities, repositories, versioned migrations and a TLS-enforced connection for Postgres, MySQL, MariaDB, MSSQL, MongoDB and sql.js.",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    "./*.js": {
+      "source": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "migration:show": "tsx --env-file=../../apps/api/.env.development --env-file-if-exists=../../apps/api/.env node_modules/typeorm/cli.js migration:show -d src/config/cli.data-source.ts",
+    "migration:run": "tsx --env-file=../../apps/api/.env.development --env-file-if-exists=../../apps/api/.env node_modules/typeorm/cli.js migration:run -d src/config/cli.data-source.ts",
+    "migration:revert": "tsx --env-file=../../apps/api/.env.development --env-file-if-exists=../../apps/api/.env node_modules/typeorm/cli.js migration:revert -d src/config/cli.data-source.ts",
+    "migration:create": "tsx node_modules/typeorm/cli.js migration:create",
+    "migration:prod": "node node_modules/typeorm/cli.js migration:run -d dist/config/cli.data-source.js"
+  },
+  "dependencies": {
+    "@express-boilerplate/common": "workspace:*",
+    "inversify": "8.2.4",
+    "mongodb": "7.8.0",
+    "mysql2": "3.24.6",
+    "pg": "8.23.1",
+    "reflect-metadata": "0.2.2",
+    "sql.js": "1.15.2",
+    "typeorm": "1.1.2"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "rimraf": "6.1.4",
+    "typescript": "7.0.2",
+    "tsx": "4.23.15"
+  },
+  "engines": {
+    "node": ">=26"
+  }
+}

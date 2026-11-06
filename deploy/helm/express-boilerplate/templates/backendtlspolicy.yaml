@@ -1,0 +1,21 @@
+{{- if .Values.httpRoute.enabled }}
+# Gateway to pod over verified TLS (Gateway API v1.4+).
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: {{ include "eb.fullname" . }}
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: {{ include "eb.fullname" . }}
+      sectionName: https
+  validation:
+    hostname: {{ include "eb.fullname" . }}.{{ .Release.Namespace }}.svc
+    caCertificateRefs:
+      - group: ""
+        kind: Secret
+        name: {{ include "eb.tlsSecretName" . }}
+{{- end }}

@@ -1,0 +1,80 @@
+{{- if .Values.migrations.enabled }}
+# Schema migrations run once per release, before the new pods start, instead
+# of every replica racing to migrate at boot (the app runs with
+# DB_MIGRATIONS_RUN=false).
+#   Argo CD: a Sync hook in wave 0, after ConfigMap/ExternalSecret (-1) and
+#            before the Deployment (1). Argo ignores helm.sh/hook when its own
+#            hook annotation is present.
+#   Helm:    a pre-install/pre-upgrade hook. Env is inline (not the
+#            ConfigMap, which does not exist yet), the Secret must already
+#            exist (secrets.existingSecret), and it runs as its own
+#            ServiceAccount (migration-serviceaccount.yaml).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "eb.fullname" . }}-migrate
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migration
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/sync-wave: "0"
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    helm.sh/hook: pre-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: {{ .Values.migrations.backoffLimit }}
+  activeDeadlineSeconds: {{ .Values.migrations.activeDeadlineSeconds }}
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        {{- include "eb.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: migration
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "eb.fullname" . }}-migrate
+      automountServiceAccountToken: false
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: migrate
+          image: {{ include "eb.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # Migrations live in the persistence layer, next to the entities.
+          workingDir: /app/packages/persistence
+          command:
+            - node
+            - node_modules/typeorm/cli.js
+            - migration:run
+            - -d
+            - dist/config/cli.data-source.js
+          env:
+            {{- range $key, $value := (include "eb.env" . | fromYaml) }}
+            - name: {{ $key }}
+              value: {{ $value | toString | quote }}
+            {{- end }}
+          {{- if include "eb.hasSecret" . }}
+          envFrom:
+            - secretRef:
+                name: {{ include "eb.secretName" . }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.migrations.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            {{- include "eb.dbCaMount" . | nindent 12 }}
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi
+        {{- include "eb.dbCaVolume" . | nindent 8 }}
+{{- end }}

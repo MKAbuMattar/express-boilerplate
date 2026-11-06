@@ -1,0 +1,28 @@
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    url: http://prometheus:9090
+    isDefault: true
+  - name: Loki
+    uid: loki
+    type: loki
+    url: http://loki:3100
+    jsonData:
+      # Click a requestId in a log line to find the request everywhere.
+      derivedFields:
+        - name: requestId
+          matcherRegex: '"requestId":"([^"]+)"'
+          url: '{container="express-boilerplate"} |= "$${__value.raw}"'
+          datasourceUid: loki
+  # @feature:tracing
+  - name: Tempo
+    uid: tempo
+    type: tempo
+    url: http://tempo:3200
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: loki
+  # @end:tracing

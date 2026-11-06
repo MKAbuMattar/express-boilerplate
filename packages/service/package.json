@@ -1,0 +1,32 @@
+{
+  "name": "@express-boilerplate/service",
+  "description": "Business logic: user, health, mail, network and experiment services, each an abstract contract with its implementation, plus the event bus and job registry.",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "exports": {
+    "./*.js": {
+      "source": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@express-boilerplate/common": "workspace:*",
+    "@express-boilerplate/persistence": "workspace:*",
+    "inversify": "8.2.4",
+    "nodemailer": "10.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@types/nodemailer": "8.0.2",
+    "rimraf": "6.1.4",
+    "typescript": "7.0.2"
+  },
+  "engines": {
+    "node": ">=26"
+  }
+}

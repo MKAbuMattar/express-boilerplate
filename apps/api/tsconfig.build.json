@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "noEmit": false,
+    // The build compiles against package dist, never their sources.
+    "customConditions": []
+  },
+  "include": ["src"]
+}

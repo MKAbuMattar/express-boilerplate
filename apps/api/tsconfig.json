@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "../..",
+    // Typecheck against package sources, matching dev and tests.
+    "customConditions": ["source"]
+  },
+  // Package sources are listed so tsx compiles them with this config
+  // (decorators) when the `source` condition loads them.
+  "include": [
+    "src",
+    "test",
+    "scripts",
+    "../../packages/common/src",
+    "../../packages/service/src",
+    "../../packages/persistence/src"
+  ],
+  "extends": "../../tsconfig.base.json"
+}

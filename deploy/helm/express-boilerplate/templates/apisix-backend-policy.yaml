@@ -1,0 +1,25 @@
+{{- /*
+APISIX ingress controller (ingressClassName: apisix): the Ingress alone makes
+APISIX speak plaintext to the Service, which only serves HTTPS on 443. This
+policy targets the Service and sets the upstream scheme to https, and passes
+the client's Host through, which the app checks (ALLOWED_HOSTS, PUBLIC_URL).
+*/ -}}
+{{- if and .Values.ingress.enabled (eq .Values.ingress.className "apisix") }}
+apiVersion: apisix.apache.org/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: {{ include "eb.fullname" . }}
+  labels:
+    {{- include "eb.labels" . | nindent 4 }}
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: {{ include "eb.fullname" . }}
+  scheme: https
+  passHost: pass
+  {{- with .Values.ingress.apisix.timeout }}
+  timeout:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}

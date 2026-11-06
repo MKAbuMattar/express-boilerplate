@@ -1,0 +1,19 @@
+{{ include "eb.fullname" . }} {{ default .Chart.AppVersion .Values.image.tag }} is deployed to {{ .Release.Namespace }}.
+
+{{- if .Values.ingress.enabled }}
+URL: https://{{ first .Values.ingress.hosts }}
+{{- else if .Values.httpRoute.enabled }}
+Hostnames: {{ join ", " .Values.httpRoute.hostnames }}
+{{- else }}
+Port-forward:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "eb.fullname" . }} 8443:443
+  curl --cacert ca.crt https://localhost:8443/livez
+{{- end }}
+
+{{- if not (include "eb.hasSecret" .) }}
+
+WARNING: no secrets.existingSecret and no externalSecret. SESSION_SECRET is
+required in production; the pods will not start without it.
+{{- end }}
+
+Check: helm test {{ .Release.Name }} -n {{ .Release.Namespace }}

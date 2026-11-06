@@ -1,17 +1,23 @@
-# Node Modules/Build 
-coverage
-node_modules
-dist
-build
-dist-ssr
+# Node Modules/Build
+**/coverage
+**/node_modules
+**/dist
+**/build
+**/.turbo
 *.local
 *.log
-.env
-.env.*
+**/.env
+**/.env.*
 
 # Docker
-compose.override.yml
-compose.traefik.yml
-compose.yml
+compose*.yml
 Dockerfile
-Dockerfile.aws
+
+# Not part of the image
+.git
+.github
+deploy
+**/test
+
+# TLS keys never enter the build context
+**/certs

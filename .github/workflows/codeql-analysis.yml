@@ -1,8 +1,14 @@
 name: CodeQL Analysis
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: "0 0 * * *"
+  # Pull requests too: main has results from this workflow, so a PR without
+  # them fails code scanning with "configuration not found".
+  pull_request:
+    branches: [main]
 
 permissions: write-all
 
@@ -11,12 +17,6 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language:
-          - javascript
-
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@46b06cea07f9e64621fdf066ba77ac6915163d43 # v2.22.3
@@ -24,20 +24,26 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        id: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Initialize CodeQL
-        id: initialize
         uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
         with:
-          languages: ${{ matrix.language }}
-          source-root: src
+          languages: javascript
+          # The app and the layer packages; tests and build output are left out.
+          config: |
+            paths:
+              - apps/api/src
+              - packages
+            paths-ignore:
+              - "**/dist"
 
       - name: Autobuild
-        id: autobuild
         uses: github/codeql-action/autobuild@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
 
       - name: Perform CodeQL Analysis
-        id: analyze
         uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          # The name results had under the old one-language matrix, so they
+          # stay comparable with earlier runs.
+          category: /language:javascript

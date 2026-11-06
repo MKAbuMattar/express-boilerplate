@@ -8,6 +8,11 @@
   },
   "packageRules": [
     {
+      "description": "Supply-chain guard: let new npm releases age 3 days before Renovate proposes them (security fixes are exempt).",
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "3 days"
+    },
+    {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch",
@@ -27,5 +32,12 @@
       "packagePatterns": ["@vitest", "vitest"],
       "groupName": "vitest"
     }
-  ]
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "schedule": ["at any time"],
+    "automerge": true
+  },
+  "osvVulnerabilityAlerts": true
 }

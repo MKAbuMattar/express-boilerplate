@@ -1,0 +1,309 @@
+import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
+import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
+import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
+import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {Scopes} from '@express-boilerplate/common/security/authorization/scopes.js';
+import {JwtGuard} from '@express-boilerplate/common/security/jwt/jwt.guard.js';
+import {CreateUserDto} from '@express-boilerplate/service/dto/create-user.dto.js';
+import {UserService} from '@express-boilerplate/service/service/user.service.js';
+import {
+  All,
+  Body,
+  Controller,
+  CreatedHttpResponse,
+  Delete,
+  ErrorHttpResponse,
+  Get,
+  Headers,
+  HttpStatusCode,
+  NoContentHttpResponse,
+  OkHttpResponse,
+  Params,
+  Patch,
+  Post,
+  Put,
+  Query,
+  Request,
+  UseGuard,
+} from '@inversifyjs/http-core';
+import {
+  OasParameter,
+  OasRequestBody,
+  OasResponse,
+  OasSecurity,
+  OasSummary,
+  OasTag,
+} from '@inversifyjs/http-open-api';
+import type {Request as ExpressRequest} from 'express';
+import {inject} from 'inversify';
+import {UserConverter} from '../../../converter/user.converter.js';
+import {PageDto, PageRequestDto} from '../../dto/v2/page.dto.js';
+import type {UserV2Dto} from '../../dto/v2/user.dto.js';
+import {UserPatchDto} from '../../dto/v2/user-patch.dto.js';
+import {Preconditions} from '../../preconditions.js';
+
+/**
+ * API v2 users: paged and searchable list, the phone field from the
+ * AddUserPhone migration, and every method with its RFC 9110 meaning:
+ *
+ * | Method | Does                          | Safe | Idempotent |
+ * |--------|-------------------------------|------|------------|
+ * | GET    | read (304 on If-None-Match)   | yes  | yes        |
+ * | QUERY  | search with a body            | yes  | yes        |
+ * | POST   | create, server picks the id   | no   | no         |
+ * | PUT    | replace all, or create at id  | no   | yes        |
+ * | PATCH  | change some fields            | no   | no         |
+ * | DELETE | remove                        | no   | yes        |
+ *
+ * Writes honour If-Match (412 when the ETag is stale).
+ */
+@Controller(ApiConstants.V2_USERS)
+export class UserV2Resource {
+  constructor(@inject(UserService) private readonly userService: UserService) {}
+
+  @OasTag('Users v2')
+  @OasSummary('List users, paged and searchable (public)')
+  @OasParameter({
+    name: 'page',
+    in: 'query',
+    schema: {type: 'integer', minimum: 1, default: 1},
+  })
+  @OasParameter({
+    name: 'size',
+    in: 'query',
+    schema: {type: 'integer', minimum: 1, maximum: 100, default: 20},
+  })
+  @OasParameter({
+    name: 'search',
+    in: 'query',
+    description: 'Substring of name or email',
+    schema: {type: 'string', maxLength: 100},
+  })
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('A page of users', OpenApiConstants.ref('UserPage')),
+  )
+  @OasResponse(
+    HttpStatusCode.BAD_REQUEST,
+    OpenApiConstants.problem('Invalid paging'),
+  )
+  @Get()
+  async getUsers(
+    @Query() query: Record<string, unknown>,
+  ): Promise<ApiResponse<PageDto<UserV2Dto>>> {
+    const request = PageRequestDto.from(query);
+    const {items, total} = await this.userService.findPage(
+      request.page,
+      request.size,
+      request.search,
+    );
+    return ApiResponse.ok(
+      'Users found',
+      new PageDto(
+        items.map((user) => UserConverter.toV2Dto(user)),
+        request.page,
+        request.size,
+        total,
+      ),
+    );
+  }
+
+  @OasTag('Users v2')
+  @OasSummary('QUERY: search with criteria in the body (safe, idempotent)')
+  @OasRequestBody({
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            search: {type: 'string'},
+            page: {type: 'integer'},
+            size: {type: 'integer'},
+          },
+        },
+      },
+    },
+  })
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('A page of users', OpenApiConstants.ref('UserPage')),
+  )
+  @All('/search')
+  async query(
+    @Request() request: ExpressRequest,
+    @Body() body: unknown,
+  ): Promise<ApiResponse<PageDto<UserV2Dto>>> {
+    if (request.method !== 'QUERY') {
+      throw new ErrorHttpResponse(
+        HttpStatusCode.METHOD_NOT_ALLOWED,
+        ApiResponse.fail(`${request.method} is not supported here`),
+        undefined,
+        undefined,
+        {Allow: 'QUERY'},
+      );
+    }
+    const criteria =
+      typeof body === 'object' && body !== null
+        ? (body as Record<string, unknown>)
+        : {};
+    return this.getUsers(criteria);
+  }
+
+  @OasTag('Users v2')
+  @OasSummary('Get a user by id (public)')
+  @OasParameter(OpenApiConstants.ID_PATH_PARAM)
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('User found', OpenApiConstants.ref('UserV2')),
+  )
+  @OasResponse(
+    HttpStatusCode.NOT_FOUND,
+    OpenApiConstants.problem('User not found'),
+  )
+  @Get('/:id')
+  async getUser(@Params({name: 'id'}) id: string): Promise<OkHttpResponse> {
+    const user = await this.userService.findById(id);
+    // Express answers 304 itself when If-None-Match equals this ETag.
+    return new OkHttpResponse(
+      ApiResponse.ok('User found', UserConverter.toV2Dto(user)),
+      {ETag: UserConverter.etag(user)},
+    );
+  }
+
+  @OasTag('Users v2')
+  @OasSummary('Create a user with an optional phone (JWT)')
+  @OasSecurity({bearerAuth: []})
+  @OasRequestBody(OpenApiConstants.CREATE_USER_V2_BODY)
+  @OasResponse(
+    HttpStatusCode.CREATED,
+    OpenApiConstants.json('User created', OpenApiConstants.ref('UserV2')),
+  )
+  @OasResponse(
+    HttpStatusCode.BAD_REQUEST,
+    OpenApiConstants.problem('Validation failed'),
+  )
+  @OasResponse(
+    HttpStatusCode.UNAUTHORIZED,
+    OpenApiConstants.problem('Missing or invalid JWT'),
+  )
+  @OasResponse(
+    HttpStatusCode.CONFLICT,
+    OpenApiConstants.problem('Email already in use'),
+  )
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
+  @Post()
+  async createUser(@Body() body: unknown): Promise<CreatedHttpResponse> {
+    const user = await this.userService.create(CreateUserDto.fromV2(body));
+    return new CreatedHttpResponse(
+      ApiResponse.ok('User created', UserConverter.toV2Dto(user)),
+    );
+  }
+
+  @OasTag('Users v2')
+  @OasSummary('Replace a user, or create it at this id (JWT, idempotent)')
+  @OasSecurity({bearerAuth: []})
+  @OasParameter(OpenApiConstants.ID_PATH_PARAM)
+  @OasRequestBody(OpenApiConstants.CREATE_USER_V2_BODY)
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('User replaced', OpenApiConstants.ref('UserV2')),
+  )
+  @OasResponse(
+    HttpStatusCode.CREATED,
+    OpenApiConstants.json('User created', OpenApiConstants.ref('UserV2')),
+  )
+  @OasResponse(
+    HttpStatusCode.PRECONDITION_FAILED,
+    OpenApiConstants.problem('ETag mismatch'),
+  )
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
+  @Put('/:id')
+  async replaceUser(
+    @Params({name: 'id'}) id: string,
+    @Body() body: unknown,
+    @Headers({name: 'if-match'}) ifMatch: string | undefined,
+    @Headers({name: 'if-none-match'}) ifNoneMatch: string | undefined,
+  ): Promise<OkHttpResponse | CreatedHttpResponse> {
+    const dto = CreateUserDto.fromV2(body);
+    Preconditions.check(await this.currentEtag(id), ifMatch, ifNoneMatch);
+    const {user, created} = await this.userService.replace(id, dto);
+    const payload = ApiResponse.ok(
+      created ? 'User created' : 'User replaced',
+      UserConverter.toV2Dto(user),
+    );
+    const etag = UserConverter.etag(user);
+    return created
+      ? new CreatedHttpResponse(payload, {
+          ETag: etag,
+          Location: `${ApiConstants.V2_USERS}/${user.id}`,
+        })
+      : new OkHttpResponse(payload, {ETag: etag});
+  }
+
+  @OasTag('Users v2')
+  @OasSummary('Change some fields of a user (JWT)')
+  @OasSecurity({bearerAuth: []})
+  @OasParameter(OpenApiConstants.ID_PATH_PARAM)
+  @OasRequestBody({
+    content: {
+      'application/merge-patch+json': {
+        schema: {type: 'object', example: {age: 43, phone: null}},
+      },
+    },
+  })
+  @OasResponse(
+    HttpStatusCode.OK,
+    OpenApiConstants.json('User updated', OpenApiConstants.ref('UserV2')),
+  )
+  @OasResponse(
+    HttpStatusCode.NOT_FOUND,
+    OpenApiConstants.problem('User not found'),
+  )
+  @OasResponse(
+    HttpStatusCode.PRECONDITION_FAILED,
+    OpenApiConstants.problem('ETag mismatch'),
+  )
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
+  @Patch('/:id')
+  async patchUser(
+    @Params({name: 'id'}) id: string,
+    @Body() body: unknown,
+    @Headers({name: 'if-match'}) ifMatch: string | undefined,
+  ): Promise<OkHttpResponse> {
+    const {changes} = UserPatchDto.from(body);
+    Preconditions.check(await this.currentEtag(id), ifMatch, undefined);
+    const user = await this.userService.patch(id, changes);
+    return new OkHttpResponse(
+      ApiResponse.ok('User updated', UserConverter.toV2Dto(user)),
+      {ETag: UserConverter.etag(user)},
+    );
+  }
+
+  @OasTag('Users v2')
+  @OasSummary('Delete a user (JWT, idempotent)')
+  @OasSecurity({bearerAuth: []})
+  @OasParameter(OpenApiConstants.ID_PATH_PARAM)
+  @OasResponse(HttpStatusCode.NO_CONTENT, OpenApiConstants.NO_CONTENT)
+  @OasResponse(
+    HttpStatusCode.NOT_FOUND,
+    OpenApiConstants.problem('User not found'),
+  )
+  @UseGuard(JwtGuard, Scopes.require(ScopeConstants.USERS_WRITE))
+  @Delete('/:id')
+  async deleteUser(
+    @Params({name: 'id'}) id: string,
+    @Headers({name: 'if-match'}) ifMatch: string | undefined,
+  ): Promise<NoContentHttpResponse> {
+    Preconditions.check(await this.currentEtag(id), ifMatch, undefined);
+    await this.userService.delete(id);
+    return new NoContentHttpResponse();
+  }
+
+  private async currentEtag(id: string): Promise<string | null> {
+    try {
+      return UserConverter.etag(await this.userService.findById(id));
+    } catch {
+      return null;
+    }
+  }
+}
