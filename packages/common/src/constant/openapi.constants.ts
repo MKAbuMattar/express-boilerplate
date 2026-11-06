@@ -95,7 +95,26 @@ export class OpenApiConstants {
       type: 'object',
       description: 'The authenticated caller.',
       properties: {
-        strategy: {enum: ['mtls', 'hmac', 'jwt', 'oauth2', 'oidc', 'saml']},
+        strategy: {
+          enum: [
+            // @feature:auth-mtls
+            'mtls',
+            // @end:auth-mtls
+            // @feature:auth-hmac
+            'hmac',
+            // @end:auth-hmac
+            'jwt',
+            // @feature:auth-oauth2
+            'oauth2',
+            // @end:auth-oauth2
+            // @feature:auth-oidc
+            'oidc',
+            // @end:auth-oidc
+            // @feature:auth-saml
+            'saml',
+            // @end:auth-saml
+          ],
+        },
         subject: {type: 'string'},
         claims: {type: 'object', additionalProperties: true},
       },
@@ -104,7 +123,7 @@ export class OpenApiConstants {
       type: 'object',
       properties: {
         database: {type: 'string', example: 'postgres'},
-        cache: {type: 'string', example: 'redis'},
+        cache: {type: 'string', example: 'memory'},
       },
     },
     ActuatorHealth: {
@@ -124,6 +143,7 @@ export class OpenApiConstants {
         },
       },
     },
+    // @feature:experiments
     Variant: {
       type: 'object',
       properties: {
@@ -131,6 +151,8 @@ export class OpenApiConstants {
         variant: {enum: ['A', 'B']},
       },
     },
+    // @end:experiments
+    // @feature:network
     PingResult: {
       type: 'object',
       properties: {
@@ -139,6 +161,7 @@ export class OpenApiConstants {
         latencyMs: {type: ['number', 'null']},
       },
     },
+    // @end:network
     JobAccepted: {
       type: 'object',
       properties: {jobId: {type: 'string'}},
@@ -229,20 +252,32 @@ export class OpenApiConstants {
     description: 'No content',
   };
 
+  // @feature:sso
   static readonly REDIRECT: OpenApi3Dot1ResponseObject = {
     description: 'Redirect (Location header)',
   };
+  // @end:sso
 
+  // @feature:auth-saml
   static readonly XML: OpenApi3Dot1ResponseObject = {
     description: 'SAML service provider metadata',
     content: {'application/xml': {schema: {type: 'string'}}},
   };
+  // @end:auth-saml
 
   static readonly QUEUE_PATH_PARAM: OpenApi3Dot1ParameterObject = {
     name: 'name',
     in: 'path',
     required: true,
-    schema: {type: 'string', enum: ['welcome-email', 'demo']},
+    schema: {
+      type: 'string',
+      enum: [
+        // @feature:mail
+        'welcome-email',
+        // @end:mail
+        'demo',
+      ],
+    },
   };
 
   static readonly ID_PATH_PARAM: OpenApi3Dot1ParameterObject = {

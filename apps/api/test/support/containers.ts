@@ -39,7 +39,9 @@ export class Containers {
       })
       .withExposedPorts(5432)
       .withHealthCheck({
-        test: ['CMD-SHELL', 'pg_isready -U app -d app'],
+        // Over TCP: on first start the image runs a socket-only init server,
+        // reports ready, then restarts it; a socket check races that restart.
+        test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -U app -d app'],
         interval: 1000,
         retries: 60,
       })

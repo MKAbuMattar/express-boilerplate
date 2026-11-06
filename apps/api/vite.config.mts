@@ -1,7 +1,11 @@
 import {defineConfig} from 'vitest/config';
 
 // One project per test type: pnpm test:<name>, or pnpm test for all of them.
+// The `source` condition loads workspace packages from src, so a change in a
+// package is tested without rebuilding its dist.
 export default defineConfig({
+  resolve: {conditions: ['source']},
+  ssr: {resolve: {conditions: ['source']}},
   test: {
     environment: 'node',
     restoreMocks: true,

@@ -1,4 +1,4 @@
-import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
+import type {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
 import {Principal} from '@express-boilerplate/common/security/principal.js';
 import {SessionService} from '@express-boilerplate/common/security/sso/session.service.js';
 import type express from 'express';
@@ -50,13 +50,14 @@ describe('ExperimentV1Resource (A/B over HTTP)', () => {
     expect(counts.B).toBeGreaterThan(140);
   });
 
+  // @feature:sso
   it('uses the SSO subject for signed-in users', async () => {
     let cookie = '';
     await application.beans
       .getBean(SessionService)
       .start(
         {cookie: (n: string, v: string) => (cookie = `${n}=${v}`)} as never,
-        new Principal(AuthStrategy.Oidc, 'alice'),
+        new Principal('oidc' as AuthStrategy, 'alice'),
       );
     const response = await request(app)
       .get('/api/experiments/all-a')
@@ -64,6 +65,7 @@ describe('ExperimentV1Resource (A/B over HTTP)', () => {
     expect(response.body.data.variant).toBe('A');
     expect(response.headers['set-cookie']).toBeUndefined();
   });
+  // @end:sso
 
   it('ignores a forged ab_id cookie (it is signed)', async () => {
     const response = await request(app)

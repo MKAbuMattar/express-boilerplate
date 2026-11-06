@@ -11,7 +11,9 @@
       // Agent skill front matter must stay byte-exact; the formatter breaks it.
       "!**/SKILL.md",
       // Helm templates are Go templates, not YAML; helm lint checks them.
-      "!deploy/helm/**/templates/**/*"
+      "!deploy/helm/**/templates/**/*",
+      // Exported by drawio from the .drawio sources next to them.
+      "!docs/diagrams/**/*"
     ],
     "ignoreUnknown": true
   },

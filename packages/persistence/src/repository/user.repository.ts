@@ -22,10 +22,12 @@ export class UserRepository {
   }
 
   findById(id: string): Promise<UserEntity | null> {
+    // @feature:db-mongodb
     if (EntityIds.isMongo) {
       if (!ObjectId.isValid(id)) return Promise.resolve(null);
       return this.orm.findOneBy({_id: new ObjectId(id)} as object);
     }
+    // @end:db-mongodb
     return this.orm.findOneBy({id});
   }
 
@@ -53,6 +55,7 @@ export class UserRepository {
   }
 
   private searchWhere(search: string): FindOptionsWhere<UserEntity>[] {
+    // @feature:db-mongodb
     if (EntityIds.isMongo) {
       const pattern = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       return [
@@ -60,6 +63,7 @@ export class UserRepository {
         {email: {$regex: pattern, $options: 'i'}},
       ] as never;
     }
+    // @end:db-mongodb
     // '!' as the LIKE escape char: unlike '', it means the same in every dialect.
     const term = `%${search.toLowerCase().replace(/[!%_]/g, '!$&')}%`;
     const like = Raw((column) => `LOWER(${column}) LIKE :term ESCAPE '!'`, {
@@ -74,13 +78,14 @@ export class UserRepository {
     return this.orm.save(this.orm.create(user));
   }
 
-  /** True when the id has the shape this database uses (UUID or ObjectId). */
+  /** True when the id has the shape this database uses. */
   isValidId(id: string): boolean {
-    return EntityIds.isMongo
-      ? ObjectId.isValid(id)
-      : /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          id,
-        );
+    // @feature:db-mongodb
+    if (EntityIds.isMongo) return ObjectId.isValid(id);
+    // @end:db-mongodb
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      id,
+    );
   }
 
   /** Insert with a client-chosen id (PUT on a missing resource). */
@@ -89,7 +94,10 @@ export class UserRepository {
     user: Pick<UserEntity, 'name' | 'email' | 'age' | 'phone'>,
   ): Promise<UserEntity> {
     const entity = this.orm.create(user);
-    (entity as {id: unknown}).id = EntityIds.isMongo ? new ObjectId(id) : id;
+    (entity as {id: unknown}).id = id;
+    // @feature:db-mongodb
+    if (EntityIds.isMongo) (entity as {id: unknown}).id = new ObjectId(id);
+    // @end:db-mongodb
     return this.orm.save(entity);
   }
 

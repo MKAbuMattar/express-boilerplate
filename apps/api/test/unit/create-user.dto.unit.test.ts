@@ -1,5 +1,5 @@
+import {ValidationException} from '@express-boilerplate/common/exceptions/domain.exception.js';
 import {CreateUserDto} from '@express-boilerplate/service/dto/create-user.dto.js';
-import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
 
 describe('CreateUserDto.from', () => {
@@ -24,14 +24,15 @@ describe('CreateUserDto.from', () => {
     [{name: 'A'.repeat(121), email: 'a@b.co', age: 1}, ['name']],
     [{name: 'A', email: 'no-at-sign', age: 1}, ['email']],
     [{name: '   ', email: 'a@b.co', age: 1}, ['name']],
-  ])('rejects %j with 400 listing %j', (body, fields) => {
+  ])('rejects %j listing %j', (body, fields) => {
     try {
       CreateUserDto.from(body);
       expect.unreachable('should throw');
     } catch (error) {
-      expect(isHttpResponse(error) && error.statusCode).toBe(400);
-      const data = (error as {body: {data: object}}).body.data;
-      expect(Object.keys(data)).toEqual(fields);
+      expect(error).toBeInstanceOf(ValidationException);
+      expect(Object.keys((error as ValidationException).fields!)).toEqual(
+        fields,
+      );
     }
   });
 

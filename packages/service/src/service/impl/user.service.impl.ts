@@ -1,6 +1,10 @@
 import {Service} from '@express-boilerplate/common/config/stereotypes.js';
 import {CacheConstants} from '@express-boilerplate/common/constant/cache.constants.js';
-import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
+import {
+  ConflictException,
+  NotFoundException,
+  ValidationException,
+} from '@express-boilerplate/common/exceptions/domain.exception.js';
 import {CacheService} from '@express-boilerplate/common/service/cache.service.js';
 import {
   type CacheAware,
@@ -9,11 +13,6 @@ import {
 } from '@express-boilerplate/common/util/cache.decorators.js';
 import type {UserEntity} from '@express-boilerplate/persistence/model/user.entity.js';
 import {UserRepository} from '@express-boilerplate/persistence/repository/user.repository.js';
-import {
-  BadRequestHttpResponse,
-  ConflictHttpResponse,
-  NotFoundHttpResponse,
-} from '@inversifyjs/http-core';
 import {inject} from 'inversify';
 import type {CreateUserDto} from '../../dto/create-user.dto.js';
 import {AppEvent} from '../../model/app-event.js';
@@ -51,7 +50,7 @@ export class UserServiceImpl extends UserService implements CacheAware {
   @CacheEvict(() => CacheConstants.USERS_ALL)
   async create(dto: CreateUserDto): Promise<UserEntity> {
     if (await this.userRepository.findByEmail(dto.email)) {
-      throw new ConflictHttpResponse(ApiResponse.fail('Email already in use'));
+      throw new ConflictException('Email already in use');
     }
     const user = await this.userRepository.save(dto);
     this.eventBus.publish(new AppEvent('user.created', {id: String(user.id)}));
@@ -92,11 +91,7 @@ export class UserServiceImpl extends UserService implements CacheAware {
       return {user, created: false};
     }
     if (!this.userRepository.isValidId(id)) {
-      throw new BadRequestHttpResponse(
-        ApiResponse.fail('Validation failed', {
-          id: 'must be a valid id to create',
-        }),
-      );
+      throw new ValidationException({id: 'must be a valid id to create'});
     }
     const user = await this.userRepository.saveWithId(id, fields);
     this.eventBus.publish(new AppEvent('user.created', {id}));
@@ -122,13 +117,13 @@ export class UserServiceImpl extends UserService implements CacheAware {
   private async ensureEmailFree(email: string, ownerId: string): Promise<void> {
     const holder = await this.userRepository.findByEmail(email);
     if (holder && String(holder.id) !== ownerId) {
-      throw new ConflictHttpResponse(ApiResponse.fail('Email already in use'));
+      throw new ConflictException('Email already in use');
     }
   }
 
   private require(user: UserEntity | null): UserEntity {
     if (!user) {
-      throw new NotFoundHttpResponse(ApiResponse.fail('User not found'));
+      throw new NotFoundException('User not found');
     }
     return user;
   }

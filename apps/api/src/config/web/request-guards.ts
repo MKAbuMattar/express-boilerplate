@@ -81,12 +81,10 @@ export class RequestGuards {
       ...config.corsOrigins,
     ]);
     return (request, response, next) => {
-      if (
-        RequestGuards.SAFE_METHODS.has(request.method) ||
-        request.path === '/auth/saml/acs'
-      ) {
-        return next();
-      }
+      if (RequestGuards.SAFE_METHODS.has(request.method)) return next();
+      // @feature:auth-saml
+      if (request.path === '/auth/saml/acs') return next();
+      // @end:auth-saml
       const site = request.header('sec-fetch-site');
       const origin = request.header('origin');
       const originAllowed = origin !== undefined && allowed.has(origin);
@@ -180,8 +178,10 @@ export class RequestGuards {
   static deadline(config: AppConfig): RequestHandler {
     const ms = config.env.HTTP_HANDLER_TIMEOUT_MS;
     return (request, response, next) => {
+      // @feature:sse
       if (String(request.headers.accept).includes('text/event-stream'))
         return next();
+      // @end:sse
       const timer = setTimeout(() => {
         ProblemDetails.send(
           response,

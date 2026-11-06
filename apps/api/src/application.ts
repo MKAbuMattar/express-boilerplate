@@ -47,10 +47,16 @@ export class Application {
     UserV1Resource,
     AuthenticationController,
     SecureV1Resource,
+    // @feature:experiments
     ExperimentV1Resource,
+    // @end:experiments
     UserV2Resource,
+    // @feature:sse
     EventV1Resource,
+    // @end:sse
+    // @feature:network
     NetworkV1Resource,
+    // @end:network
     QueueV1Resource,
     WellKnownController,
     ActuatorController,
@@ -108,6 +114,7 @@ export class Application {
           String(response.getHeader('X-Request-Id')),
       }),
     );
+    // @feature:metrics
     if (config.env.METRICS_ENABLED) {
       const metrics = this.beans.getBean(Metrics);
       app.use(metrics.middleware());
@@ -124,6 +131,7 @@ export class Application {
         );
       }
     }
+    // @end:metrics
     app.use(RequestGuards.hostValidation(config));
     app.use(RateLimiter.middleware(config, store));
     app.use(HttpSemantics.options(() => built));
@@ -175,15 +183,25 @@ export class Application {
     return built;
   }
 
+  // @feature:transports
   /** Everything shares the one TLS server: HTTPS, WebSocket and TCP (ALPN). */
   startTransports(server: https.Server): void {
+    // @feature:websocket
     this.beans.getBean(WebSocketGateway).attach(server);
+    // @end:websocket
+    // @feature:tcp
     this.beans.getBean(TcpServer).attach(server);
+    // @end:tcp
   }
+  // @end:transports
 
   async close(server?: https.Server): Promise<void> {
+    // @feature:websocket
     await this.beans.getBean(WebSocketGateway).close();
+    // @end:websocket
+    // @feature:tcp
     this.beans.getBean(TcpServer).close();
+    // @end:tcp
     server?.closeAllConnections?.();
     await new Promise<void>((resolve) =>
       server ? server.close(() => resolve()) : resolve(),

@@ -28,6 +28,7 @@
     "lint:fix": "biome check --write ./apps ./packages",
     "fmt": "biome format --write ./apps ./packages",
     "certs": "pnpm --filter @express-boilerplate/api certs",
+    "eb": "node packages/cli/src/main.ts",
     "jwt": "pnpm --filter @express-boilerplate/api jwt",
     "jwt:keygen": "pnpm --filter @express-boilerplate/api jwt:keygen",
     "migration:show": "pnpm --filter @express-boilerplate/persistence migration:show",

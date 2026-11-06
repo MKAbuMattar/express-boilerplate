@@ -16,22 +16,30 @@ describe('AppConfig', () => {
     return () => new AppConfig(env);
   };
 
-  it('splits CORS origins, HMAC clients and experiments', () => {
+  it('splits CORS origins and feature lists', () => {
     const config = new AppConfig({
       NODE_ENV: 'test',
       CORS_ORIGINS: 'https://a.example, https://b.example',
+      // @feature:auth-hmac
       HMAC_CLIENTS: 'a:s1,b:s:with:colons',
+      // @end:auth-hmac
+      // @feature:experiments
       EXPERIMENTS: 'checkout:50, search:10',
+      // @end:experiments
     });
     expect(config.corsOrigins).toEqual([
       'https://a.example',
       'https://b.example',
     ]);
+    // @feature:auth-hmac
     expect(config.hmacClients.get('b')).toBe('s:with:colons');
+    // @end:auth-hmac
+    // @feature:experiments
     expect([...config.experiments]).toEqual([
       ['checkout', 50],
       ['search', 10],
     ]);
+    // @end:experiments
   });
 
   it('uses dev defaults only when NODE_ENV is set and not production', () => {
@@ -51,6 +59,7 @@ describe('AppConfig', () => {
     ).toThrow('exit 1');
   });
 
+  // @feature:experiments
   it('rejects malformed experiments', () => {
     expect(
       () => new AppConfig({NODE_ENV: 'test', EXPERIMENTS: 'x:101'}),
@@ -59,6 +68,7 @@ describe('AppConfig', () => {
       'EXPERIMENTS',
     );
   });
+  // @end:experiments
 
   describe('encrypted transit (staging and production)', () => {
     const secret = 'x'.repeat(48);
@@ -104,10 +114,18 @@ describe('AppConfig', () => {
       })();
       for (const name of [
         'DB_TLS',
+        // @feature:redis
         'CACHE_URL',
+        // @end:redis
+        // @feature:mail
         'SMTP_URL',
+        // @end:mail
+        // @feature:vault
         'VAULT_ADDR',
+        // @end:vault
+        // @feature:auth-oidc
         'OIDC_ISSUER',
+        // @end:auth-oidc
       ]) {
         expect(error).toContain(name);
       }
@@ -135,11 +153,17 @@ describe('AppConfig', () => {
         rejectUnauthorized: true,
         ca: undefined,
       });
+      // @feature:db-mysql
       expect(options({DB_TYPE: 'mysql', ...url}).ssl).toMatchObject({
         rejectUnauthorized: true,
       });
+      // @end:db-mysql
+      // @feature:db-mongodb
       expect(options({DB_TYPE: 'mongodb', ...url}).tls).toBe(true);
+      // @end:db-mongodb
+      // @feature:db-mssql
       expect(options({DB_TYPE: 'mssql', ...url}).options?.encrypt).toBe(true);
+      // @end:db-mssql
       expect(
         options({DB_TYPE: 'postgres', DB_URL: 'x://db'}).ssl,
       ).toBeUndefined();

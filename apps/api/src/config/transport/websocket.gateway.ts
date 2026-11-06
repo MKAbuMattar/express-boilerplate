@@ -19,8 +19,10 @@ import {TransportMessage} from './transport-message.js';
  * Auth, checked before the upgrade completes (bad auth gets HTTP 401):
  * - `Authorization: Bearer <jwt>` for servers,
  * - `?access_token=<jwt>` for browsers, which cannot set headers,
+ // @feature:sso
  * - the SSO session cookie, only from an allowed Origin (blocks cross-site
  *   WebSocket hijacking).
+ // @end:sso
  *
  * Messages are JSON {type, ...}: ping, echo, broadcast, whoami. Server events
  * from EventBus arrive as {type: "event", event}.
@@ -37,7 +39,9 @@ export class WebSocketGateway {
   constructor(
     @inject(AppConfig) private readonly config: AppConfig,
     @inject(TokenProvider) private readonly tokenProvider: TokenProvider,
+    // @feature:sso
     @inject(SessionService) private readonly sessionService: SessionService,
+    // @end:sso
     @inject(EventBus) private readonly eventBus: EventBus,
     @inject(AppLogger) private readonly appLogger: AppLogger,
   ) {}
@@ -122,13 +126,16 @@ export class WebSocketGateway {
         return null;
       }
     }
+    // @feature:sso
     const session = this.cookie(request, SecurityConstants.SESSION_COOKIE);
     if (session && this.isAllowedOrigin(request.headers.origin)) {
       return this.sessionService.readToken(session);
     }
+    // @end:sso
     return null;
   }
 
+  // @feature:sso
   private isAllowedOrigin(origin: string | undefined): boolean {
     if (!origin) return false;
     return (
@@ -136,7 +143,9 @@ export class WebSocketGateway {
       this.config.corsOrigins.includes(origin)
     );
   }
+  // @end:sso
 
+  // @feature:sso
   private cookie(request: IncomingMessage, name: string): string | undefined {
     for (const part of (request.headers.cookie ?? '').split(';')) {
       const [key, ...value] = part.trim().split('=');
@@ -144,6 +153,7 @@ export class WebSocketGateway {
     }
     return undefined;
   }
+  // @end:sso
 
   private onConnection(client: WebSocket, principal: Principal): void {
     this.alive.set(client, true);

@@ -3,6 +3,7 @@ import {createHmac, randomBytes} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import tls from 'node:tls';
+import {ScopeConstants} from '@express-boilerplate/common/constant/scope.constants.js';
 import {SignJWT} from 'jose';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {WebSocket} from 'ws';
@@ -17,21 +18,33 @@ import {TestApp} from '../support/test-app.js';
  */
 describe('E2E: real HTTPS server', () => {
   const JWT_SECRET = randomBytes(32).toString('base64url');
+  // @feature:auth-hmac
   const HMAC_SECRET = 'e2e-hmac-secret';
+  // @end:auth-hmac
   let certs: string;
+  // @feature:idp
   let idp: MockIdentityProvider;
+  // @end:idp
   let server: ChildProcess;
   let client: HttpsClient;
   let output = '';
 
   beforeAll(async () => {
     certs = TestApp.certs();
+    // @feature:idp
     idp = await new MockIdentityProvider(certs).start();
+    // @end:idp
     const port = await HttpsClient.freePort();
     client = new HttpsClient(certs, port);
     server = spawn(
       process.execPath,
-      ['--disable-proto=delete', '--import', 'tsx', 'src/main.ts'],
+      [
+        '--disable-proto=delete',
+        '--conditions=source',
+        '--import',
+        'tsx',
+        'src/main.ts',
+      ],
       {
         env: {
           ...process.env,
@@ -47,16 +60,24 @@ describe('E2E: real HTTPS server', () => {
           DB_URL: '',
           CACHE_TYPE: 'memory',
           JWT_SECRET,
+          // @feature:auth-hmac
           HMAC_CLIENTS: `e2e-partner:${HMAC_SECRET}`,
+          // @end:auth-hmac
+          // @feature:auth-oauth2
           OAUTH2_ISSUER: idp.issuer,
           OAUTH2_AUDIENCE: MockIdentityProvider.API_AUDIENCE,
           OAUTH2_JWKS_URI: idp.jwksUri,
+          // @end:auth-oauth2
+          // @feature:auth-oidc
           OIDC_ISSUER: idp.issuer,
           OIDC_CLIENT_ID: MockIdentityProvider.CLIENT_ID,
           OIDC_CLIENT_SECRET: 'e2e-secret',
-          SAML_ENTRY_POINT: `${idp.issuer}/saml`,
+          // @end:auth-oidc
+          // @feature:auth-saml
+          SAML_ENTRY_POINT: 'https://idp.example.com/saml',
           SAML_ISSUER: 'express-boilerplate-e2e',
           SAML_IDP_CERT: readFileSync(join(certs, 'ca.crt'), 'utf8'),
+          // @end:auth-saml
         },
         stdio: ['ignore', 'pipe', 'pipe'],
       },
@@ -75,11 +96,13 @@ describe('E2E: real HTTPS server', () => {
 
   afterAll(async () => {
     server?.kill();
+    // @feature:idp
     await idp?.stop();
+    // @end:idp
   });
 
   const jwt = () =>
-    new SignJWT({scope: 'users:write ops:queues ops:network'})
+    new SignJWT({scope: ScopeConstants.ALL.join(' ')})
       .setProtectedHeader({alg: 'HS256'})
       .setSubject('e2e-admin')
       .setJti(randomBytes(8).toString('hex'))
@@ -125,6 +148,7 @@ describe('E2E: real HTTPS server', () => {
     expect((await client.request('GET', `/api/users/${id}`)).status).toBe(404);
   });
 
+  // @feature:auth-mtls
   it('mTLS: off by default (TLS_CLIENT_AUTH=none), so the route is 401', async () => {
     // require mode is covered on a real socket in auth.integration.
     const withCert = await client.request('GET', '/api/secure/mtls', {
@@ -133,7 +157,9 @@ describe('E2E: real HTTPS server', () => {
     expect(withCert.status).toBe(401);
     expect((await client.request('GET', '/api/secure/mtls')).status).toBe(401);
   });
+  // @end:auth-mtls
 
+  // @feature:auth-hmac
   it('HMAC: signed once is 200, the replay is 401', async () => {
     const body = '{"amount":10}';
     const ts = String(Math.floor(Date.now() / 1000));
@@ -153,7 +179,9 @@ describe('E2E: real HTTPS server', () => {
         .status,
     ).toBe(401);
   });
+  // @end:auth-hmac
 
+  // @feature:auth-oauth2
   it('OAuth2: token from the IdP is 200, wrong audience is 401', async () => {
     const ok = await client.request('GET', '/api/secure/oauth2', {
       headers: {authorization: `Bearer ${await idp.accessToken('client-42')}`},
@@ -164,7 +192,9 @@ describe('E2E: real HTTPS server', () => {
     });
     expect(wrong.status).toBe(401);
   });
+  // @end:auth-oauth2
 
+  // @feature:auth-oidc
   it('OIDC: full login, session, logout', async () => {
     const login = await client.request('GET', '/auth/oidc/login');
     expect(login.status).toBe(302);
@@ -212,7 +242,9 @@ describe('E2E: real HTTPS server', () => {
       ).status,
     ).toBe(204);
   });
+  // @end:auth-oidc
 
+  // @feature:auth-saml
   it('SAML: redirect, metadata, forged assertion is 401', async () => {
     const login = await client.request('GET', '/auth/saml/login');
     expect(String(login.headers.location)).toContain('/saml?SAMLRequest=');
@@ -229,7 +261,9 @@ describe('E2E: real HTTPS server', () => {
     expect(acs.status).toBe(401);
     expect(acs.cookie('session')).toBeUndefined();
   });
+  // @end:auth-saml
 
+  // @feature:websocket
   it('WebSocket over TLS (wss://) with a JWT', async () => {
     const token = await jwt();
     const reply = await new Promise<any>((resolve, reject) => {
@@ -253,6 +287,7 @@ describe('E2E: real HTTPS server', () => {
       subject: 'e2e-admin',
     });
   });
+  // @end:websocket
 
   it('API v2: PUT create, PATCH, QUERY, ETag 304, problem details', async () => {
     const auth = {authorization: `Bearer ${await jwt()}`};
@@ -308,9 +343,10 @@ describe('E2E: real HTTPS server', () => {
     expect(
       await handshake({
         maxVersion: 'TLSv1.2',
-        ciphers: 'ECDHE-RSA-AES128-GCM-SHA256',
+        // The local certificates are ECDSA, so the ECDSA suites are the ones on offer.
+        ciphers: 'ECDHE-ECDSA-AES128-GCM-SHA256',
       }),
-    ).toBe('ECDHE-RSA-AES128-GCM-SHA256');
+    ).toBe('ECDHE-ECDSA-AES128-GCM-SHA256');
     // Static RSA key exchange: no forward secrecy, so the server refuses it.
     expect(
       await handshake({maxVersion: 'TLSv1.2', ciphers: 'AES128-GCM-SHA256'}),
@@ -324,6 +360,7 @@ describe('E2E: real HTTPS server', () => {
     ).toMatch(/^rejected/);
   });
 
+  // @feature:experiments
   it('A/B: a visitor keeps the variant', async () => {
     const first = await client.request('GET', '/api/experiments/new-checkout');
     const cookie = first.cookie('ab_id')!;
@@ -332,4 +369,5 @@ describe('E2E: real HTTPS server', () => {
     });
     expect(again.json.data.variant).toBe(first.json.data.variant);
   });
+  // @end:experiments
 });

@@ -5,17 +5,18 @@
   "type": "module",
   "version": "0.0.0",
   "exports": {
-    "./*": "./dist/*"
+    "./*.js": {
+      "source": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
   },
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@express-boilerplate/common": "workspace:*",
     "@express-boilerplate/persistence": "workspace:*",
-    "@inversifyjs/http-core": "5.9.2",
     "inversify": "8.2.4",
     "nodemailer": "10.3.1"
   },

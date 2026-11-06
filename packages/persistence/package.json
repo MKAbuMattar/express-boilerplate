@@ -5,11 +5,13 @@
   "type": "module",
   "version": "0.0.0",
   "exports": {
-    "./*": "./dist/*"
+    "./*.js": {
+      "source": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
   },
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit",
     "migration:show": "tsx --env-file=../../apps/api/.env.development --env-file-if-exists=../../apps/api/.env node_modules/typeorm/cli.js migration:show -d src/config/cli.data-source.ts",
     "migration:run": "tsx --env-file=../../apps/api/.env.development --env-file-if-exists=../../apps/api/.env node_modules/typeorm/cli.js migration:run -d src/config/cli.data-source.ts",

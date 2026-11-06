@@ -16,7 +16,7 @@ export class PingHealthIndicator extends HealthIndicator {
   }
 }
 
-/** A round trip to the database: SELECT 1, or ping on MongoDB. */
+/** A round trip to the database: SELECT 1 (ping on MongoDB). */
 @Component()
 export class DatabaseHealthIndicator extends HealthIndicator {
   readonly name = 'db';
@@ -31,7 +31,16 @@ export class DatabaseHealthIndicator extends HealthIndicator {
       return Health.down({database, error: 'not connected'});
     }
     const started = performance.now();
-    if (database === 'mongodb') {
+    await this.roundTrip();
+    return Health.up({
+      database,
+      latencyMs: Math.round(performance.now() - started),
+    });
+  }
+
+  private async roundTrip(): Promise<void> {
+    // @feature:db-mongodb
+    if (this.dataSource.options.type === 'mongodb') {
       // TypeORM types the Mongo query runner loosely; its connection is a MongoClient.
       const client = (
         this.dataSource.mongoManager.queryRunner as unknown as {
@@ -39,13 +48,10 @@ export class DatabaseHealthIndicator extends HealthIndicator {
         }
       ).databaseConnection;
       await client.db().command({ping: 1});
-    } else {
-      await this.dataSource.query('SELECT 1');
+      return;
     }
-    return Health.up({
-      database,
-      latencyMs: Math.round(performance.now() - started),
-    });
+    // @end:db-mongodb
+    await this.dataSource.query('SELECT 1');
   }
 }
 

@@ -59,12 +59,14 @@ export class TcpServer {
     socket.setEncoding('utf8');
 
     let principal: Principal | null = null;
+    // @feature:auth-mtls
     if (socket.authorized) {
       principal = new Principal(
         AuthStrategy.Mtls,
         String(socket.getPeerCertificate().subject.CN),
       );
     }
+    // @end:auth-mtls
     let buffer = '';
     let queue = Promise.resolve();
     socket.on('data', (chunk: string) => {

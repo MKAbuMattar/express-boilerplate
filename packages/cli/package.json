@@ -1,0 +1,57 @@
+{
+  "name": "create-express-boilerplate",
+  "description": "Create an express-boilerplate project with only the features you pick, and generate resources inside it.",
+  "type": "module",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Mohammad Abu Mattar",
+  "homepage": "https://github.com/MKAbuMattar/express-boilerplate/tree/main/packages/cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MKAbuMattar/express-boilerplate.git",
+    "directory": "packages/cli"
+  },
+  "bugs": "https://github.com/MKAbuMattar/express-boilerplate/issues",
+  "keywords": [
+    "express",
+    "boilerplate",
+    "generator",
+    "scaffold",
+    "create",
+    "cli",
+    "typescript"
+  ],
+  "bin": {
+    "create-express-boilerplate": "./dist/main.js",
+    "eb": "./dist/main.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rimraf dist && esbuild src/main.ts --bundle --platform=node --format=esm --target=node24 --outfile=dist/main.js --external:./devtools.js --minify-syntax --minify-whitespace --legal-comments=external --log-level=warning \"--banner:js=import {createRequire} from 'node:module';const require=createRequire(import.meta.url);\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "prepack": "pnpm build"
+  },
+  "devDependencies": {
+    "@inkjs/ui": "2.0.0",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "esbuild": "0.28.2",
+    "ink": "8.0.0",
+    "ink-testing-library": "4.0.0",
+    "react": "19.3.1",
+    "rimraf": "6.1.4",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  },
+  "engines": {
+    "node": ">=26"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

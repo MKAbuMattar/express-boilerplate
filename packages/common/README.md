@@ -34,4 +34,4 @@ Shared infrastructure that every package uses: configuration, dependency injecti
 
 ## Scripts
 
-`build` (to `dist/`), `dev` (watch), `typecheck`. Other packages import by path, for example `@express-boilerplate/common/config/app.config.js`.
+`build` (to `dist/`), `typecheck`. Dev and tests load `src/` through the `source` export condition; builds and production use `dist/`. Other packages import by path, for example `@express-boilerplate/common/config/app.config.js`.

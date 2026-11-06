@@ -19,24 +19,38 @@ const PUBLIC_ROUTES = new Set([
   'GET /actuator/health/readiness',
   // Limited to OPS_ALLOWED_CIDRS; loopback is allowed here.
   'GET /actuator/info',
+  // @feature:metrics
   'GET /actuator/prometheus',
+  // @end:metrics
   'GET /api/v1/users',
   'GET /api/v1/users/:id',
   'GET /api/v2/users',
   'GET /api/v2/users/:id',
   'GET /api/v1/secure/public',
+  // @feature:experiments
   'GET /api/v1/experiments',
   'GET /api/v1/experiments/:name',
+  // @end:experiments
+  // @feature:sse
   'GET /api/v1/events',
+  // @end:sse
   'GET /.well-known/jwks.json',
+  // @feature:metrics
   'GET /metrics', // limited to OPS_ALLOWED_CIDRS; loopback is allowed here
+  // @end:metrics
   // Login flows must be reachable before login.
+  // @feature:auth-oidc
   'GET /auth/oidc/login',
   'GET /auth/oidc/callback',
+  // @end:auth-oidc
+  // @feature:auth-saml
   'GET /auth/saml/login',
   'POST /auth/saml/acs',
   'GET /auth/saml/metadata',
+  // @end:auth-saml
+  // @feature:sso
   'POST /auth/logout',
+  // @end:sso
 ]);
 
 /** @All routes: every method, public on purpose (QUERY search; others 405). */
@@ -70,7 +84,8 @@ describe('Security: route audit (deny by default)', () => {
   afterAll(() => application.close());
 
   it('finds the routes', () => {
-    expect(routes.length).toBeGreaterThan(30);
+    // Even the smallest generated project has users, health, actuator and auth.
+    expect(routes.length).toBeGreaterThan(15);
   });
 
   it('every non-public route refuses an anonymous caller', async () => {

@@ -16,8 +16,10 @@ export class TlsConfig {
     'ECDHE-RSA-CHACHA20-POLY1305',
   ].join(':');
 
+  // @feature:tcp
   /** ALPN id of the newline-delimited JSON protocol (TcpServer) on 443. */
   static readonly LINE_PROTOCOL = 'ndjson/1';
+  // @end:tcp
 
   static serverOptions(config: AppConfig): ServerOptions {
     const {TLS_KEY_FILE, TLS_CERT_FILE, TLS_CA_FILE} = config.env;
@@ -30,9 +32,14 @@ export class TlsConfig {
       honorCipherOrder: true,
       // One port: HTTP/1.1 (and WebSocket upgrades), plus the TCP line
       // protocol only when it is on, so no client negotiates a dead protocol.
+      // @feature:tcp
       ALPNProtocols: config.env.TCP_ENABLED
         ? ['http/1.1', TlsConfig.LINE_PROTOCOL]
         : ['http/1.1'],
+      // @end:tcp
+      // @feature:!tcp
+      //~ ALPNProtocols: ['http/1.1'],
+      // @end:!tcp
       // Client certificates are all or nothing at the handshake: "require"
       // refuses any connection without a cert signed by TLS_CA_FILE. Use it
       // when only a proxy (with its own client cert) and mTLS clients connect;

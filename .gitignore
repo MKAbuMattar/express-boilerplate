@@ -346,4 +346,6 @@ certs/
 # Turborepo cache
 .turbo
 
+.serena
+
 # >>> End of custom patterns (edit freely; igntui preserves this block) <<<

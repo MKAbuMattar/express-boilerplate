@@ -12,8 +12,12 @@ export class Main {
   static async run(): Promise<void> {
     // Secrets first (they may include OTEL_* or DB settings), then tracing,
     // which must patch HTTP before the server exists.
+    // @feature:vault
     const fromVault = await VaultSecrets.load();
+    // @end:vault
+    // @feature:tracing
     Tracing.start();
+    // @end:tracing
     const application = new Application();
     const {config} = application;
     const {logger} = application.beans.getBean(AppLogger);
@@ -25,10 +29,25 @@ export class Main {
       config,
     );
 
+    // @feature:transports
     application.startTransports(server);
+    // @end:transports
+    // @feature:vault
     if (fromVault.length > 0) {
       logger.info({keys: fromVault}, 'Secrets loaded from Vault');
     }
+    // @end:vault
+    server.once('error', (error: NodeJS.ErrnoException) => {
+      // Ports below 1024 need a privilege most Linux setups do not grant.
+      if (error.code === 'EACCES' && config.env.PORT < 1024) {
+        logger.fatal(
+          `Cannot bind port ${config.env.PORT}. Allow it once with: ` +
+            `sudo sysctl -w net.ipv4.ip_unprivileged_port_start=${config.env.PORT}`,
+        );
+        process.exit(1);
+      }
+      throw error;
+    });
     server.listen(config.env.PORT, config.env.HOST, () => {
       logger.info(
         `Server (${config.env.NODE_ENV}) on https://${config.env.HOST}:${config.env.PORT}` +
@@ -41,7 +60,9 @@ export class Main {
       setTimeout(() => process.exit(1), Main.SHUTDOWN_TIMEOUT_MS).unref();
       application
         .close(server)
+        // @feature:tracing
         .then(() => Tracing.stop())
+        // @end:tracing
         .then(
           () => process.exit(0),
           (error: unknown) => {

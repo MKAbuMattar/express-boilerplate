@@ -28,12 +28,10 @@ export class DatabaseConfig {
     const ca = config.env.DB_TLS_CA_FILE
       ? readFileSync(config.env.DB_TLS_CA_FILE)
       : undefined;
-    const isMongo = DB_TYPE === DatabaseType.Mongodb;
     const common = {
       entities: DatabaseConfig.entities,
-      // MongoDB is schemaless, so it has no migrations to run.
-      migrations: isMongo ? [] : DatabaseConfig.migrations,
-      migrationsRun: !isMongo && DB_MIGRATIONS_RUN,
+      migrations: DatabaseConfig.migrations,
+      migrationsRun: DB_MIGRATIONS_RUN,
       migrationsTableName: 'schema_migrations',
       synchronize: DB_SYNCHRONIZE,
     };
@@ -44,6 +42,7 @@ export class DatabaseConfig {
         return DB_URL
           ? {...common, type: 'sqljs', location: DB_URL, autoSave: true}
           : {...common, type: 'sqljs'};
+      // @feature:db-mssql
       case DatabaseType.Mssql:
         return {
           ...common,
@@ -53,9 +52,14 @@ export class DatabaseConfig {
             options: {encrypt: true, trustServerCertificate: false},
           }),
         };
+      // @end:db-mssql
+      // @feature:db-mongodb
       case DatabaseType.Mongodb:
         return {
           ...common,
+          // MongoDB is schemaless, so it has no migrations to run.
+          migrations: [],
+          migrationsRun: false,
           type: 'mongodb',
           url: DatabaseConfig.url(DB_URL),
           ...(DB_TLS && {
@@ -63,6 +67,7 @@ export class DatabaseConfig {
             tlsCAFile: config.env.DB_TLS_CA_FILE || undefined,
           }),
         };
+      // @end:db-mongodb
       default:
         // Verified TLS: the server cert must chain to a trusted CA.
         return {

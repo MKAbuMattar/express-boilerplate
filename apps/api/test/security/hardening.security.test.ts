@@ -44,9 +44,10 @@ describe('Security: runtime hardening', () => {
     });
 
     it('has a stricter, separate bucket for /auth (brute force)', async () => {
-      expect((await request(app).get('/auth/me')).status).toBe(401);
-      expect((await request(app).get('/auth/me')).status).toBe(401);
-      expect((await request(app).get('/auth/me')).status).toBe(429);
+      const revoke = () => request(app).post('/auth/token/revoke');
+      expect((await revoke()).status).toBe(401);
+      expect((await revoke()).status).toBe(401);
+      expect((await revoke()).status).toBe(429);
     });
 
     it('fails open when the cache is down', async () => {

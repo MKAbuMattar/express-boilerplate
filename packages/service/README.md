@@ -38,6 +38,8 @@ userService(beans: BeanFactory): UserService {
 2. `src/service/impl/order.service.impl.ts`: `@Service() export class OrderServiceImpl extends OrderService`, with dependencies taken through `@inject(Token)`.
 3. Add a `@Bean(OrderService)` method to `ServiceConfiguration`.
 
+`pnpm eb generate resource order --fields title:string,total:int` does all three, plus the entity, DTOs and REST resource. Services throw domain errors (`NotFoundException`, `ConflictException`, `ValidationException`), never HTTP responses.
+
 ## Scripts
 
-`build` (to `dist/`), `dev` (watch), `typecheck`. Other packages import the compiled output by path, for example `@express-boilerplate/service/service/user.service.js`.
+`build` (to `dist/`), `typecheck`. Dev and tests load `src/` through the `source` export condition; builds and production use `dist/`. Other packages import by path, for example `@express-boilerplate/service/service/user.service.js`.

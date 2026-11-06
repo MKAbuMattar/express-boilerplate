@@ -1,5 +1,4 @@
-import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
-import {BadRequestHttpResponse} from '@inversifyjs/http-core';
+import {ValidationException} from '@express-boilerplate/common/exceptions/domain.exception.js';
 
 export class CreateUserDto {
   private static readonly EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -24,13 +23,12 @@ export class CreateUserDto {
     try {
       base = CreateUserDto.from(body);
     } catch (error) {
-      errors = (error as {body: {data: Record<string, string>}}).body.data;
+      if (!(error instanceof ValidationException)) throw error;
+      errors = {...error.fields};
     }
     if (phoneError) errors.phone = 'must be 6 to 32 digits, spaces, ()+-';
     if (!base || phoneError) {
-      throw new BadRequestHttpResponse(
-        ApiResponse.fail('Validation failed', errors),
-      );
+      throw new ValidationException(errors);
     }
     return new CreateUserDto(
       base.name,
@@ -71,9 +69,7 @@ export class CreateUserDto {
     }
 
     if (Object.keys(errors).length > 0) {
-      throw new BadRequestHttpResponse(
-        ApiResponse.fail('Validation failed', errors),
-      );
+      throw new ValidationException(errors);
     }
     return new CreateUserDto(
       (name as string).trim(),

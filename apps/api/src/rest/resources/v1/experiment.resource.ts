@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto';
+import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import {ApiConstants} from '@express-boilerplate/common/constant/api.constants.js';
 import {ExperimentConstants} from '@express-boilerplate/common/constant/experiment.constants.js';
 import {OpenApiConstants} from '@express-boilerplate/common/constant/openapi.constants.js';
@@ -30,7 +31,10 @@ export class ExperimentV1Resource {
   constructor(
     @inject(ExperimentService)
     private readonly experimentService: ExperimentService,
+    @inject(AppConfig) private readonly config: AppConfig,
+    // @feature:sso
     @inject(SessionService) private readonly sessionService: SessionService,
+    // @end:sso
   ) {}
 
   @OasTag('Experiments')
@@ -83,8 +87,10 @@ export class ExperimentV1Resource {
     request: ExpressRequest,
     response: ExpressResponse,
   ): Promise<string> {
+    // @feature:sso
     const principal = await this.sessionService.read(request);
     if (principal) return `${principal.strategy}:${principal.subject}`;
+    // @end:sso
 
     const existing: unknown =
       request.signedCookies?.[ExperimentConstants.SUBJECT_COOKIE];
@@ -92,7 +98,7 @@ export class ExperimentV1Resource {
 
     const subject = randomUUID();
     response.cookie(ExperimentConstants.SUBJECT_COOKIE, subject, {
-      ...this.sessionService.cookieOptions,
+      ...this.config.cookieOptions,
       signed: true,
       maxAge: ExperimentConstants.SUBJECT_COOKIE_MAX_AGE_MS,
     });

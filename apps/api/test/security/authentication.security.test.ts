@@ -1,7 +1,7 @@
 import {mkdtempSync, writeFileSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
+import type {AuthStrategy} from '@express-boilerplate/common/enumeration/auth-strategy.enum.js';
 import {TokenProvider} from '@express-boilerplate/common/security/jwt/token.provider.js';
 import {Principal} from '@express-boilerplate/common/security/principal.js';
 import {SessionService} from '@express-boilerplate/common/security/sso/session.service.js';
@@ -41,13 +41,14 @@ describe('Security: authentication', () => {
       expect((await use(other)).status).toBe(200);
     });
 
+    // @feature:sso
     it('SSO logout revokes the session server-side', async () => {
       let cookie = '';
       await application.beans
         .getBean(SessionService)
         .start(
           {cookie: (n: string, v: string) => (cookie = `${n}=${v}`)} as never,
-          new Principal(AuthStrategy.Saml, 'bob'),
+          new Principal('oidc' as AuthStrategy, 'bob'),
         );
       expect(
         (await request(app).get('/auth/me').set('cookie', cookie)).status,
@@ -60,6 +61,7 @@ describe('Security: authentication', () => {
         (await request(app).get('/auth/me').set('cookie', cookie)).status,
       ).toBe(401);
     });
+    // @end:sso
   });
 
   describe('token validation', () => {

@@ -97,21 +97,25 @@ describe('Actuator health', () => {
     expect(typeof body.uptimeSeconds).toBe('number');
   });
 
+  // @feature:metrics
   it('prometheus is /metrics under its Actuator name', async () => {
     const response = await request(app).get('/actuator/prometheus');
     expect(response.status).toBe(200);
     expect(response.text).toContain('http_request_duration_seconds');
   });
+  // @end:metrics
 
-  it('info and prometheus are limited to ops networks; health is not', async () => {
+  it('ops endpoints are limited to ops networks; health is not', async () => {
     const {application: locked, app: lockedApp} = await TestApp.create({
       OPS_ALLOWED_CIDRS: '10.0.0.0/8',
     });
     try {
+      // @feature:metrics
       expect((await request(lockedApp).get('/actuator/info')).status).toBe(403);
       expect(
         (await request(lockedApp).get('/actuator/prometheus')).status,
       ).toBe(403);
+      // @end:metrics
       expect((await request(lockedApp).get('/actuator/health')).status).toBe(
         200,
       );

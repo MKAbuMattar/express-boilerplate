@@ -61,6 +61,7 @@ describe('Security: scope-based authorization', () => {
       (await request(app).get('/api/v1/queues').auth(writer, {type: 'bearer'}))
         .status,
     ).toBe(403);
+    // @feature:network
     expect(
       (
         await request(app)
@@ -69,6 +70,7 @@ describe('Security: scope-based authorization', () => {
           .send({host: '127.0.0.1'})
       ).status,
     ).toBe(403);
+    // @end:network
     const ops = await token({scope: 'ops:queues'});
     expect(
       (await request(app).get('/api/v1/queues').auth(ops, {type: 'bearer'}))
@@ -113,7 +115,7 @@ describe('Security: scope-based authorization', () => {
   });
 
   it('reads scopes from every known claim', () => {
-    const principal = new Principal(AuthStrategy.OAuth2, 'x', {
+    const principal = new Principal(AuthStrategy.Jwt, 'x', {
       scope: 'a b',
       scp: ['c'],
       roles: ['d'],

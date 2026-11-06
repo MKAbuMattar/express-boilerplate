@@ -8,19 +8,31 @@ export type Env = ReturnType<(typeof AppConfig)['read']>;
 
 export class AppConfig {
   readonly env: Env;
+  // @feature:auth-hmac
   readonly hmacClients: ReadonlyMap<string, string>;
+  // @end:auth-hmac
   readonly corsOrigins: string[];
+  // @feature:experiments
   readonly experiments: ReadonlyMap<string, number>;
+  // @end:experiments
+  // @feature:auth-hmac
   readonly hmacClientScopes: ReadonlyMap<string, string>;
+  // @end:auth-hmac
+  // @feature:auth-mtls
   readonly mtlsClientScopes: ReadonlyMap<string, string>;
+  // @end:auth-mtls
   /** Hops for Express 'trust proxy'; false when not behind a proxy. */
   readonly trustProxy: number | false;
 
   constructor(source: NodeJS.ProcessEnv = process.env) {
     this.env = AppConfig.read(source);
     this.corsOrigins = AppConfig.list(this.env.CORS_ORIGINS);
+    // @feature:auth-hmac
     this.hmacClientScopes = AppConfig.scopeMap(this.env.HMAC_CLIENT_SCOPES);
+    // @end:auth-hmac
+    // @feature:auth-mtls
     this.mtlsClientScopes = AppConfig.scopeMap(this.env.MTLS_CLIENT_SCOPES);
+    // @end:auth-mtls
     // A hop count, never `true`: `true` trusts the leftmost X-Forwarded-For,
     // which the client writes, so anyone could pick their own rate-limit IP.
     const proxy = this.env.TRUST_PROXY.trim().toLowerCase();
@@ -32,6 +44,7 @@ export class AppConfig {
     if (this.env.NODE_ENV === 'production' || this.env.NODE_ENV === 'staging') {
       AppConfig.requireEncryptedTransit(this.env);
     }
+    // @feature:experiments
     this.experiments = new Map(
       AppConfig.list(this.env.EXPERIMENTS).map((pair) => {
         const [name = '', percent = ''] = pair.split(':');
@@ -47,12 +60,15 @@ export class AppConfig {
         return [name, percentA] as const;
       }),
     );
+    // @end:experiments
+    // @feature:auth-hmac
     this.hmacClients = new Map(
       AppConfig.list(this.env.HMAC_CLIENTS).map((pair) => {
         const index = pair.indexOf(':');
         return [pair.slice(0, index), pair.slice(index + 1)] as const;
       }),
     );
+    // @end:auth-hmac
   }
 
   get isDevelopment(): boolean {
@@ -63,34 +79,75 @@ export class AppConfig {
     return this.env.NODE_ENV === 'production';
   }
 
+  /** Every cookie the app sets: no script access, HTTPS only outside tests. */
+  get cookieOptions(): {
+    httpOnly: true;
+    secure: boolean;
+    sameSite: 'lax';
+    path: string;
+  } {
+    return {
+      httpOnly: true,
+      secure: this.env.NODE_ENV !== 'test',
+      sameSite: 'lax',
+      path: '/',
+    };
+  }
+
   /**
    * Every connection the app makes leaves over TLS. Fails startup with the
    * full list of plaintext settings; sql.js is in-process, so it has none.
    */
   static requireEncryptedTransit(env: Env): void {
     const plain: string[] = [];
-    const scheme = (name: keyof Env, value: string, allowed: string[]) => {
-      if (value && !allowed.some((s) => value.startsWith(s))) {
-        plain.push(`${String(name)} must use ${allowed.join(' or ')}`);
-      }
-    };
     if (!env.PUBLIC_URL.startsWith('https://')) {
       plain.push('PUBLIC_URL must use https://');
     }
     if (env.DB_TYPE !== DatabaseType.Sqljs && !env.DB_TLS) {
       plain.push('DB_TLS must be true');
     }
-    scheme('CACHE_URL', env.CACHE_URL, ['rediss://']);
-    scheme('QUEUE_URL', env.QUEUE_URL, ['rediss://']);
-    scheme('SMTP_URL', env.SMTP_URL, ['smtps://']);
-    scheme('VAULT_ADDR', env.VAULT_ADDR, ['https://']);
-    scheme('OTEL_EXPORTER_OTLP_ENDPOINT', env.OTEL_EXPORTER_OTLP_ENDPOINT, [
+    // @feature:redis
+    AppConfig.checkScheme(plain, 'CACHE_URL', env.CACHE_URL, ['rediss://']);
+    // @end:redis
+    // @feature:redis
+    AppConfig.checkScheme(plain, 'QUEUE_URL', env.QUEUE_URL, ['rediss://']);
+    // @end:redis
+    // @feature:mail
+    AppConfig.checkScheme(plain, 'SMTP_URL', env.SMTP_URL, ['smtps://']);
+    // @end:mail
+    // @feature:vault
+    AppConfig.checkScheme(plain, 'VAULT_ADDR', env.VAULT_ADDR, ['https://']);
+    // @end:vault
+    // @feature:tracing
+    AppConfig.checkScheme(
+      plain,
+      'OTEL_EXPORTER_OTLP_ENDPOINT',
+      env.OTEL_EXPORTER_OTLP_ENDPOINT,
+      ['https://'],
+    );
+    // @end:tracing
+    // @feature:auth-oauth2
+    AppConfig.checkScheme(plain, 'OAUTH2_ISSUER', env.OAUTH2_ISSUER, [
       'https://',
     ]);
-    scheme('OAUTH2_ISSUER', env.OAUTH2_ISSUER, ['https://']);
-    scheme('OIDC_ISSUER', env.OIDC_ISSUER, ['https://']);
+    // @end:auth-oauth2
+    // @feature:auth-oidc
+    AppConfig.checkScheme(plain, 'OIDC_ISSUER', env.OIDC_ISSUER, ['https://']);
+    // @end:auth-oidc
     if (plain.length > 0) {
       throw new Error(`Encrypted transit required: ${plain.join('; ')}`);
+    }
+  }
+
+  /** Adds a finding when value is set and uses none of the allowed schemes. */
+  static checkScheme(
+    findings: string[],
+    name: string,
+    value: string,
+    allowed: string[],
+  ): void {
+    if (value && !allowed.some((s) => value.startsWith(s))) {
+      findings.push(`${name} must use ${allowed.join(' or ')}`);
     }
   }
 
@@ -125,14 +182,18 @@ export class AppConfig {
         default: 'false',
         desc: 'false, or proxy hops in front of the app (true means 1)',
       }),
+      // @feature:auth-mtls
       MTLS_FORWARDED_HEADER: str({
         default: '',
         desc: 'Header the edge proxy puts the client cert in (base64 DER)',
       }),
+      // @end:auth-mtls
+      // @feature:auth-mtls
       MTLS_TRUSTED_PROXY_CN: str({
         default: 'edge-proxy',
         desc: 'CN of the proxy client cert allowed to forward client certs',
       }),
+      // @end:auth-mtls
       CORS_ORIGINS: str({default: '', desc: 'Comma-separated origins'}),
 
       TLS_KEY_FILE: str({default: 'certs/server.key'}),
@@ -173,11 +234,15 @@ export class AppConfig {
         choices: Object.values(CacheType),
         default: CacheType.Memory,
       }),
+      // @feature:redis
       CACHE_URL: str({default: '', desc: 'redis:// or rediss:// (TLS)'}),
+      // @end:redis
+      // @feature:redis
       CACHE_CLUSTER: bool({
         default: false,
         desc: 'Redis/ElastiCache cluster mode',
       }),
+      // @end:redis
       CACHE_TTL_SECONDS: num({default: 60}),
       CACHE_PREFIX: str({default: 'app:'}),
       CACHE_TIMEOUT_MS: num({
@@ -185,17 +250,33 @@ export class AppConfig {
         desc: 'Cache calls slower than this count as a miss',
       }),
 
+      // @feature:websocket
       WS_ENABLED: bool({default: true, desc: 'WebSocket on the HTTP(S) port'}),
       WS_PATH: str({default: '/ws'}),
       WS_MAX_PAYLOAD_BYTES: num({default: 64 * 1024}),
+      // @end:websocket
+      // @feature:tcp
       TCP_ENABLED: bool({
         default: false,
         desc: 'Line protocol on the HTTPS port, ALPN ndjson/1',
       }),
+      // @end:tcp
+      // @feature:network
       PING_TIMEOUT_MS: num({default: 2000}),
+      // @end:network
 
-      QUEUE_TYPE: str({choices: ['memory', 'bullmq'], default: 'memory'}),
+      QUEUE_TYPE: str({
+        // @feature:redis
+        choices: ['memory', 'bullmq'],
+        // @end:redis
+        // @feature:!redis
+        //~ choices: ['memory'],
+        // @end:!redis
+        default: 'memory',
+      }),
+      // @feature:redis
       QUEUE_URL: str({default: '', desc: 'Redis URL; empty uses CACHE_URL'}),
+      // @end:redis
       QUEUE_ATTEMPTS: num({
         default: 3,
         desc: 'Tries before a job is dead-lettered',
@@ -232,22 +313,26 @@ export class AppConfig {
       HTTP_REQUEST_TIMEOUT_MS: num({default: 30_000}),
       HTTP_KEEP_ALIVE_TIMEOUT_MS: num({default: 5_000}),
 
+      // @feature:mail
       SMTP_URL: str({
         default: '',
         desc: 'smtp://host:port or smtps://; empty logs instead of sending',
       }),
       MAIL_FROM: str({default: 'Express Boilerplate <no-reply@example.com>'}),
+      // @end:mail
+      // @feature:metrics
       METRICS_ENABLED: bool({
         default: true,
         desc: 'Prometheus metrics at GET /metrics',
       }),
-      // Read before AppConfig by VaultSecrets and Tracing; listed for docs.
+      // @end:metrics
       HEALTH_SHOW_DETAILS: str({
         choices: ['never', 'always'],
         default: 'never',
         desc: 'Actuator show-details: component details in health responses',
       }),
-      // Read before AppConfig by VaultSecrets and Tracing; listed for docs.
+      // @feature:vault
+      // Read before AppConfig by VaultSecrets; listed for docs.
       VAULT_ADDR: str({
         default: '',
         desc: 'Load secrets from Vault KV v2 at startup',
@@ -257,13 +342,19 @@ export class AppConfig {
       VAULT_SECRET_ID: str({default: ''}),
       VAULT_KV_MOUNT: str({default: 'secret'}),
       VAULT_SECRET_PATH: str({default: 'express-boilerplate'}),
+      // @end:vault
+      // @feature:tracing
+      // Read before AppConfig by Tracing; listed for docs.
       OTEL_EXPORTER_OTLP_ENDPOINT: str({default: '', desc: 'Turns tracing on'}),
       OTEL_SERVICE_NAME: str({default: 'express-boilerplate'}),
+      // @end:tracing
 
+      // @feature:experiments
       EXPERIMENTS: str({
         default: 'new-checkout:50',
         desc: 'A/B experiments as name:percentInA,name:percentInA',
       }),
+      // @end:experiments
 
       SESSION_SECRET: AppConfig.secret({
         devDefault: 'dev-only-session-secret-0123456789abcdef',
@@ -281,32 +372,42 @@ export class AppConfig {
       JWT_CLOCK_TOLERANCE_SECONDS: num({default: 30}),
       JWT_ISSUER: str({default: 'express-boilerplate'}),
       JWT_AUDIENCE: str({default: 'express-boilerplate'}),
+      // @feature:auth-hmac
       HMAC_CLIENTS: str({default: '', desc: 'clientId:secret,clientId:secret'}),
       HMAC_CLIENT_SCOPES: str({
         default: '',
         desc: 'clientId=scope scope,clientId=scope (what each HMAC client may do)',
       }),
+      // @end:auth-hmac
+      // @feature:auth-mtls
       MTLS_CLIENT_SCOPES: str({
         default: '',
         desc: 'certCN=scope scope,certCN=scope (what each mTLS client may do)',
       }),
+      // @end:auth-mtls
 
+      // @feature:auth-oauth2
       OAUTH2_ISSUER: str({default: ''}),
       OAUTH2_AUDIENCE: str({default: ''}),
       OAUTH2_JWKS_URI: str({default: ''}),
+      // @end:auth-oauth2
 
+      // @feature:auth-oidc
       OIDC_ISSUER: str({default: ''}),
       OIDC_CLIENT_ID: str({default: ''}),
       OIDC_CLIENT_SECRET: str({default: ''}),
+      // @end:auth-oidc
 
+      // @feature:auth-saml
       SAML_ENTRY_POINT: str({default: ''}),
       SAML_ISSUER: str({default: ''}),
       SAML_IDP_CERT: str({default: '', desc: 'IdP signing cert, PEM body'}),
+      // @end:auth-saml
     });
   }
 
   /** "name=scope scope,name2=scope" to name -> "scope scope". */
-  private static scopeMap(value: string): Map<string, string> {
+  static scopeMap(value: string): Map<string, string> {
     return new Map(
       AppConfig.list(value).map((entry) => {
         const index = entry.indexOf('=');

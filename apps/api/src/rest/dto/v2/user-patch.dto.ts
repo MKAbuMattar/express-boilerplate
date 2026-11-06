@@ -1,3 +1,4 @@
+import {ValidationException} from '@express-boilerplate/common/exceptions/domain.exception.js';
 import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
 import {CreateUserDto} from '@express-boilerplate/service/dto/create-user.dto.js';
 import {BadRequestHttpResponse} from '@inversifyjs/http-core';
@@ -44,9 +45,8 @@ export class UserPatchDto {
     try {
       CreateUserDto.fromV2(merged);
     } catch (error) {
-      throw UserPatchDto.invalid(
-        (error as {body: {data: Record<string, string>}}).body.data,
-      );
+      if (!(error instanceof ValidationException)) throw error;
+      throw UserPatchDto.invalid({...error.fields});
     }
     const changes: UserPatchDto['changes'] = {};
     if ('name' in input) changes.name = String(input.name).trim();

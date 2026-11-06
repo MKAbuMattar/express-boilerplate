@@ -22,12 +22,7 @@ export class SessionService {
   }
 
   get cookieOptions(): CookieOptions {
-    return {
-      httpOnly: true,
-      secure: this.config.env.NODE_ENV !== 'test',
-      sameSite: 'lax',
-      path: '/',
-    };
+    return this.config.cookieOptions;
   }
 
   async start(response: Response, principal: Principal): Promise<void> {

@@ -34,8 +34,8 @@ pnpm migration:revert
 pnpm --filter @express-boilerplate/persistence migration:create src/repository/migration/AddX
 ```
 
-After creating one, add it to the end of `DatabaseConfig.migrations`. Never edit a migration that has shipped; add a new one. In Kubernetes, the Helm chart runs `migration:prod` as a Job before the new pods start.
+After creating one, add it to the end of `DatabaseConfig.migrations`. `pnpm eb generate resource <name>` writes an entity, repository and migration and registers both. Never edit a migration that has shipped; add a new one. In Kubernetes, the Helm chart runs `migration:prod` as a Job before the new pods start.
 
 ## Scripts
 
-`build`, `dev`, `typecheck`, and the `migration:*` scripts above. They read `apps/api/.env.development` and `apps/api/.env`.
+`build`, `typecheck`, and the `migration:*` scripts above. They read `apps/api/.env.development` and `apps/api/.env`.

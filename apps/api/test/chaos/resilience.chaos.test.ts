@@ -92,6 +92,7 @@ describe('Chaos: dependencies fail, the app degrades cleanly', () => {
     expect(ms).toBeLessThan(1000);
   });
 
+  // @feature:auth-hmac
   it('cache down: HMAC fails closed with 503, never skips the replay check', async () => {
     const {application: appCtx, app} = await boot();
     vi.spyOn(appCtx.beans.getBean(CacheStore), 'setIfAbsent').mockRejectedValue(
@@ -113,7 +114,9 @@ describe('Chaos: dependencies fail, the app degrades cleanly', () => {
       .send(body);
     expect(response.status).toBe(503);
   });
+  // @end:auth-hmac
 
+  // @feature:auth-oidc
   it('OIDC provider down: 503, and still 503 (not stuck) on retry', async () => {
     const deadPort = await HttpsClient.freePort();
     const {app} = await boot({
@@ -127,7 +130,9 @@ describe('Chaos: dependencies fail, the app degrades cleanly', () => {
       expect(ms).toBeLessThan(5000);
     }
   });
+  // @end:auth-oidc
 
+  // @feature:auth-oauth2
   it('OAuth2 JWKS down: 401 (fail closed) within the JWKS timeout', async () => {
     const deadPort = await HttpsClient.freePort();
     const {app} = await boot({
@@ -142,6 +147,7 @@ describe('Chaos: dependencies fail, the app degrades cleanly', () => {
     expect(response.status).toBe(401);
     expect(ms).toBeLessThan(5000);
   });
+  // @end:auth-oauth2
 
   it('flaky repository: every request gets an answer, the app keeps serving', async () => {
     const {application: appCtx, app} = await boot();

@@ -21,25 +21,35 @@ export class CommonConfiguration {
   }
 
   @Bean(CacheStore)
+  // @feature:redis
   cacheStore(beans: BeanFactory): CacheStore {
     const {CACHE_TYPE, CACHE_URL, CACHE_CLUSTER} = beans.getBean(AppConfig).env;
-    if (CACHE_TYPE === CacheType.Memory) return new MemoryCacheStore();
-    if (!CACHE_URL) {
-      throw new Error('CACHE_URL is required when CACHE_TYPE=redis');
+    if (CACHE_TYPE === CacheType.Redis) {
+      if (!CACHE_URL) {
+        throw new Error('CACHE_URL is required when CACHE_TYPE=redis');
+      }
+      return new RedisCacheStore(CACHE_URL, CACHE_CLUSTER);
     }
-    return new RedisCacheStore(CACHE_URL, CACHE_CLUSTER);
+    // @end:redis
+    // @feature:!redis
+    //~ cacheStore(): CacheStore {
+    // @end:!redis
+    return new MemoryCacheStore();
   }
 
   @Bean(QueueBroker)
   queueBroker(beans: BeanFactory): QueueBroker {
-    const {QUEUE_TYPE, QUEUE_URL, CACHE_URL, QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS} =
-      beans.getBean(AppConfig).env;
-    if (QUEUE_TYPE === 'memory') {
-      return new MemoryQueueBroker(QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS);
+    const {QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS} = beans.getBean(AppConfig).env;
+    // @feature:redis
+    const {QUEUE_TYPE, QUEUE_URL, CACHE_URL} = beans.getBean(AppConfig).env;
+    if (QUEUE_TYPE === 'bullmq') {
+      const url = QUEUE_URL || CACHE_URL;
+      if (!url)
+        throw new Error('QUEUE_URL or CACHE_URL is required for bullmq');
+      return new BullMqQueueBroker(url, QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS);
     }
-    const url = QUEUE_URL || CACHE_URL;
-    if (!url) throw new Error('QUEUE_URL or CACHE_URL is required for bullmq');
-    return new BullMqQueueBroker(url, QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS);
+    // @end:redis
+    return new MemoryQueueBroker(QUEUE_ATTEMPTS, QUEUE_BACKOFF_MS);
   }
 
   @Bean(CacheService)
@@ -47,8 +57,10 @@ export class CommonConfiguration {
     return beans.getBean(CacheServiceImpl);
   }
 
+  // @feature:metrics
   @Bean(Metrics)
   metrics(): Metrics {
     return new Metrics();
   }
+  // @end:metrics
 }

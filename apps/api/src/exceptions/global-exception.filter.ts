@@ -1,3 +1,9 @@
+import {
+  ConflictException,
+  DomainException,
+  NotFoundException,
+  ValidationException,
+} from '@express-boilerplate/common/exceptions/domain.exception.js';
 import {ProblemDetails} from '@express-boilerplate/common/exceptions/problem-details.js';
 import {AppLogger} from '@express-boilerplate/common/util/app-logger.js';
 import {HealthService} from '@express-boilerplate/service/service/health.service.js';
@@ -13,8 +19,10 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
   private static readonly UNAVAILABLE_NAMES = new Set([
     'CannotExecuteNotConnectedError',
     'ConnectionIsNotSetError',
+    // @feature:db-mongodb
     'MongoNetworkError',
     'MongoServerSelectionError',
+    // @end:db-mongodb
   ]);
   private static readonly UNAVAILABLE_CODES = new Set([
     'ECONNREFUSED',
@@ -23,7 +31,9 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
     'EPIPE',
     'ENOTFOUND',
     'EHOSTUNREACH',
+    // @feature:db-mysql
     'PROTOCOL_CONNECTION_LOST',
+    // @end:db-mysql
     '57P01', // postgres admin_shutdown
     '57P03', // postgres cannot_connect_now
   ]);
@@ -46,6 +56,15 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
       );
       return;
     }
+    if (error instanceof DomainException) {
+      ProblemDetails.send(
+        response,
+        GlobalErrorFilter.domainStatus(error),
+        {message: error.message, data: error.fields},
+        instance,
+      );
+      return;
+    }
     this.appLogger.logger.error(
       {err: error, path: request.path},
       'Unhandled error',
@@ -55,6 +74,14 @@ export class GlobalErrorFilter implements ExpressErrorFilter {
       return;
     }
     ProblemDetails.send(response, 500, 'Internal Server Error', instance);
+  }
+
+  /** instanceof, so a subclass such as OrderNotFound maps like its parent. */
+  private static domainStatus(error: DomainException): number {
+    if (error instanceof NotFoundException) return 404;
+    if (error instanceof ConflictException) return 409;
+    if (error instanceof ValidationException) return 400;
+    return 422;
   }
 
   private isUnavailable(error: unknown): boolean {

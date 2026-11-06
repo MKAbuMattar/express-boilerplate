@@ -12,15 +12,18 @@ import {
 } from 'typeorm';
 
 export class EntityIds {
+  // @feature:db-mongodb
   // Decorators run at import time, before AppConfig exists, so read env here.
   static readonly isMongo = process.env.DB_TYPE === DatabaseType.Mongodb;
+  // @end:db-mongodb
 
   // SQL ids are UUIDs made by the app: one migration then works on every
   // dialect, with no database-side uuid extension or default.
   static primary(): PropertyDecorator {
-    return EntityIds.isMongo
-      ? ObjectIdColumn()
-      : PrimaryColumn('varchar', {length: 36});
+    // @feature:db-mongodb
+    if (EntityIds.isMongo) return ObjectIdColumn();
+    // @end:db-mongodb
+    return PrimaryColumn('varchar', {length: 36});
   }
 }
 
@@ -55,6 +58,9 @@ export class UserEntity {
 
   @BeforeInsert()
   assignId(): void {
-    if (!EntityIds.isMongo && !this.id) this.id = randomUUID();
+    // @feature:db-mongodb
+    if (EntityIds.isMongo) return; // MongoDB assigns the ObjectId
+    // @end:db-mongodb
+    if (!this.id) this.id = randomUUID();
   }
 }

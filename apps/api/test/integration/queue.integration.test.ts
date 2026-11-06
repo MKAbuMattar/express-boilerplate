@@ -80,6 +80,7 @@ describe('Queues and dead-letter queues', () => {
     ).toBe(404);
   });
 
+  // @feature:mail
   it('enqueues a welcome email when a user is created', async () => {
     const broker = application.beans.getBean(QueueBroker);
     const enqueue = vi.spyOn(broker, 'enqueue');
@@ -91,6 +92,7 @@ describe('Queues and dead-letter queues', () => {
       userId: created.body.data.id,
     });
   });
+  // @end:mail
 
   it('refuses unknown queues', async () => {
     expect(

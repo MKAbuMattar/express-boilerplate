@@ -53,9 +53,22 @@ describe('OpenAPI document (Swagger, development)', () => {
       OpenApiConfig.TAGS.map((t) => t.name),
     );
     expect(Object.keys(spec.components.securitySchemes).sort()).toEqual(
-      ['bearerAuth', 'hmac', 'mutualTLS', 'oauth2', 'session'].sort(),
+      [
+        'bearerAuth',
+        // @feature:auth-hmac
+        'hmac',
+        // @end:auth-hmac
+        // @feature:auth-mtls
+        'mutualTLS',
+        // @end:auth-mtls
+        // @feature:auth-oauth2
+        'oauth2',
+        // @end:auth-oauth2
+        // @feature:sso
+        'session',
+        // @end:sso
+      ].sort(),
     );
-    expect(spec.components.securitySchemes.mutualTLS!.type).toBe('mutualTLS');
   });
 
   it('every operation is tagged with a declared tag (nothing under "default")', () => {
@@ -65,7 +78,7 @@ describe('OpenAPI document (Swagger, development)', () => {
         ([, op]) => !op.tags?.length || !op.tags.every((t) => declared.has(t)),
       )
       .map(([name]) => name);
-    expect(operations.length).toBeGreaterThan(35);
+    expect(operations.length).toBeGreaterThan(15);
     expect(untagged).toEqual([]);
   });
 

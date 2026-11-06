@@ -168,11 +168,13 @@ describe('HTTP semantics and standard responses', () => {
       expect(again.text).toBe('');
     });
 
+    // @feature:auth-oidc
     it('SSO login redirects with 302 + Location', async () => {
       const response = await request(app).get('/auth/oidc/login');
       // Not configured here, so 501; with an IdP it is a 302 (see e2e).
       expect([302, 501]).toContain(response.status);
     });
+    // @end:auth-oidc
   });
 
   describe('4xx and 5xx use RFC 9457 problem details', () => {

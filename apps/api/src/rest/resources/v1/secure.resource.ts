@@ -36,6 +36,7 @@ export class SecureV1Resource {
     return ApiResponse.ok('Public endpoint', null);
   }
 
+  // @feature:auth-mtls
   @OasTag('Auth examples')
 
   @OasSummary('Mutual TLS client certificate')
@@ -59,7 +60,9 @@ export class SecureV1Resource {
   mtls(@Request() request: ExpressRequest): ApiResponse<Principal> {
     return SecureV1Resource.whoami(request);
   }
+  // @end:auth-mtls
 
+  // @feature:auth-hmac
   @OasTag('Auth examples')
 
   @OasSummary('HMAC-SHA256 signed request')
@@ -92,6 +95,7 @@ export class SecureV1Resource {
   hmac(@Request() request: ExpressRequest): ApiResponse<Principal> {
     return SecureV1Resource.whoami(request);
   }
+  // @end:auth-hmac
 
   @OasTag('Auth examples')
 
@@ -118,6 +122,7 @@ export class SecureV1Resource {
     return SecureV1Resource.whoami(request);
   }
 
+  // @feature:auth-oauth2
   @OasTag('Auth examples')
 
   @OasSummary('OAuth 2.0 access token from an external authorization server')
@@ -142,7 +147,9 @@ export class SecureV1Resource {
   oauth2(@Request() request: ExpressRequest): ApiResponse<Principal> {
     return SecureV1Resource.whoami(request);
   }
+  // @end:auth-oauth2
 
+  // @feature:sso
   @OasTag('Auth examples')
 
   @OasSummary('SSO session from OIDC or SAML')
@@ -166,6 +173,7 @@ export class SecureV1Resource {
   sso(@Request() request: ExpressRequest): ApiResponse<Principal> {
     return SecureV1Resource.whoami(request);
   }
+  // @end:sso
 
   private static whoami(request: ExpressRequest): ApiResponse<Principal> {
     return ApiResponse.ok('Authenticated', request.principal!);

@@ -17,25 +17,31 @@ import {UserService} from '../service/user.service.js';
 /** Business layer: service contracts (abstract classes) bound to their impls. */
 @Configuration()
 export class ServiceConfiguration {
+  // @feature:experiments
   @Bean(ExperimentService)
   experimentService(beans: BeanFactory): ExperimentService {
     return beans.getBean(ExperimentServiceImpl);
   }
+  // @end:experiments
 
+  // @feature:mail
   @Bean(MailService)
   mailService(beans: BeanFactory): MailService {
     return beans.getBean(MailServiceImpl);
   }
+  // @end:mail
 
   @Bean(HealthService)
   healthService(beans: BeanFactory): HealthService {
     return beans.getBean(HealthServiceImpl);
   }
 
+  // @feature:network
   @Bean(NetworkService)
   networkService(beans: BeanFactory): NetworkService {
     return beans.getBean(NetworkServiceImpl);
   }
+  // @end:network
 
   @Bean(UserService)
   userService(beans: BeanFactory): UserService {

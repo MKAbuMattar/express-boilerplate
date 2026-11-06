@@ -1,6 +1,6 @@
 import {ExperimentVariant} from '@express-boilerplate/common/enumeration/experiment-variant.enum.js';
+import {NotFoundException} from '@express-boilerplate/common/exceptions/domain.exception.js';
 import {ExperimentServiceImpl} from '@express-boilerplate/service/service/impl/experiment.service.impl.js';
-import {isHttpResponse} from '@inversifyjs/http-core';
 import {describe, expect, it} from 'vitest';
 import {UnitFixtures} from '../support/unit-fixtures.js';
 
@@ -50,12 +50,12 @@ describe('ExperimentServiceImpl (A/B)', () => {
     expect(same / 10_000).toBeLessThan(0.53);
   });
 
-  it('throws 404 for an unknown experiment', () => {
+  it('throws NotFoundException for an unknown experiment', () => {
     try {
       service('checkout:50').assign('missing', 'u');
       expect.unreachable();
     } catch (error) {
-      expect(isHttpResponse(error) && error.statusCode).toBe(404);
+      expect(error).toBeInstanceOf(NotFoundException);
     }
   });
 });

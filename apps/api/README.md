@@ -6,7 +6,7 @@ Depends on `@express-boilerplate/service` and `@express-boilerplate/common`. Con
 
 ## What it serves
 
-Everything runs on one TLS listener, port 443. There is no plaintext port.
+Everything runs on one TLS listener, port 443. There is no plaintext port. Locally it answers at `https://api.express-boilerplate.len` (`pnpm certs` prints the hosts line).
 
 | Path                                                                  | What                                                                      |
 | --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -42,17 +42,19 @@ test/                        unit, integration, e2e, security, monkey, chaos, co
 
 Run from the repo root (`pnpm dev`) or here with `pnpm --filter @express-boilerplate/api <script>`.
 
-| Script                | What                                                                         |
-| --------------------- | ---------------------------------------------------------------------------- |
-| `dev`                 | Restarts on changes here or in a rebuilt package                             |
-| `build`, `start`      | Compile to `dist/`, run it                                                   |
-| `certs`               | Local CA, server cert and mTLS client certs in `certs/`                      |
-| `jwt`, `jwt:keygen`   | Dev token; ES256 key pair                                                    |
-| `test`, `test:<type>` | Vitest projects: unit, integration, e2e, security, monkey, chaos, containers |
+| Script                | What                                                                          |
+| --------------------- | ----------------------------------------------------------------------------- |
+| `dev`                 | Restarts on changes here or in any package (loaded from source)               |
+| `build`, `start`      | Compile to `dist/`, run it                                                    |
+| `certs`               | Local CA, `*.express-boilerplate.len` cert, client and etcd certs in `certs/` |
+| `jwt`, `jwt:keygen`   | Dev token; ES256 key pair                                                     |
+| `test`, `test:<type>` | Vitest projects: unit, integration, e2e, security, monkey, chaos, containers  |
 
 The tests live here because they exercise the assembled app. They start a real TLS server, so HTTPS, WSS and TCP are all tested on the production code path.
 
 ## Adding an endpoint
+
+`pnpm eb generate resource <name> --fields ...` writes a guarded CRUD resource through every layer. By hand:
 
 1. Add a resource class in `src/rest/resources/v<n>/` with `@Controller`, `@Get` and the OpenAPI decorators (`@OasTag`, `@OasSummary`, `@OasResponse`).
 2. Inject a service contract from `@express-boilerplate/service` with `@inject(SomeService)`.

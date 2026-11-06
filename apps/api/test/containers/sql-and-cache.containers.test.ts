@@ -25,8 +25,10 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
 
   it.each([
     ['postgres', () => Containers.postgres()],
+    // @feature:db-mysql
     ['mysql', () => Containers.mysql()],
     ['mariadb', () => Containers.mariadb()],
+    // @end:db-mysql
   ] as const)('%s: user lifecycle', async (dbType, start) => {
     await withService(start, async (db) => {
       const {application, app} = await TestApp.create({
@@ -52,11 +54,12 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
     });
   });
 
+  // @feature:redis
   it.each([
     ['redis', 'redis:8-alpine'],
     ['valkey', 'valkey/valkey:9-alpine'],
   ] as const)(
-    '%s: cache-aside and HMAC replay protection',
+    '%s: cache, replay protection and dead letters',
     async (_name, image) => {
       await withService(
         () => Containers.redisProtocol(image),
@@ -77,6 +80,7 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
               .createToken('it', TestApp.ALL_SCOPES);
             await Containers.userLifecycle(app, token);
 
+            // @feature:auth-hmac
             const ts = String(Math.floor(Date.now() / 1000));
             const body = '{}';
             const send = () =>
@@ -94,6 +98,7 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
                 .send(body);
             expect((await send()).status).toBe(200);
             expect((await send()).status).toBe(401);
+            // @end:auth-hmac
 
             // BullMQ: a failing job ends in the dead-letter queue.
             const auth = {authorization: `Bearer ${token}`};
@@ -120,4 +125,5 @@ describe.skipIf(!docker)('Containers: real databases and caches', () => {
       );
     },
   );
+  // @end:redis
 });

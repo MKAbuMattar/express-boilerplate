@@ -32,7 +32,7 @@
     "test:monkey": { "dependsOn": ["^build"], "cache": false },
     "test:chaos": { "dependsOn": ["^build"], "cache": false },
     "test:cov": { "dependsOn": ["^build"], "outputs": ["coverage/**"] },
-    "dev": { "cache": false, "persistent": true, "dependsOn": ["^build"] },
+    "dev": { "cache": false, "persistent": true },
     "start": { "cache": false, "persistent": true, "dependsOn": ["build"] }
   }
 }

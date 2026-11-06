@@ -31,21 +31,27 @@ export class OpenApiConfig {
       description:
         'One route per authentication method. Copy the guard you need onto your own routes.',
     },
+    // @feature:experiments
     {name: 'Experiments', description: 'A/B testing with sticky variants.'},
+    // @end:experiments
+    // @feature:sse
     {
       name: 'Events',
       description:
         'Server-Sent Events: live user.created / user.updated / user.deleted.',
     },
+    // @end:sse
     {
       name: 'Queues',
       description:
         'Background jobs and their dead-letter queues. Scope ops:queues, ops networks only.',
     },
+    // @feature:network
     {
       name: 'Network',
       description: 'ICMP reachability. Scope ops:network, ops networks only.',
     },
+    // @end:network
     {
       name: 'Actuator',
       description:
@@ -75,7 +81,12 @@ export class OpenApiConfig {
       tags: OpenApiConfig.TAGS,
       components: {
         schemas: OpenApiConstants.SCHEMAS,
+        // @feature:auth-oidc
         securitySchemes: OpenApiConfig.securitySchemes(config),
+        // @end:auth-oidc
+        // @feature:!auth-oidc
+        //~ securitySchemes: OpenApiConfig.securitySchemes(),
+        // @end:!auth-oidc
       },
     } as OpenApi3Dot1Object;
   }
@@ -91,8 +102,13 @@ export class OpenApiConfig {
     ];
   }
 
+  // @feature:auth-oidc
   private static securitySchemes(config: AppConfig) {
     const {OIDC_ISSUER} = config.env;
+    // @end:auth-oidc
+    // @feature:!auth-oidc
+    //~ private static securitySchemes() {
+    // @end:!auth-oidc
     return {
       bearerAuth: {
         type: 'http',
@@ -101,6 +117,7 @@ export class OpenApiConfig {
         description:
           'A JWT from this service (`pnpm jwt`). Needs scopes such as users:write for writes.',
       },
+      // @feature:auth-oauth2
       oauth2: {
         type: 'http',
         scheme: 'bearer',
@@ -108,6 +125,8 @@ export class OpenApiConfig {
         description:
           'An access token from your OAuth 2.0 authorization server (Keycloak, Auth0, Entra ID, Okta), checked against its JWKS.',
       },
+      // @end:auth-oauth2
+      // @feature:auth-hmac
       hmac: {
         type: 'apiKey',
         in: 'header',
@@ -115,22 +134,29 @@ export class OpenApiConfig {
         description:
           'Hex HMAC-SHA256 of "<X-Timestamp>\\n<METHOD>\\n<path?query>\\n<raw body>", with X-Client-Id and X-Timestamp headers. Each signature works once.',
       },
+      // @end:auth-hmac
+      // @feature:auth-mtls
       mutualTLS: {
         type: 'mutualTLS',
         description: 'A client certificate signed by the service CA.',
       },
+      // @end:auth-mtls
+      // @feature:sso
       session: {
         type: 'apiKey',
         in: 'cookie',
         name: 'session',
         description: 'The SSO session cookie set by an OIDC or SAML login.',
       },
+      // @end:sso
+      // @feature:auth-oidc
       ...(OIDC_ISSUER && {
         openIdConnect: {
           type: 'openIdConnect',
           openIdConnectUrl: `${OIDC_ISSUER.replace(/\/+$/, '')}/.well-known/openid-configuration`,
         },
       }),
+      // @end:auth-oidc
     };
   }
 

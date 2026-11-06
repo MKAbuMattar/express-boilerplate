@@ -39,12 +39,19 @@ import {inject} from 'inversify';
 @Controller(ApiConstants.AUTH)
 export class AuthenticationController {
   constructor(
+    // @feature:auth-oidc
     @inject(OidcService) private readonly oidcService: OidcService,
+    // @end:auth-oidc
+    // @feature:auth-saml
     @inject(SamlService) private readonly samlService: SamlService,
+    // @end:auth-saml
+    // @feature:sso
     @inject(SessionService) private readonly sessionService: SessionService,
+    // @end:sso
     @inject(TokenProvider) private readonly tokenProvider: TokenProvider,
   ) {}
 
+  // @feature:auth-oidc
   @OasTag('Authentication')
 
   @OasSummary('Start OIDC login (redirects to the IdP)')
@@ -67,7 +74,9 @@ export class AuthenticationController {
     );
     response.redirect(url.href);
   }
+  // @end:auth-oidc
 
+  // @feature:auth-oidc
   @OasTag('Authentication')
 
   @OasSummary('OIDC redirect URI')
@@ -102,7 +111,9 @@ export class AuthenticationController {
     await this.sessionService.start(response, principal);
     response.redirect(ApiConstants.AUTH + ApiConstants.AUTH_ME);
   }
+  // @end:auth-oidc
 
+  // @feature:auth-saml
   @OasTag('Authentication')
 
   @OasSummary('Start SAML login (redirects to the IdP)')
@@ -115,7 +126,9 @@ export class AuthenticationController {
   async samlLogin(@Response() response: ExpressResponse): Promise<void> {
     response.redirect(await this.samlService.createLoginUrl());
   }
+  // @end:auth-saml
 
+  // @feature:auth-saml
   @OasTag('Authentication')
 
   @OasSummary('SAML assertion consumer service (HTTP-POST)')
@@ -133,7 +146,9 @@ export class AuthenticationController {
     await this.sessionService.start(response, principal);
     response.redirect(ApiConstants.AUTH + ApiConstants.AUTH_ME);
   }
+  // @end:auth-saml
 
+  // @feature:auth-saml
   @OasTag('Authentication')
 
   @OasSummary('SAML service provider metadata')
@@ -146,7 +161,9 @@ export class AuthenticationController {
   samlMetadata(@Response() response: ExpressResponse): void {
     response.type('application/xml').send(this.samlService.metadata());
   }
+  // @end:auth-saml
 
+  // @feature:sso
   @OasTag('Authentication')
 
   @OasSummary('Current SSO session (OIDC or SAML)')
@@ -166,7 +183,9 @@ export class AuthenticationController {
   me(@Request() request: ExpressRequest): ApiResponse<Principal> {
     return ApiResponse.ok('Authenticated', request.principal!);
   }
+  // @end:sso
 
+  // @feature:sso
   @OasTag('Authentication')
 
   @OasSummary('End the SSO session')
@@ -179,6 +198,7 @@ export class AuthenticationController {
     await this.sessionService.end(request, response);
     response.status(204).end();
   }
+  // @end:sso
 
   @OasTag('Authentication')
 

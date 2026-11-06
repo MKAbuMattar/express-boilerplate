@@ -2,8 +2,7 @@ import {createHash} from 'node:crypto';
 import {AppConfig} from '@express-boilerplate/common/config/app.config.js';
 import {Service} from '@express-boilerplate/common/config/stereotypes.js';
 import {ExperimentVariant} from '@express-boilerplate/common/enumeration/experiment-variant.enum.js';
-import {ApiResponse} from '@express-boilerplate/common/rest/dto/api-response.dto.js';
-import {NotFoundHttpResponse} from '@inversifyjs/http-core';
+import {NotFoundException} from '@express-boilerplate/common/exceptions/domain.exception.js';
 import {inject} from 'inversify';
 import {ExperimentService} from '../experiment.service.js';
 
@@ -25,9 +24,7 @@ export class ExperimentServiceImpl extends ExperimentService {
   assign(experiment: string, subjectId: string): ExperimentVariant {
     const percentA = this.config.experiments.get(experiment);
     if (percentA === undefined) {
-      throw new NotFoundHttpResponse(
-        ApiResponse.fail(`Unknown experiment "${experiment}"`),
-      );
+      throw new NotFoundException(`Unknown experiment "${experiment}"`);
     }
     return ExperimentServiceImpl.bucket(experiment, subjectId) < percentA
       ? ExperimentVariant.A

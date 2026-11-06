@@ -1,0 +1,250 @@
+{
+  "features": [
+    {
+      "id": "auth-mtls",
+      "title": "mTLS client certificates (MtlsGuard)",
+      "group": "auth",
+      "default": true,
+      "remove": ["packages/common/src/security/mtls"]
+    },
+    {
+      "id": "auth-hmac",
+      "title": "HMAC-signed requests with replay protection",
+      "group": "auth",
+      "default": true,
+      "remove": [
+        "packages/common/src/security/hmac",
+        "apps/api/test/unit/hmac.guard.unit.test.ts"
+      ]
+    },
+    {
+      "id": "auth-oauth2",
+      "title": "OAuth 2.0 resource server (external JWKS)",
+      "group": "auth",
+      "default": true,
+      "requires": ["idp"],
+      "remove": ["packages/common/src/security/oauth2"]
+    },
+    {
+      "id": "auth-oidc",
+      "title": "OIDC browser login (PKCE)",
+      "group": "auth",
+      "requires": ["sso", "idp"],
+      "remove": ["packages/common/src/security/sso/oidc.service.ts"],
+      "dependencies": {
+        "packages/common": ["openid-client"]
+      }
+    },
+    {
+      "id": "auth-saml",
+      "title": "SAML 2.0 browser login",
+      "group": "auth",
+      "requires": ["sso"],
+      "remove": ["packages/common/src/security/sso/saml.service.ts"],
+      "dependencies": {
+        "packages/common": ["@node-saml/node-saml"]
+      }
+    },
+    {
+      "id": "sso",
+      "title": "SSO session cookie (needed by OIDC and SAML)",
+      "group": "internal",
+      "remove": [
+        "packages/common/src/security/sso/session.service.ts",
+        "packages/common/src/security/sso/sso.guard.ts"
+      ]
+    },
+    {
+      "id": "idp",
+      "title": "Identity provider for local dev and tests (Keycloak, mock IdP)",
+      "group": "internal",
+      "remove": [
+        "deploy/keycloak",
+        "apps/api/test/support/mock-identity-provider.ts"
+      ]
+    },
+    {
+      "id": "db-mysql",
+      "title": "MySQL and MariaDB",
+      "group": "data",
+      "dependencies": {
+        "packages/persistence": ["mysql2"]
+      }
+    },
+    {
+      "id": "db-mongodb",
+      "title": "MongoDB",
+      "group": "data",
+      "remove": ["apps/api/test/containers/mongodb.containers.test.ts"],
+      "dependencies": {
+        "packages/persistence": ["mongodb"]
+      }
+    },
+    {
+      "id": "db-mssql",
+      "title": "Microsoft SQL Server (install the mssql driver)",
+      "group": "data"
+    },
+    {
+      "id": "redis",
+      "title": "Redis/Valkey cache and BullMQ queues",
+      "group": "data",
+      "default": true,
+      "remove": [
+        "packages/common/src/config/cache/redis-cache.store.ts",
+        "packages/common/src/config/queue/bullmq-queue.broker.ts"
+      ],
+      "dependencies": {
+        "packages/common": ["redis", "bullmq", "ioredis"]
+      }
+    },
+    {
+      "id": "vault",
+      "title": "Secrets from HashiCorp Vault at startup",
+      "group": "ops",
+      "remove": [
+        "packages/common/src/config/vault-secrets.ts",
+        "apps/api/test/integration/vault.integration.test.ts"
+      ]
+    },
+    {
+      "id": "metrics",
+      "title": "Prometheus metrics, Grafana, Loki logs",
+      "group": "ops",
+      "default": true,
+      "remove": [
+        "packages/common/src/config/observability/metrics.ts",
+        "deploy/observability/prometheus.yml",
+        "deploy/observability/config.alloy",
+        "deploy/observability/grafana",
+        "deploy/helm/express-boilerplate/templates/servicemonitor.yaml",
+        "apps/api/test/integration/metrics.integration.test.ts"
+      ],
+      "dependencies": {
+        "packages/common": ["prom-client"]
+      }
+    },
+    {
+      "id": "tracing",
+      "title": "OpenTelemetry tracing to Tempo",
+      "group": "ops",
+      "default": true,
+      "requires": ["metrics"],
+      "remove": [
+        "packages/common/src/config/observability/tracing.ts",
+        "apps/api/test/integration/tracing.integration.test.ts",
+        "deploy/observability/tempo.yaml"
+      ],
+      "dependencies": {
+        "packages/common": [
+          "@opentelemetry/exporter-trace-otlp-http",
+          "@opentelemetry/instrumentation-http",
+          "@opentelemetry/resources",
+          "@opentelemetry/sdk-node"
+        ]
+      }
+    },
+    {
+      "id": "mail",
+      "title": "SMTP mail and the welcome-email job",
+      "group": "ops",
+      "remove": [
+        "packages/service/src/service/mail.service.ts",
+        "packages/service/src/service/impl/mail.service.impl.ts",
+        "apps/api/test/integration/mail.integration.test.ts"
+      ],
+      "dependencies": {
+        "packages/service": ["nodemailer", "@types/nodemailer"]
+      }
+    },
+    {
+      "id": "websocket",
+      "title": "WebSocket (wss://) on port 443",
+      "group": "realtime",
+      "default": true,
+      "requires": ["transports"],
+      "remove": [
+        "apps/api/src/config/transport/websocket.gateway.ts",
+        "apps/api/test/integration/websocket.integration.test.ts"
+      ],
+      "dependencies": {
+        "apps/api": ["ws", "@types/ws"]
+      }
+    },
+    {
+      "id": "sse",
+      "title": "Server-Sent Events stream",
+      "group": "realtime",
+      "default": true,
+      "remove": [
+        "apps/api/src/rest/resources/v1/event.resource.ts",
+        "apps/api/test/integration/sse.integration.test.ts"
+      ]
+    },
+    {
+      "id": "tcp",
+      "title": "TCP line protocol over TLS (ALPN on 443)",
+      "group": "realtime",
+      "requires": ["transports"],
+      "remove": [
+        "apps/api/src/config/transport/tcp.server.ts",
+        "apps/api/test/integration/tcp.integration.test.ts"
+      ]
+    },
+    {
+      "id": "transports",
+      "title": "Shared code for WebSocket and TCP",
+      "group": "internal",
+      "remove": ["apps/api/src/config/transport/transport-message.ts"]
+    },
+    {
+      "id": "experiments",
+      "title": "A/B experiments with sticky variants",
+      "group": "examples",
+      "remove": [
+        "apps/api/src/rest/resources/v1/experiment.resource.ts",
+        "packages/service/src/service/experiment.service.ts",
+        "packages/service/src/service/impl/experiment.service.impl.ts",
+        "packages/common/src/enumeration/experiment-variant.enum.ts",
+        "packages/common/src/constant/experiment.constants.ts",
+        "apps/api/test/integration/experiment.integration.test.ts",
+        "apps/api/test/unit/experiment.service.unit.test.ts"
+      ]
+    },
+    {
+      "id": "network",
+      "title": "ICMP ping endpoint (ops)",
+      "group": "examples",
+      "remove": [
+        "apps/api/src/rest/resources/v1/network.resource.ts",
+        "apps/api/src/rest/dto/v1/ping-request.dto.ts",
+        "packages/service/src/service/network.service.ts",
+        "packages/service/src/service/impl/network.service.impl.ts",
+        "apps/api/test/integration/network.integration.test.ts",
+        "apps/api/test/security/command-injection.security.test.ts"
+      ]
+    },
+    {
+      "id": "helm",
+      "title": "Helm chart and Argo CD apps for Kubernetes",
+      "group": "deploy",
+      "default": true,
+      "remove": ["deploy/helm", "deploy/argocd", ".github/workflows/helm.yml"]
+    }
+  ],
+  "presets": {
+    "minimal": [],
+    "standard": [
+      "auth-mtls",
+      "auth-hmac",
+      "auth-oauth2",
+      "redis",
+      "metrics",
+      "tracing",
+      "websocket",
+      "sse",
+      "helm"
+    ],
+    "full": "*"
+  }
+}

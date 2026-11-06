@@ -3,6 +3,7 @@ import {describe, expect, it} from 'vitest';
 import {TransportMessage} from '../../src/config/transport/transport-message.js';
 import {PingRequestDto} from '../../src/rest/dto/v1/ping-request.dto.js';
 
+// @feature:transports
 describe('TransportMessage', () => {
   it.each(['{"type":"ping"}', '{"type":"echo","a":1}'])('parses %s', (raw) => {
     expect(TransportMessage.parse(raw)?.type).toBeTypeOf('string');
@@ -19,7 +20,9 @@ describe('TransportMessage', () => {
     });
   });
 });
+// @end:transports
 
+// @feature:network
 describe('PingRequestDto', () => {
   it.each([
     '127.0.0.1',
@@ -37,6 +40,7 @@ describe('PingRequestDto', () => {
     },
   );
 });
+// @end:network
 
 describe('MemoryQueueBroker', () => {
   const waitFor = async (check: () => Promise<boolean>) => {
