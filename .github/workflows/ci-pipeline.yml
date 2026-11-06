@@ -93,6 +93,10 @@ jobs:
           node-version: 26
           cache: "pnpm"
 
+      # The CLI runs from source here, so it needs its own packages (ink).
+      - name: Install the CLI
+        run: pnpm install --frozen-lockfile --filter create-express-boilerplate
+
       # Every preset must stand on its own: the cut leaves no dangling code.
       - name: Create the project
         run: node packages/cli/src/main.ts create "$RUNNER_TEMP/app" --preset ${{ matrix.preset }} --name demo --yes
