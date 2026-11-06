@@ -8,7 +8,7 @@ ARG APP=@express-boilerplate/api
 FROM ${NODE_IMAGE} AS base
 ARG APP
 ENV APP=${APP}
-RUN npm install -g pnpm@12.16.1
+RUN npm install -g pnpm@12.18.0
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.base.json ./
 COPY apps/api/package.json ./apps/api/
