@@ -54,8 +54,8 @@ export class Main {
     });
     if (values.help) return console.log(CliConstants.USAGE);
 
-    // `create-express-boilerplate my-app` has no command word; with one
-    // (npx create-express-boilerplate generate ...) it acts like `eb`.
+    // `create-expresso my-app` has no command word; with one
+    // (npx create-expresso generate ...) it acts like `eb`.
     const [first, ...rest] = positionals;
     const bare = Invocation.isBareCreate(
       process.argv[1] ?? '',

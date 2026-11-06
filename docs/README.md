@@ -24,13 +24,13 @@ Three rules hold everywhere, from `pnpm dev` to production:
 
 ## Which path to take
 
-| You want to                         | Start with                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------ |
-| Build an API on this base           | `pnpm create express-boilerplate my-api`, then [Generator](generator.md) |
-| Hack on the API alone, fast reloads | [Local setup](local-setup.md), `pnpm dev`                                |
-| See everything running together     | [Docker compose](docker.md), `docker compose --profile full up --build`  |
-| Ship it                             | [Kubernetes](kubernetes.md)                                              |
-| Change the template itself          | [AGENTS.md](../AGENTS.md) (rules) and [Architecture](architecture.md)    |
+| You want to                         | Start with                                                              |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| Build an API on this base           | `pnpm create expresso my-api`, then [Generator](generator.md)           |
+| Hack on the API alone, fast reloads | [Local setup](local-setup.md), `pnpm dev`                               |
+| See everything running together     | [Docker compose](docker.md), `docker compose --profile full up --build` |
+| Ship it                             | [Kubernetes](kubernetes.md)                                             |
+| Change the template itself          | [AGENTS.md](../AGENTS.md) (rules) and [Architecture](architecture.md)   |
 
 ## Diagrams
 
