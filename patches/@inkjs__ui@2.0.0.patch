@@ -1,0 +1,45 @@
+diff --git a/build/theme.js b/build/theme.js
+index 85212dbda1e7c9b97f56fb2913ac48200d9175ed..4c1825d8f774b1b81d37cf63967d790d05f67638 100644
+--- a/build/theme.js
++++ b/build/theme.js
+@@ -1,5 +1,4 @@
+ import React, { createContext, useContext } from 'react';
+-import deepmerge from 'deepmerge';
+ import alertTheme from './components/alert/theme.js';
+ import badgeTheme from './components/badge/theme.js';
+ import confirmInputTheme from './components/confirm-input/theme.js';
+@@ -34,8 +33,21 @@ export const ThemeContext = createContext(defaultTheme);
+ export function ThemeProvider({ children, theme }) {
+     return (React.createElement(ThemeContext.Provider, { value: theme }, children));
+ }
++// Patched: deepmerge (GHSA-gcqx-w48m-w2h4, unfixed) replaced by a merge
++// that skips prototype keys.
++const UNSAFE = new Set(['__proto__', 'constructor', 'prototype']);
++const isPlain = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
++const merge = (target, source) => {
++    const result = { ...target };
++    for (const [key, value] of Object.entries(source)) {
++        if (UNSAFE.has(key))
++            continue;
++        result[key] = isPlain(value) && isPlain(result[key]) ? merge(result[key], value) : value;
++    }
++    return result;
++};
+ export const extendTheme = (originalTheme, newTheme) => {
+-    return deepmerge(originalTheme, newTheme);
++    return merge(originalTheme, newTheme);
+ };
+ export const useComponentTheme = (component) => {
+     const theme = useContext(ThemeContext);
+diff --git a/package.json b/package.json
+index 788f761414a437929cb919198e6eae5c0ca0040c..5a033d03ed289923a85b9abbbf35825c921d1d6f 100644
+--- a/package.json
++++ b/package.json
+@@ -33,7 +33,6 @@
+ 	"dependencies": {
+ 		"chalk": "^5.3.0",
+ 		"cli-spinners": "^3.0.0",
+-		"deepmerge": "^4.3.1",
+ 		"figures": "^6.1.0"
+ 	},
+ 	"devDependencies": {

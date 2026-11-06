@@ -15,6 +15,9 @@ overrides:
   # GHSA-3g3m-2fjr-6pw4 and GHSA-g3hv-75wg-m249. Drop when archiver-utils
   # moves to glob 14 itself.
   "archiver-utils>glob": 14.0.3
+  # deepmerge has an unfixed advisory (GHSA-gcqx-w48m-w2h4); the
+  # @inkjs/ui patch in patches/ replaces its one use, so it is not installed.
+  "@inkjs/ui>deepmerge": "-"
 # Supply-chain guard: refuse versions published less than 3 days ago
 # (most hijacked releases are caught and pulled within hours).
 minimumReleaseAge: 4320
@@ -52,3 +55,5 @@ minimumReleaseAgeExclude:
   - "rimraf@6.1.4"
 # Pin exact versions on `pnpm add` (pnpm 12 reads this here, not from .npmrc).
 saveExact: true
+patchedDependencies:
+  '@inkjs/ui@2.0.0': patches/@inkjs__ui@2.0.0.patch

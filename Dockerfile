@@ -11,6 +11,7 @@ ENV APP=${APP}
 RUN npm install -g pnpm@12.18.0
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.base.json ./
+COPY patches ./patches
 COPY apps/api/package.json ./apps/api/
 COPY packages/common/package.json ./packages/common/
 COPY packages/persistence/package.json ./packages/persistence/
