@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.5 (2026-11-09)</small>
+
+* Merge pull request #834 from MKAbuMattar/renovate/cycjimmy-semantic-release-action-8.x ([88107c3](https://github.com/MKAbuMattar/express-boilerplate/commit/88107c3)), closes [#834](https://github.com/MKAbuMattar/express-boilerplate/issues/834)
+* Merge pull request #850 from MKAbuMattar/renovate/all-minor-patch ([8dee5b0](https://github.com/MKAbuMattar/express-boilerplate/commit/8dee5b0)), closes [#850](https://github.com/MKAbuMattar/express-boilerplate/issues/850)
+* Merge pull request #851 from MKAbuMattar/renovate/biome ([5248097](https://github.com/MKAbuMattar/express-boilerplate/commit/5248097)), closes [#851](https://github.com/MKAbuMattar/express-boilerplate/issues/851)
+* fix(deps): update all non-major dependencies ([ef88e8d](https://github.com/MKAbuMattar/express-boilerplate/commit/ef88e8d))
+* chore(deps): update cycjimmy/semantic-release-action action to v8 ([fcc0ffa](https://github.com/MKAbuMattar/express-boilerplate/commit/fcc0ffa))
+* chore(deps): update dependency @biomejs/biome to v2.6.6 ([b9daf67](https://github.com/MKAbuMattar/express-boilerplate/commit/b9daf67))
+
 ## <small>3.0.4 (2026-11-09)</small>
 
 * fix(deps): update all non-major dependencies (#848) ([3fc5bb4](https://github.com/MKAbuMattar/express-boilerplate/commit/3fc5bb4)), closes [#848](https://github.com/MKAbuMattar/express-boilerplate/issues/848)
