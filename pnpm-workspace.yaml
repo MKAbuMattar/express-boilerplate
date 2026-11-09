@@ -14,7 +14,7 @@ overrides:
   # Dev-only (testcontainers > archiver > archiver-utils). Patched for
   # GHSA-3g3m-2fjr-6pw4 and GHSA-g3hv-75wg-m249. Drop when archiver-utils
   # moves to glob 14 itself.
-  "archiver-utils>glob": 14.0.3
+  "archiver-utils>glob": 14.0.4
   # deepmerge has an unfixed advisory (GHSA-gcqx-w48m-w2h4); the
   # @inkjs/ui patch in patches/ replaces its one use, so it is not installed.
   "@inkjs/ui>deepmerge": "-"
