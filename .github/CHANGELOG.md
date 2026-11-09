@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.4 (2026-11-09)</small>
+
+* fix(deps): update all non-major dependencies (#848) ([3fc5bb4](https://github.com/MKAbuMattar/express-boilerplate/commit/3fc5bb4)), closes [#848](https://github.com/MKAbuMattar/express-boilerplate/issues/848)
+
 ## <small>3.0.3 (2026-11-06)</small>
 
 * Merge pull request #847 from MKAbuMattar/fix/npm-create-entry ([758a6c8](https://github.com/MKAbuMattar/express-boilerplate/commit/758a6c8)), closes [#847](https://github.com/MKAbuMattar/express-boilerplate/issues/847)
