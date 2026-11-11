@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.6 (2026-11-11)</small>
+
+* fix(deps): update all non-major dependencies (#853) ([944fb88](https://github.com/MKAbuMattar/express-boilerplate/commit/944fb88)), closes [#853](https://github.com/MKAbuMattar/express-boilerplate/issues/853)
+* chore(deps): update azure/setup-helm action to v5.1.0 (#852) ([337095d](https://github.com/MKAbuMattar/express-boilerplate/commit/337095d)), closes [#852](https://github.com/MKAbuMattar/express-boilerplate/issues/852)
+
 ## <small>3.0.5 (2026-11-09)</small>
 
 * Merge pull request #834 from MKAbuMattar/renovate/cycjimmy-semantic-release-action-8.x ([88107c3](https://github.com/MKAbuMattar/express-boilerplate/commit/88107c3)), closes [#834](https://github.com/MKAbuMattar/express-boilerplate/issues/834)
