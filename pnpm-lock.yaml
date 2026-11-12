@@ -217,14 +217,14 @@ importers:
         specifier: workspace:*
         version: link:../../packages/service
       '@inversifyjs/http-core':
-        specifier: 5.9.3
-        version: 5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
+        specifier: 5.10.0
+        version: 5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
       '@inversifyjs/http-express':
-        specifier: 5.9.3
-        version: 5.9.3(express@5.3.0)(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
+        specifier: 5.10.0
+        version: 5.10.0(express@5.3.0)(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
       '@inversifyjs/http-open-api':
-        specifier: 5.9.3
-        version: 5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
+        specifier: 5.10.0
+        version: 5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
       compression:
         specifier: 1.8.2
         version: 1.8.2
@@ -253,8 +253,8 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
       ws:
-        specifier: 8.22.1
-        version: 8.22.1
+        specifier: 8.22.2
+        version: 8.22.2
     devDependencies:
       '@inversifyjs/open-api-types':
         specifier: 2.0.1
@@ -287,8 +287,8 @@ importers:
         specifier: 4.10.2
         version: 4.10.2
       jose:
-        specifier: 6.2.15
-        version: 6.2.15
+        specifier: 6.2.16
+        version: 6.2.16
       pino-pretty:
         specifier: 13.2.0
         version: 13.2.0
@@ -347,8 +347,8 @@ importers:
   packages/common:
     dependencies:
       '@inversifyjs/http-core':
-        specifier: 5.9.3
-        version: 5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
+        specifier: 5.10.0
+        version: 5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
       '@node-saml/node-saml':
         specifier: 5.2.0
         version: 5.2.0
@@ -377,8 +377,8 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
       jose:
-        specifier: 6.2.15
-        version: 6.2.15
+        specifier: 6.2.16
+        version: 6.2.16
       openid-client:
         specifier: 6.8.9
         version: 6.8.9
@@ -390,8 +390,8 @@ importers:
         version: 15.1.3
     devDependencies:
       '@inversifyjs/http-express':
-        specifier: 5.9.3
-        version: 5.9.3(express@5.3.0)(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
+        specifier: 5.10.0
+        version: 5.10.0(express@5.3.0)(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
       '@inversifyjs/open-api-types':
         specifier: 2.0.1
         version: 2.0.1
@@ -781,24 +781,24 @@ packages:
     peerDependencies:
       inversify: ^8.2.3
 
-  '@inversifyjs/http-core@5.9.3':
-    resolution: {integrity: sha512-fFjyd3J7tPfqm7yLmPftOINLqfyDBSLVCnFAA46MGBCMsmrXmf7HO/4y+zkte6rLaSdWr65gdS8NIxmeYuoqXA==}
+  '@inversifyjs/http-core@5.10.0':
+    resolution: {integrity: sha512-dVNE7yyTqDEOGbC73aT7i0OrjcsDCvMP5FWZYWUxkTH3W1JyZ5LrgXCoTHHnR0F39oQxn1WL8Y2H0FOwFWZKJg==}
     peerDependencies:
-      inversify: ^8.2.3
+      inversify: ^8.3.0
 
-  '@inversifyjs/http-express@5.9.3':
-    resolution: {integrity: sha512-oj5yaYkMB7sFz5KytyqBfwMfwSltr+hDHiTcu9R3FCzPLvndwo3sYnSMtWq/uZTRaNcZjKV2FcHmpcp9oUFLcg==}
+  '@inversifyjs/http-express@5.10.0':
+    resolution: {integrity: sha512-dYL7dB+fkYYOW/YOJMJSUlOFPR5nJoCVYXqlUS0LEAVvJ9sMoTw4+N1xqT7idh8eN1iJvVZ5eYgMAcUbxh+tNQ==}
     peerDependencies:
       express: ^5.3.0
-      inversify: ^8.2.3
+      inversify: ^8.3.0
 
-  '@inversifyjs/http-instrumentation-core@5.9.3':
-    resolution: {integrity: sha512-pZVdwbDC7t0tztGDGwR9Chb+V3C8BgRha2HTSd/g/2v7tFZz2qNSU+ekrpARv4SJ54CADyGHO/kBGDnIoyBsGQ==}
+  '@inversifyjs/http-instrumentation-core@5.10.0':
+    resolution: {integrity: sha512-4epx8fQe0tkxvNhmTHIVtk9qJ7sinw8yDecIfHvfKFi1CRWadRwKK4JMh47X7aS4fe4zbu6yBikhUg9G7Ea/HQ==}
 
-  '@inversifyjs/http-open-api@5.9.3':
-    resolution: {integrity: sha512-gNTFm6gPT3mlRVYtiWcJOotOR+WtNzFvu2Ef7py5BjrxhmfoAMStPHWAP4Drj2Kxm7pSwnjqOE28DCOOIQkr2Q==}
+  '@inversifyjs/http-open-api@5.10.0':
+    resolution: {integrity: sha512-Zq3XKwn/3aQiZYeM+KRIY3TocOkTmN0J/P/41G+pnZRMZedGVn0knVuQni6wk8P3lX8QljO2ThiZ2HdoSDbJ9g==}
     peerDependencies:
-      inversify: ^8.2.3
+      inversify: ^8.3.0
 
   '@inversifyjs/json-schema-pointer@2.0.1':
     resolution: {integrity: sha512-0c18ToRBS2lAzntdb8ApnGFBcUJrDkCmEzc3wtlG7H7ZGXk8fk98q1WeqAFfH/ZeYg2JK/O/4QcBBjFXB57hIA==}
@@ -2260,8 +2260,8 @@ packages:
   isarray@1.0.0:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
 
-  jose@6.2.15:
-    resolution: {integrity: sha512-qdF6ewcZARtef63fJ9AKKZPgxw+t7USH6HLXYcD4CrdmSvDp79rpJSPFEKc90QBeGS63u1KQtN2MZQHC0yDIzA==}
+  jose@6.2.16:
+    resolution: {integrity: sha512-4LSJpbuBuPdGrONCdZUy0xnxtLf8eEz+EY0SMXdHQEBU7bgUHDVblU/JAjryv3wID9/LK7/YuwFwq+AQNfMscQ==}
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -3264,8 +3264,8 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  ws@8.22.1:
-    resolution: {integrity: sha512-oyL6OPYme/CmiFvNuGzeoxCJ4nOrZE2O1FwM9MWM1AsGri6nLXB2pg+lNA8aLeXMSav0J6eIVS1j6vUPzUtK9g==}
+  ws@8.22.2:
+    resolution: {integrity: sha512-/rEZ2ejown2N5gxVTHUu9bVVC7ttu0/Tgzf5hbTOixR3Fs7mbbXgn2DbdbcKgJOmpQMtrIUWivtYuVMnp/W/yA==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -3551,11 +3551,11 @@ snapshots:
     transitivePeerDependencies:
       - reflect-metadata
 
-  '@inversifyjs/http-core@5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)':
+  '@inversifyjs/http-core@5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)':
     dependencies:
       '@inversifyjs/common': 2.0.2
       '@inversifyjs/framework-core': 2.2.2(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)
-      '@inversifyjs/http-instrumentation-core': 5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)
+      '@inversifyjs/http-instrumentation-core': 5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)
       '@inversifyjs/logger': 2.0.1(winston@3.19.0)
       '@inversifyjs/prototype-utils': 0.2.1
       '@inversifyjs/reflect-metadata-utils': 1.5.0(reflect-metadata@0.2.2)
@@ -3564,10 +3564,10 @@ snapshots:
       - reflect-metadata
       - winston
 
-  '@inversifyjs/http-express@5.9.3(express@5.3.0)(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)':
+  '@inversifyjs/http-express@5.10.0(express@5.3.0)(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)':
     dependencies:
-      '@inversifyjs/http-core': 5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
-      '@inversifyjs/http-instrumentation-core': 5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)
+      '@inversifyjs/http-core': 5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
+      '@inversifyjs/http-instrumentation-core': 5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)
       cookie-parser: 1.4.7
       express: 5.3.0
       inversify: 8.3.0(reflect-metadata@0.2.2)
@@ -3575,7 +3575,7 @@ snapshots:
       - reflect-metadata
       - winston
 
-  '@inversifyjs/http-instrumentation-core@5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)':
+  '@inversifyjs/http-instrumentation-core@5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)':
     dependencies:
       '@inversifyjs/common': 2.0.2
       '@inversifyjs/framework-core': 2.2.2(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)
@@ -3583,9 +3583,9 @@ snapshots:
       - inversify
       - reflect-metadata
 
-  '@inversifyjs/http-open-api@5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)':
+  '@inversifyjs/http-open-api@5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)':
     dependencies:
-      '@inversifyjs/http-core': 5.9.3(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
+      '@inversifyjs/http-core': 5.10.0(inversify@8.3.0(reflect-metadata@0.2.2))(reflect-metadata@0.2.2)(winston@3.19.0)
       '@inversifyjs/json-schema-pointer': 2.0.1
       '@inversifyjs/logger': 2.0.1(winston@3.19.0)
       '@inversifyjs/reflect-metadata-utils': 1.5.0(reflect-metadata@0.2.2)
@@ -4973,7 +4973,7 @@ snapshots:
 
   isarray@1.0.0: {}
 
-  jose@6.2.15: {}
+  jose@6.2.16: {}
 
   joycon@3.1.1: {}
 
@@ -5213,7 +5213,7 @@ snapshots:
 
   openid-client@6.8.9:
     dependencies:
-      jose: 6.2.15
+      jose: 6.2.16
       oauth4webapi: 3.8.8
 
   package-json-from-dist@1.0.1: {}
@@ -5983,7 +5983,7 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@8.22.1: {}
+  ws@8.22.2: {}
 
   xml-crypto@6.4.0:
     dependencies:
