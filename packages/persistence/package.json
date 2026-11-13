@@ -26,7 +26,7 @@
     "mysql2": "3.24.6",
     "pg": "8.23.1",
     "reflect-metadata": "0.2.2",
-    "sql.js": "1.15.2",
+    "sql.js": "1.16.0",
     "typeorm": "1.1.2"
   },
   "devDependencies": {
