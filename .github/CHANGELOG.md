@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.8 (2026-11-13)</small>
+
+* fix(deps): update all non-major dependencies (#855) ([7122511](https://github.com/MKAbuMattar/express-boilerplate/commit/7122511)), closes [#855](https://github.com/MKAbuMattar/express-boilerplate/issues/855)
+
 ## <small>3.0.7 (2026-11-12)</small>
 
 * fix(deps): update all non-major dependencies (#854) ([1a60d58](https://github.com/MKAbuMattar/express-boilerplate/commit/1a60d58)), closes [#854](https://github.com/MKAbuMattar/express-boilerplate/issues/854)
