@@ -18,7 +18,7 @@
     "@express-boilerplate/common": "workspace:*",
     "@express-boilerplate/persistence": "workspace:*",
     "inversify": "8.3.0",
-    "nodemailer": "10.4.0"
+    "nodemailer": "10.5.0"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
