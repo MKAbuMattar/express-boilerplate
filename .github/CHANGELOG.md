@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.10 (2026-11-14)</small>
+
+* fix(deps): update dependency bullmq to v6.7.4 (#857) ([7d25ba3](https://github.com/MKAbuMattar/express-boilerplate/commit/7d25ba3)), closes [#857](https://github.com/MKAbuMattar/express-boilerplate/issues/857)
+
 ## <small>3.0.9 (2026-11-13)</small>
 
 * fix(deps): update all non-major dependencies (#856) ([ad80b84](https://github.com/MKAbuMattar/express-boilerplate/commit/ad80b84)), closes [#856](https://github.com/MKAbuMattar/express-boilerplate/issues/856)
