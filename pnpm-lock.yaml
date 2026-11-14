@@ -365,8 +365,8 @@ importers:
         specifier: 0.301.1
         version: 0.301.1(@opentelemetry/api@1.10.0)
       bullmq:
-        specifier: 6.7.3
-        version: 6.7.3(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0))
+        specifier: 6.7.4
+        version: 6.7.4(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0))
       envalid:
         specifier: 9.0.0
         version: 9.0.0
@@ -1702,8 +1702,8 @@ packages:
     resolution: {integrity: sha512-lHblz4ahamxpTmnsk+MNTRWsjYKv965MwOrSJyeD588rR3Jcu7swE+0wN5F+PbL5cjgu/9ObkhfzEPuofEMwLA==}
     engines: {node: '>=10.0.0'}
 
-  bullmq@6.7.3:
-    resolution: {integrity: sha512-0ROchqVhgJw2ajv62GrN1cGMpDabxpTJAp5ZDlm/qL7f+B+CdFJAcu70U3zbD/D3hc6NZxbdHvRMPTC0aEl77A==}
+  bullmq@6.7.4:
+    resolution: {integrity: sha512-wSNRD2kUE+sqNV42MQLiwtOPgwJmhiZlZ0X5zYBYXRkmok6YKJMf9IXfYLCu7DI4/txNTBlT2g2NHfRW/PxCvw==}
     engines: {node: '>=14.18.0'}
     peerDependencies:
       bullmq-otel: '>=2.0.0'
@@ -4409,7 +4409,7 @@ snapshots:
   buildcheck@0.0.7:
     optional: true
 
-  bullmq@6.7.3(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0)):
+  bullmq@6.7.4(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0)):
     dependencies:
       cron-parser: 5.10.4
       msgpackr: 2.1.4
