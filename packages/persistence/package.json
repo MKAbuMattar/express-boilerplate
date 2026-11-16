@@ -22,12 +22,12 @@
   "dependencies": {
     "@express-boilerplate/common": "workspace:*",
     "inversify": "8.3.0",
-    "mongodb": "7.8.0",
+    "mongodb": "7.9.0",
     "mysql2": "3.24.6",
     "pg": "8.23.1",
     "reflect-metadata": "0.2.2",
     "sql.js": "1.16.0",
-    "typeorm": "1.1.2"
+    "typeorm": "1.1.3"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
