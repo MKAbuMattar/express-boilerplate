@@ -41,7 +41,7 @@
     "pino": "10.4.0",
     "pino-http": "11.0.0",
     "reflect-metadata": "0.2.2",
-    "ws": "8.22.2"
+    "ws": "8.23.0"
   },
   "devDependencies": {
     "@inversifyjs/open-api-types": "2.0.1",
