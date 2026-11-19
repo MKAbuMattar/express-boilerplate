@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.14 (2026-11-19)</small>
+
+* fix(deps): update all non-major dependencies (#862) ([6e9934f](https://github.com/MKAbuMattar/express-boilerplate/commit/6e9934f)), closes [#862](https://github.com/MKAbuMattar/express-boilerplate/issues/862)
+* chore(deps): update dependency @biomejs/biome to v2.6.8 (#863) ([810c46a](https://github.com/MKAbuMattar/express-boilerplate/commit/810c46a)), closes [#863](https://github.com/MKAbuMattar/express-boilerplate/issues/863)
+
 ## <small>3.0.13 (2026-11-17)</small>
 
 * fix(deps): update all non-major dependencies (#861) ([5a2a1e7](https://github.com/MKAbuMattar/express-boilerplate/commit/5a2a1e7)), closes [#861](https://github.com/MKAbuMattar/express-boilerplate/issues/861)
