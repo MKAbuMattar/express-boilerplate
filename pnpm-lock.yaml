@@ -444,8 +444,8 @@ importers:
         specifier: 8.3.0
         version: 8.3.0(reflect-metadata@0.2.2)
       nodemailer:
-        specifier: 10.5.0
-        version: 10.5.0
+        specifier: 10.6.0
+        version: 10.6.0
     devDependencies:
       '@types/node':
         specifier: 26.6.6
@@ -2518,8 +2518,8 @@ packages:
     resolution: {integrity: sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw==}
     hasBin: true
 
-  nodemailer@10.5.0:
-    resolution: {integrity: sha512-L/w/HH5MqpzMDuZD7fQdt/+KqymuvrpaApaIjAH2XA3ILePwlcvXCVVvP75xVrXCEt2ggK2marrrHHFB5Qu0kA==}
+  nodemailer@10.6.0:
+    resolution: {integrity: sha512-jWanL7D9GD3jvUDYKmoC5rWTiG8MnBgnN2yV68bgMKip1zUJhiSTyz7Eg+18y8sk5OvdVDzws5nZK5arSI4f5Q==}
     engines: {node: '>=20.0.0'}
 
   normalize-path@3.0.0:
@@ -5163,7 +5163,7 @@ snapshots:
       detect-libc: 2.1.2
     optional: true
 
-  nodemailer@10.5.0: {}
+  nodemailer@10.6.0: {}
 
   normalize-path@3.0.0: {}
 
