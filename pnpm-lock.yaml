@@ -349,8 +349,8 @@ importers:
         specifier: 0.301.2
         version: 0.301.2(@opentelemetry/api@1.10.0)
       bullmq:
-        specifier: 6.7.6
-        version: 6.7.6(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0))
+        specifier: 6.7.7
+        version: 6.7.7(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0))
       envalid:
         specifier: 9.0.0
         version: 9.0.0
@@ -1686,8 +1686,8 @@ packages:
     resolution: {integrity: sha512-lHblz4ahamxpTmnsk+MNTRWsjYKv965MwOrSJyeD588rR3Jcu7swE+0wN5F+PbL5cjgu/9ObkhfzEPuofEMwLA==}
     engines: {node: '>=10.0.0'}
 
-  bullmq@6.7.6:
-    resolution: {integrity: sha512-ykp2HGMkOz8BtuE/FBFRMetpI6RHDyFvAkUawqKJv7sDWIaZPz1cPtpzIad879iwW2oMJY4CFMPvfBKnWdB3Rw==}
+  bullmq@6.7.7:
+    resolution: {integrity: sha512-UYCta40FLxOTEYqFZmwvQhnqqYbUCkYRsjOhCyQ6/fH5vbRsHvQPEljorbE7Jm4w5uyfZV9ri3N1U95mskGgLg==}
     engines: {node: '>=14.18.0'}
     peerDependencies:
       bullmq-otel: '>=2.0.0'
@@ -1865,8 +1865,8 @@ packages:
     resolution: {integrity: sha512-piICUB6ei4IlTv1+653yq5+KoqfBYmj9bw6LqXoOneTMDXk5nM1qt12mFW1caG3LlJXEKW1Bp0WggEmIfQB34g==}
     engines: {node: '>= 14'}
 
-  cron-parser@5.10.4:
-    resolution: {integrity: sha512-TagNqYzoV/C7Ty7VAQjrQg+57WsEOuQEUh0tWT5Dc+l/GOuoAdWVIzFU0CqYdQswqdjUalrdmOvaMtQhErYZTA==}
+  cron-parser@5.10.5:
+    resolution: {integrity: sha512-zxFew0gkBdb9HudAqeNLIZ2Phczw8oQDGDMYc1HUYvAaxZqhML2gZyUwVqaOs23YKDWXRRvd/nNo0ycGdXt80A==}
     engines: {node: '>=18'}
 
   csstype@3.2.3:
@@ -4393,9 +4393,9 @@ snapshots:
   buildcheck@0.0.7:
     optional: true
 
-  bullmq@6.7.6(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0)):
+  bullmq@6.7.7(ioredis@6.0.0)(pg@8.23.1)(redis@6.3.1(@opentelemetry/api@1.10.0)):
     dependencies:
-      cron-parser: 5.10.4
+      cron-parser: 5.10.5
       msgpackr: 2.1.4
       node-abort-controller: 3.1.1
       semver: 7.8.6
@@ -4553,7 +4553,7 @@ snapshots:
       crc-32: 1.2.2
       readable-stream: 4.8.0
 
-  cron-parser@5.10.4:
+  cron-parser@5.10.5:
     dependencies:
       luxon: 3.7.2
 
