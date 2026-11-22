@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.16 (2026-11-22)</small>
+
+* fix(deps): update all non-major dependencies (#868) ([822708f](https://github.com/MKAbuMattar/express-boilerplate/commit/822708f)), closes [#868](https://github.com/MKAbuMattar/express-boilerplate/issues/868)
+* chore(deps): update all non-major dependencies (#866) ([53d3e19](https://github.com/MKAbuMattar/express-boilerplate/commit/53d3e19)), closes [#866](https://github.com/MKAbuMattar/express-boilerplate/issues/866)
+* chore(deps): update vitest to v5.1.1 (#867) ([830ed8a](https://github.com/MKAbuMattar/express-boilerplate/commit/830ed8a)), closes [#867](https://github.com/MKAbuMattar/express-boilerplate/issues/867)
+
 ## <small>3.0.15 (2026-11-20)</small>
 
 * fix(deps): update all non-major dependencies (#865) ([66e3dec](https://github.com/MKAbuMattar/express-boilerplate/commit/66e3dec)), closes [#865](https://github.com/MKAbuMattar/express-boilerplate/issues/865)
