@@ -21,11 +21,11 @@
     "@opentelemetry/instrumentation-http": "0.301.2",
     "@opentelemetry/resources": "3.1.1",
     "@opentelemetry/sdk-node": "0.301.2",
-    "bullmq": "6.7.7",
+    "bullmq": "6.7.8",
     "envalid": "9.0.0",
     "inversify": "8.3.0",
     "ioredis": "6.0.0",
-    "jose": "6.2.17",
+    "jose": "6.2.18",
     "openid-client": "6.9.0",
     "pino": "10.4.0",
     "prom-client": "15.1.3"
