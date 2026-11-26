@@ -24,7 +24,7 @@
     "bullmq": "6.7.8",
     "envalid": "9.0.0",
     "inversify": "8.3.0",
-    "ioredis": "6.0.0",
+    "ioredis": "6.1.0",
     "jose": "6.2.18",
     "openid-client": "6.9.1",
     "pino": "10.4.0",
