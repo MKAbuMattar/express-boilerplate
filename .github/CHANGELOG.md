@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.20 (2026-11-27)</small>
+
+* fix(deps): update dependency ioredis to v6.1.0 (#873) ([c524e8f](https://github.com/MKAbuMattar/express-boilerplate/commit/c524e8f)), closes [#873](https://github.com/MKAbuMattar/express-boilerplate/issues/873)
+* chore(deps): update pnpm to v12.23.0 (#872) ([ff3ee4d](https://github.com/MKAbuMattar/express-boilerplate/commit/ff3ee4d)), closes [#872](https://github.com/MKAbuMattar/express-boilerplate/issues/872)
+
 ## <small>3.0.19 (2026-11-25)</small>
 
 * fix(deps): update all non-major dependencies (#871) ([d70c5cc](https://github.com/MKAbuMattar/express-boilerplate/commit/d70c5cc)), closes [#871](https://github.com/MKAbuMattar/express-boilerplate/issues/871)
