@@ -34,7 +34,7 @@
     "@inversifyjs/http-express": "5.10.1",
     "@inversifyjs/open-api-types": "2.0.1",
     "@types/express": "5.0.6",
-    "@types/node": "26.6.6",
+    "@types/node": "26.6.10",
     "rimraf": "6.1.4",
     "typescript": "7.0.2"
   },
