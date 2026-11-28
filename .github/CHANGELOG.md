@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## <small>3.0.21 (2026-11-28)</small>
+
+* fix(deps): update dependency bullmq to v6.7.10 (#874) ([cb3ee39](https://github.com/MKAbuMattar/express-boilerplate/commit/cb3ee39)), closes [#874](https://github.com/MKAbuMattar/express-boilerplate/issues/874)
+
 ## <small>3.0.20 (2026-11-27)</small>
 
 * fix(deps): update dependency ioredis to v6.1.0 (#873) ([c524e8f](https://github.com/MKAbuMattar/express-boilerplate/commit/c524e8f)), closes [#873](https://github.com/MKAbuMattar/express-boilerplate/issues/873)
